@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.fseventsd
+
+# Claude Code
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+
+# Node.js
+publicity-server/node_modules/
+
+# Working directories
+incoming/
+preview/
+temp/
+
+# Raw SDIF files
+*.sd3
+*.zip
+
+# Logs
+*.log

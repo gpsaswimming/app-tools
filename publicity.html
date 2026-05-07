@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPSA Meet Publicity Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- JSZip for .zip file extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Favicon Links -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://assets.gpsaswimming.org/img/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://assets.gpsaswimming.org/img/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://assets.gpsaswimming.org/img/favicons/favicon-16x16.png">
+    <link rel="mask-icon" href="https://assets.gpsaswimming.org/img/favicons/safari-pinned-tab.svg" color="#002366">
+    <meta name="msapplication-TileColor" content="#002366">
+    <meta name="theme-color" content="#002366">
+    <!-- GPSA Common Styles -->
+    <link rel="stylesheet" href="https://css.gpsaswimming.org/gpsa-tools-common.css">
+</head>
+<body>
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <header class="gpsa-header p-4 shadow-md flex items-center justify-center no-print mb-6 rounded-lg">
+                <img id="logo-display" src="https://assets.gpsaswimming.org/img/gpsa_logo.png" alt="GPSA Logo" class="h-16 w-16 md:h-20 md:w-20 mr-4 rounded-full" onerror="this.onerror=null; this.src='https://placehold.co/100x100/002366/FFFFFF?text=GPSA';">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold">GPSA Meet Publicity Tool</h1>
+                    <p class="gpsa-header-subtitle">Generate formatted HTML results from SDIF meet files.</p>
+                </div>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-center mb-6 text-gray-700">Upload Results File</h2>
+            <div class="flex items-center justify-center w-full">
+                <label for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                        <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span></p>
+                        <p id="file-name" class="text-xs text-gray-500">SDIF file (.sd3, .txt, or .zip)</p>
+                    </div>
+                    <input id="file-upload" type="file" accept=".txt,.sd3,.zip" />
+                </label>
+            </div>
+            <button id="process-button" class="mt-6 w-full btn-primary font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all disabled:opacity-50" disabled>
+                Process Results
+            </button>
+        </div>
+
+        <!-- Special Circumstances Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
+            <h2 class="text-2xl font-bold mb-4 text-gray-700">Special Circumstances (Optional)</h2>
+            <div class="space-y-4">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="override-checkbox" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="ml-3 text-gray-700 font-medium">This meet has special circumstances (forfeit, cancellation, etc.)</span>
+                </label>
+
+                <div id="override-details" class="hidden mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p class="text-sm text-gray-600 mb-4">Configure the meet outcome and provide an explanation for the override.</p>
+
+                    <div class="mb-4">
+                        <label for="winning-team-select" class="block text-sm font-medium text-gray-700 mb-2">Winning Team</label>
+                        <select id="winning-team-select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                            <option value="">-- Upload and process file first --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Forfeit Score</label>
+                        <div class="flex items-center gap-4 text-sm text-gray-600">
+                            <span>Winner: <strong>1.0</strong></span>
+                            <span>•</span>
+                            <span>Loser: <strong>0.0</strong></span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Standard forfeit scoring ensures correct win/loss tracking in season archives.</p>
+                    </div>
+
+                    <div>
+                        <label for="override-reason" class="block text-sm font-medium text-gray-700 mb-2">Reason for Override</label>
+                        <textarea id="override-reason" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Example: Team forfeited due to insufficient swimmers"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="text-center p-10 hidden">
+            <p class="text-lg font-semibold">Parsing swim data and generating results...</p>
+        </div>
+        
+        <div id="export-section" class="text-center my-8 hidden">
+             <button id="export-button" class="btn-secondary font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                Export to HTML
+            </button>
+        </div>
+
+            <div id="results-container">
+                <!-- Results will be dynamically injected here -->
+                <div id="meet-title" class="text-center mb-8"></div>
+                <div id="team-scores" class="mb-8"></div>
+                <div id="events-grid" class="space-y-8"></div>
+            </div>
+            <footer class="text-center mt-10 text-gray-500 text-sm">
+                 <p>GPSA Meet Publicity Tool v<span id="version-display"></span></p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script type="module">
+        // Import shared parsing logic from core module
+        import {
+            escapeHtml,
+            parseAgeCode,
+            parseSdif,
+            validateDualMeet,
+            applyForfeitScores,
+            generateExportableHtml,
+            generateFilename,
+            LOGO_URL,
+            VERSION
+        } from './lib/publicity-core.js';
+
+        // DOM Elements
+        const fileUploadInput = document.getElementById('file-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        const logoDisplay = document.getElementById('logo-display');
+        const processButton = document.getElementById('process-button');
+        const loadingDiv = document.getElementById('loading');
+        const resultsContainer = document.getElementById('results-container');
+        const meetTitleDiv = document.getElementById('meet-title');
+        const teamScoresDiv = document.getElementById('team-scores');
+        const eventsGridDiv = document.getElementById('events-grid');
+        const exportSection = document.getElementById('export-section');
+        const exportButton = document.getElementById('export-button');
+        const overrideCheckbox = document.getElementById('override-checkbox');
+        const overrideDetails = document.getElementById('override-details');
+        const winningTeamSelect = document.getElementById('winning-team-select');
+        const overrideReason = document.getElementById('override-reason');
+
+        let fileContent = '';
+        let parsedData = null;
+        let overrideData = null; // Stores override information
+
+        // Set version from shared module
+        document.getElementById('version-display').textContent = VERSION;
+
+        // Toast Notification Function (browser-specific)
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            toast.innerHTML = `
+                <span class="toast-icon" aria-hidden="true">${icons[type]}</span>
+                <span class="toast-message">${escapeHtml(message)}</span>
+                <button class="toast-close" aria-label="Close notification">×</button>
+            `;
+
+            container.appendChild(toast);
+
+            const closeBtn = toast.querySelector('.toast-close');
+            const removeToast = () => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            };
+
+            closeBtn.addEventListener('click', removeToast);
+
+            if (duration > 0) {
+                setTimeout(removeToast, duration);
+            }
+
+            return toast;
+        }
+
+        // --- Zip File Extraction ---
+        async function extractSdifFromZip(file) {
+            // Check file size (256KB limit)
+            const maxSize = 256 * 1024; // 256KB in bytes
+            if (file.size > maxSize) {
+                showToast(`Zip file is too large (${(file.size / 1024).toFixed(1)}KB). Maximum size is 256KB.`, 'error', 6000);
+                return null;
+            }
+
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const sdifFiles = [];
+
+                // Find all .sd3 and .txt files in the zip
+                zip.forEach((relativePath, zipEntry) => {
+                    const fileName = relativePath.toLowerCase();
+                    if ((fileName.endsWith('.sd3') || fileName.endsWith('.txt')) && !zipEntry.dir) {
+                        sdifFiles.push({ name: relativePath, entry: zipEntry });
+                    }
+                });
+
+                if (sdifFiles.length === 0) {
+                    showToast('No SDIF files (.sd3 or .txt) found in the zip archive.', 'error', 6000);
+                    return null;
+                }
+
+                if (sdifFiles.length > 1) {
+                    showToast(`Found ${sdifFiles.length} SDIF files in zip. Using: ${sdifFiles[0].name}`, 'info', 6000);
+                }
+
+                // Extract the first SDIF file
+                const sdifContent = await sdifFiles[0].entry.async('text');
+                showToast(`Successfully extracted: ${sdifFiles[0].name}`, 'success');
+                return sdifContent;
+
+            } catch (error) {
+                showToast(`Failed to extract zip file: ${error.message}`, 'error', 6000);
+                return null;
+            }
+        }
+
+        // --- Helper Functions for Override Functionality ---
+        function populateTeamDropdown(data) {
+            const teams = Object.values(data.teams);
+            winningTeamSelect.innerHTML = '<option value="">-- Select winning team --</option>';
+            teams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team.code;
+                option.textContent = team.name;
+                option.dataset.fullName = team.name;
+                winningTeamSelect.appendChild(option);
+            });
+            winningTeamSelect.disabled = false;
+        }
+
+        function prepareOverrideData(data) {
+            if (!overrideCheckbox.checked) {
+                overrideData = null;
+                return;
+            }
+
+            const winnerCode = winningTeamSelect.value;
+            const reason = overrideReason.value.trim();
+
+            if (!winnerCode) {
+                showToast('Please select a winning team for the override.', 'warning');
+                overrideData = null;
+                return;
+            }
+
+            if (!reason) {
+                showToast('Please provide a reason for the override.', 'warning');
+                overrideData = null;
+                return;
+            }
+
+            const teams = Object.values(data.teams);
+            const winnerTeam = teams.find(t => t.code === winnerCode);
+            const loserTeam = teams.find(t => t.code !== winnerCode);
+
+            if (!winnerTeam || !loserTeam) {
+                showToast('Could not identify teams for override.', 'error');
+                overrideData = null;
+                return;
+            }
+
+            overrideData = {
+                winnerCode: winnerTeam.code,
+                winnerName: winnerTeam.name,
+                loserCode: loserTeam.code,
+                loserName: loserTeam.name,
+                reason: reason
+            };
+        }
+
+        // applyForfeitScores is imported from publicity-core.mjs
+
+        fileUploadInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fileNameDisplay.textContent = file.name;
+            fileContent = '';
+            processButton.disabled = true;
+
+            // Check if file is a zip
+            if (file.name.toLowerCase().endsWith('.zip')) {
+                const extractedContent = await extractSdifFromZip(file);
+                if (extractedContent) {
+                    fileContent = extractedContent;
+                    processButton.disabled = false;
+                } else {
+                    fileNameDisplay.textContent = 'SDIF file (.sd3, .txt, or .zip)';
+                    showToast('Please upload a valid SDIF file or zip archive.', 'error');
+                }
+            } else {
+                // Handle regular .sd3 or .txt files
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    fileContent = e.target.result;
+                    processButton.disabled = !fileContent;
+                };
+                reader.onerror = () => {
+                    showToast('Failed to read file. Please try again.', 'error');
+                    fileNameDisplay.textContent = 'SDIF file (.sd3, .txt, or .zip)';
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Override checkbox toggle
+        overrideCheckbox.addEventListener('change', (event) => {
+            if (event.target.checked) {
+                overrideDetails.classList.remove('hidden');
+            } else {
+                overrideDetails.classList.add('hidden');
+            }
+        });
+
+        processButton.addEventListener('click', () => {
+            loadingDiv.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            exportSection.classList.add('hidden');
+
+            setTimeout(() => {
+                parsedData = parseSdif(fileContent);
+
+                // Validate this is a dual meet (exactly 2 teams)
+                const dualMeetValidation = validateDualMeet(parsedData);
+                if (!dualMeetValidation.valid) {
+                    loadingDiv.classList.add('hidden');
+                    showToast(dualMeetValidation.error, 'error', 8000);
+                    return;
+                }
+
+                // Populate team dropdown for override functionality
+                populateTeamDropdown(parsedData);
+
+                // Prepare override data if checkbox is checked
+                // Note: This validates the override inputs and sets overrideData
+                prepareOverrideData(parsedData);
+
+                // Render results (will apply override if enabled)
+                renderResults(parsedData);
+
+                loadingDiv.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+                exportSection.classList.remove('hidden');
+            }, 500);
+        });
+
+        // Add event listener to re-process when override settings change
+        winningTeamSelect.addEventListener('change', () => {
+            if (parsedData && overrideCheckbox.checked) {
+                prepareOverrideData(parsedData);
+                renderResults(parsedData);
+            }
+        });
+
+        overrideReason.addEventListener('blur', () => {
+            if (parsedData && overrideCheckbox.checked) {
+                prepareOverrideData(parsedData);
+                renderResults(parsedData);
+            }
+        });
+        
+        exportButton.addEventListener('click', () => {
+            if (!parsedData) return;
+
+            // Validate override data if checkbox is checked
+            if (overrideCheckbox.checked) {
+                prepareOverrideData(parsedData);
+                if (!overrideData) {
+                    showToast('Please complete the override settings before exporting.', 'error');
+                    return;
+                }
+            }
+
+            // Use imported generateFilename function
+            const fileName = generateFilename(parsedData);
+
+            // Pass overrideData to generateExportableHtml
+            const exportableHtml = generateExportableHtml(parsedData, LOGO_URL, overrideData);
+            const blob = new Blob([exportableHtml], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Results exported successfully!', 'success');
+        });
+
+        // parseSdif, parseAgeCode imported from publicity-core.mjs
+
+        // --- HTML Rendering Logic (browser-specific) ---
+        function renderResults(data) {
+            parsedData = data; // Save for export
+
+            // Apply forfeit scores if override is enabled
+            if (overrideData) {
+                applyForfeitScores(data, overrideData);
+            }
+
+            const { meet, teams, events } = data;
+
+            // Clear previous results
+            meetTitleDiv.innerHTML = '';
+            teamScoresDiv.innerHTML = '';
+            eventsGridDiv.innerHTML = '';
+
+            // Render Meet Title
+            meetTitleDiv.innerHTML = `<h2 class="text-3xl font-bold text-gray-800">${meet.name || 'Swim Meet'}</h2>`;
+
+            // Render Override Banner (if applicable)
+            if (overrideData) {
+                const bannerHtml = `
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    <strong class="font-bold">⚠️ MEET RESULTS OVERRIDDEN</strong><br>
+                                    <strong>Winner:</strong> ${escapeHtml(overrideData.winnerName)}<br>
+                                    <strong>Reason:</strong> ${escapeHtml(overrideData.reason)}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                meetTitleDiv.innerHTML += bannerHtml;
+            }
+
+            // Render Team Scores
+            const sortedTeams = Object.values(teams).sort((a, b) => b.score - a.score);
+            let scoresHtml = `<div class="bg-white p-4 sm:p-6 rounded-xl shadow-md"><h3 class="text-2xl font-semibold mb-4 text-center">Team Scores</h3><div class="overflow-x-auto"><table class="min-w-full"><thead><tr class="border-b"><th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th><th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th></tr></thead><tbody>`;
+            sortedTeams.forEach(team => {
+                scoresHtml += `<tr class="border-t"><td class="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${team.name}</td><td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">${team.score.toFixed(1)}</td></tr>`;
+            });
+            scoresHtml += `</tbody></table></div></div>`;
+            teamScoresDiv.innerHTML = scoresHtml;
+
+            // --- RENDER WINNERS TABLE ---
+            const winners = [];
+            Object.keys(events).sort((a,b) => parseInt(a) - parseInt(b)).forEach(eventNum => {
+                const event = events[eventNum];
+                const winner = event.results.find(r => r.place === 1);
+                if (winner) {
+                    winners.push({ eventNum, description: event.description, winnerData: winner, type: event.type });
+                }
+            });
+
+            if (winners.length > 0) {
+                let winnersHtml = `<div class="bg-white p-4 sm:p-6 rounded-xl shadow-md"><h4 class="text-xl font-bold mb-4 text-center">Event Winners</h4><div class="overflow-x-auto"><table class="min-w-full"><thead><tr class="border-b"><th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th><th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th><th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Winner(s)</th><th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th><th class="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th></tr></thead><tbody>`;
+                winners.forEach(w => {
+                    const result = w.winnerData;
+                    let winnerCellContent = (w.type === 'Relay' && result.swimmers?.length) ? `<div class="text-xs leading-tight">${result.swimmers.join('<br>')}</div>` : `<span class="font-medium">${result.swimmer}</span>`;
+                    winnersHtml += `<tr class="border-t"><td class="px-3 py-4 align-top">${w.eventNum}</td><td class="px-3 py-4 align-top">${w.description}</td><td class="px-3 py-4 align-top">${winnerCellContent}</td><td class="px-3 py-4 align-top">${result.teamCode || ''}</td><td class="px-3 py-4 align-top">${result.time}</td></tr>`;
+                });
+                winnersHtml += `</tbody></table></div></div>`;
+                eventsGridDiv.innerHTML = winnersHtml;
+            }
+        }
+
+        // generateExportableHtml imported from publicity-core.mjs
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPSA Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://css.gpsaswimming.org/gpsa-tools-common.css">
+</head>
+<body>
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <header class="gpsa-header p-4 shadow-md flex items-center justify-center no-print mb-6 rounded-lg">
+                <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png"
+                     alt="GPSA Logo"
+                     class="h-16 w-16 md:h-20 md:w-20 mr-4 rounded-full"
+                     onerror="this.onerror=null; this.src='https://placehold.co/100x100/002366/FFFFFF?text=GPSA';">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold">GPSA Tools</h1>
+                    <p class="gpsa-header-subtitle">Browser-based utilities for meet management.</p>
+                </div>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <ul class="divide-y divide-gray-100">
+                    <li class="py-4">
+                        <a href="publicity.html" class="flex items-start gap-4 hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
+                            <div>
+                                <p class="font-semibold text-gray-900">Meet Publicity Tool</p>
+                                <p class="text-sm text-gray-500 mt-0.5">Generate formatted HTML results from SDIF meet files. Supports forfeit/override functionality.</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="py-4">
+                        <a href="roster.html" class="flex items-start gap-4 hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors">
+                            <div>
+                                <p class="font-semibold text-gray-900">Roster Formatter</p>
+                                <p class="text-sm text-gray-500 mt-0.5">Process SwimTopia CSV exports to generate roster, contacts, and officials HTML.</p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

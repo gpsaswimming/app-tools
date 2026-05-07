@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swim Team Roster Formatter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- GPSA Common Styles -->
+    <link rel="stylesheet" href="https://css.gpsaswimming.org/gpsa-tools-common.css">
+    <style>
+
+        /* --- SCRIPT CLASS OVERRIDES --- */
+        /* These rules override styles set by the script to match the new theme */
+        .text-blue-600 { color: #002366 !important; }
+        .border-blue-600 { border-color: #002366 !important; }
+
+        /* Remap old button colors to new theme colors */
+        .bg-blue-500 { background-color: #002366 !important; }
+        .bg-blue-600 { background-color: #002366 !important; }
+        .hover\:bg-blue-600:hover { background-color: #0033a0 !important; }
+        .hover\:bg-blue-700:hover { background-color: #0033a0 !important; }
+        
+        .bg-green-600 { background-color: #002366 !important; }
+        .hover\:bg-green-700:hover { background-color: #0033a0 !important; }
+        
+        .bg-purple-600 { background-color: #d9242b !important; }
+        .hover\:bg-purple-700:hover { background-color: #b81e24 !important; }
+        
+        .bg-cyan-600 { background-color: #d9242b !important; }
+        .hover\:bg-cyan-700:hover { background-color: #b81e24 !important; }
+        
+        /* Roster Table Header */
+        #roster-output .bg-sky-100 { background-color: #f3f4f6 !important; }
+
+        /* Roster-specific print styles */
+        @media print {
+            body, #roster-output-container { margin: 0; padding: 0; border: none; box-shadow: none; }
+            main { padding: 0; }
+        }
+
+        /* Input Validation Styles */
+        .input-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+
+        .input-success {
+            border-color: #10b981 !important;
+        }
+
+        .input-helper-text {
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .input-helper-error {
+            color: #ef4444;
+        }
+
+        .input-helper-success {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <header class="gpsa-header p-4 shadow-md flex items-center justify-center no-print mb-6 rounded-lg">
+                <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png" alt="GPSA Logo" class="h-16 w-16 md:h-20 md:w-20 mr-4 rounded-full" onerror="this.onerror=null; this.src='https://placehold.co/100x100/002366/FFFFFF?text=GPSA';">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold">Swim Team Roster Formatter</h1>
+                    <p class="gpsa-header-subtitle">A tool for team rosters, contacts, and officials.</p>
+                </div>
+            </header>
+
+            <!-- Tabs -->
+            <div class="mb-4 border-b border-gray-200 no-print">
+                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" role="tablist">
+                    <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="data-tab" type="button" role="tab" aria-controls="data-content" aria-selected="true">Roster Input</button></li>
+                    <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="contacts-tab" type="button" role="tab" aria-controls="contacts-content" aria-selected="false">Contacts</button></li>
+                    <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="officials-tab" type="button" role="tab" aria-controls="officials-content" aria-selected="false">Officials</button></li>
+                    <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="roster-tab" type="button" role="tab" aria-controls="roster-content" aria-selected="false">Formatted Roster</button></li>
+                </ul>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="tabContent">
+                <!-- Roster Input Tab -->
+                <div id="data-content" role="tabpanel" aria-labelledby="data-tab">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4 text-gray-700">1. Export Your Roster from SwimTopia</h2>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-700 bg-gray-50 p-4 rounded-md">
+                            <li>Log into your team's SwimTopia website.</li>
+                            <li>Navigate to <strong>Reports &gt; Athlete Roster</strong>.</li>
+                            <li>Click the <strong>Generate Report</strong> button.</li>
+                            <li>On the top right, click <strong>Download Athlete Roster Data (CSV)</strong>.</li>
+                        </ol>
+                        
+                        <h2 class="text-2xl font-bold text-center mt-8 mb-6 text-gray-700">2. Upload Your CSV File</h2>
+                         <div class="flex items-center justify-center w-full">
+                            <label for="csv-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                    <svg class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span></p>
+                                    <p id="file-feedback-display" class="text-xs text-gray-500">SwimTopia Athlete Roster (CSV)</p>
+                                </div>
+                                <input type="file" id="csv-file" accept=".csv" class="hidden">
+                            </label>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button id="clear-roster-btn" class="btn btn-secondary hidden">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                Clear Roster & Upload New File
+                            </button>
+                        </div>
+                        <div id="progress-container" class="mt-4 hidden">
+                            <div class="w-full bg-gray-200 rounded-full">
+                                <div id="progress-bar" class="text-xs font-medium text-white text-center p-0.5 leading-none rounded-full transition-all duration-500" style="width: 0%; background-color: #002366;">0%</div>
+                            </div>
+                            <p id="progress-status" class="text-center text-sm mt-2 text-gray-600"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contacts Tab -->
+                <div id="contacts-content" class="hidden" role="tabpanel" aria-labelledby="contacts-tab">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold mb-4 text-gray-700">GPSA Representatives</h2>
+                            <div id="reps-container" class="space-y-4"></div>
+                            <button id="add-rep-btn" class="mt-6 btn btn-primary">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                Add Rep
+                            </button>
+                        </div>
+                        <div class="border-t border-gray-200 pt-8">
+                            <h2 class="text-2xl font-bold mb-4 text-gray-700">Coaches</h2>
+                            <div id="coaches-container" class="space-y-4"></div>
+                            <button id="add-coach-btn" class="mt-6 btn btn-primary">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                Add Coach
+                            </button>
+                        </div>
+                         <div class="border-t border-gray-200 mt-8 pt-6 text-center flex flex-col sm:flex-row gap-2 justify-center">
+                             <button id="export-contacts-btn" class="btn btn-secondary w-full sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                Export Contacts HTML
+                            </button>
+                            <button id="clear-contacts-btn" class="btn btn-primary w-full sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                Clear All Contacts
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Officials Tab -->
+                 <div id="officials-content" class="hidden" role="tabpanel" aria-labelledby="officials-tab">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h2 class="text-2xl font-bold mb-4 text-gray-700">Stroke & Turn</h2>
+                                <p class="text-sm text-gray-500 mb-2">Paste a list of names, one per line.</p>
+                                <textarea id="stroke-turn-officials" class="w-full h-48 p-2 border rounded-md" placeholder="Jane Doe&#10;John Smith"></textarea>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold mb-4 text-gray-700">Starter / Referee</h2>
+                                 <p class="text-sm text-gray-500 mb-2">Paste a list of names, one per line.</p>
+                                <textarea id="starter-ref-officials" class="w-full h-48 p-2 border rounded-md" placeholder="John Appleseed&#10;Jane Miller"></textarea>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 mt-8 pt-6 text-center flex flex-col sm:flex-row gap-2 justify-center">
+                             <button id="export-officials-btn" class="btn btn-secondary w-full sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                Export Officials HTML
+                            </button>
+                            <button id="clear-officials-btn" class="btn btn-primary w-full sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                Clear All Officials
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formatted Roster Tab -->
+                <div id="roster-content" class="hidden" role="tabpanel" aria-labelledby="roster-tab">
+                    <div id="roster-output-container" class="bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                            <h2 id="roster-title" class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Team Roster</h2>
+                            <div class="flex space-x-2 no-print">
+                                <button id="export-roster-btn" class="btn btn-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                    Export Roster
+                                </button>
+                                <button id="print-btn" class="btn btn-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" /></svg>
+                                    Print Roster
+                                </button>
+                            </div>
+                        </div>
+                        <p id="roster-date-preview" class="text-right text-sm text-gray-500 -mt-4 mb-4"></p>
+                        <div id="roster-output" class="text-gray-800">
+                             <p class="text-center text-gray-500 py-10">Please upload a CSV file on the "Roster Input" tab to generate the roster.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Export HTML Modal -->
+            <div id="export-modal" class="no-print fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                <div class="relative top-20 mx-auto p-5 border w-full sm:w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-md bg-white">
+                    <div class="mt-3 text-center">
+                        <h3 id="modal-title" class="text-lg leading-6 font-medium text-gray-900"></h3>
+                        <div class="mt-2 px-7 py-3">
+                            <p class="text-sm text-gray-500 mb-4">Copy the code below and paste it into your website's HTML editor.</p>
+                            <textarea id="html-export-code" readonly class="w-full h-64 p-2 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm"></textarea>
+                        </div>
+                        <div class="items-center px-4 py-3">
+                            <button id="copy-html-btn" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">Copy Code</button>
+                            <button id="close-modal-btn" class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <!-- This small script handles the file name display without touching the main logic -->
+    <script>
+      document.getElementById('csv-file').addEventListener('change', function() {
+        const display = document.getElementById('file-feedback-display');
+        if (this.files && this.files.length > 0) {
+          display.textContent = this.files[0].name;
+        } else {
+          display.textContent = 'SwimTopia Athlete Roster (CSV)';
+        }
+      });
+    </script>
+    
+    <!-- ORIGINAL SCRIPT - UNMODIFIED -->
+    <script>
+        let processedRosterData = null;
+
+        // localStorage keys
+        const STORAGE_KEYS = {
+            contacts: 'gpsa_roster_contacts',
+            officials: 'gpsa_roster_officials'
+        };
+
+        // localStorage Helper Functions
+        function saveToLocalStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (error) {
+                console.error('Failed to save to localStorage:', error);
+            }
+        }
+
+        function loadFromLocalStorage(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            } catch (error) {
+                console.error('Failed to load from localStorage:', error);
+                return null;
+            }
+        }
+
+        function clearLocalStorage(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch (error) {
+                console.error('Failed to clear localStorage:', error);
+            }
+        }
+
+        // Toast Notification Functions
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            toast.innerHTML = `
+                <span class="toast-icon" aria-hidden="true">${icons[type]}</span>
+                <span class="toast-message">${escapeHtml(message)}</span>
+                <button class="toast-close" aria-label="Close notification">×</button>
+            `;
+
+            container.appendChild(toast);
+
+            const closeBtn = toast.querySelector('.toast-close');
+            const removeToast = () => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            };
+
+            closeBtn.addEventListener('click', removeToast);
+
+            if (duration > 0) {
+                setTimeout(removeToast, duration);
+            }
+
+            return toast;
+        }
+
+        // Validation Helper Functions
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function formatPhoneNumber(phone) {
+            // Remove all non-numeric characters
+            const cleaned = phone.replace(/\D/g, '');
+            // Format as (XXX) XXX-XXXX if 10 digits
+            if (cleaned.length === 10) {
+                return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+            }
+            return phone;
+        }
+
+        function validateContactInputs(row) {
+            const emailInput = row.querySelector('.contact-email');
+            const phoneInput = row.querySelector('.contact-phone');
+            let isValid = true;
+
+            // Validate email if not empty
+            if (emailInput && emailInput.value.trim()) {
+                if (isValidEmail(emailInput.value.trim())) {
+                    emailInput.classList.remove('input-error');
+                    emailInput.classList.add('input-success');
+                } else {
+                    emailInput.classList.add('input-error');
+                    emailInput.classList.remove('input-success');
+                    isValid = false;
+                }
+            } else if (emailInput) {
+                emailInput.classList.remove('input-error', 'input-success');
+            }
+
+            return isValid;
+        }
+
+        const tabs = {
+            data: { btn: document.getElementById('data-tab'), content: document.getElementById('data-content') },
+            contacts: { btn: document.getElementById('contacts-tab'), content: document.getElementById('contacts-content') },
+            officials: { btn: document.getElementById('officials-tab'), content: document.getElementById('officials-content') },
+            roster: { btn: document.getElementById('roster-tab'), content: document.getElementById('roster-content') }
+        };
+
+        const setActiveTab = (activeTabKey) => {
+            Object.keys(tabs).forEach(key => {
+                const isActive = key === activeTabKey;
+                tabs[key].btn.setAttribute('aria-selected', isActive);
+                tabs[key].content.classList.toggle('hidden', !isActive);
+                tabs[key].btn.classList.toggle('border-blue-600', isActive);
+                tabs[key].btn.classList.toggle('text-blue-600', isActive);
+                tabs[key].btn.classList.toggle('dark:text-blue-500', isActive);
+                tabs[key].btn.classList.toggle('dark:border-blue-500', isActive);
+                tabs[key].btn.classList.toggle('border-transparent', !isActive);
+                tabs[key].btn.classList.toggle('hover:text-gray-600', !isActive);
+                tabs[key].btn.classList.toggle('dark:hover:text-gray-300', !isActive);
+                tabs[key].btn.classList.toggle('hover:border-gray-300', !isActive);
+                tabs[key].btn.classList.toggle('dark:hover:border-gray-600', !isActive);
+            });
+        };
+        
+        Object.keys(tabs).forEach(key => {
+            tabs[key].btn.addEventListener('click', () => setActiveTab(key));
+        });
+        setActiveTab('data');
+
+        const repsContainer = document.getElementById('reps-container');
+        const coachesContainer = document.getElementById('coaches-container');
+
+        function saveContactsToLocalStorage() {
+            const reps = getContactData('reps-container');
+            const coaches = getContactData('coaches-container');
+            saveToLocalStorage(STORAGE_KEYS.contacts, { reps, coaches });
+        }
+
+        function addContactRow(container, initialData = null) {
+            const row = document.createElement('div');
+            row.className = 'grid grid-cols-1 md:grid-cols-4 gap-4 items-center contact-row';
+            const nameValue = initialData?.name || '';
+            row.innerHTML = `
+                <input type="text" placeholder="Name" class="contact-name md:col-span-2 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" value="${nameValue}">
+                <input type="tel" placeholder="Phone (e.g., 757-123-4567)" class="contact-phone p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" value="${initialData?.phone || ''}">
+                <div class="flex items-center">
+                    <input type="email" placeholder="Email" class="contact-email w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600" value="${initialData?.email || ''}">
+                    <button class="remove-btn ml-2 text-red-500 hover:text-red-700 p-2 font-bold text-xl" aria-label="Remove ${nameValue || 'contact'}">&times;</button>
+                </div>
+            `;
+            container.appendChild(row);
+
+            const emailInput = row.querySelector('.contact-email');
+            const phoneInput = row.querySelector('.contact-phone');
+            const nameInput = row.querySelector('.contact-name');
+            const removeBtn = row.querySelector('.remove-btn');
+
+            // Validate email on blur
+            emailInput.addEventListener('blur', () => {
+                if (emailInput.value.trim() && !isValidEmail(emailInput.value.trim())) {
+                    emailInput.classList.add('input-error');
+                    emailInput.classList.remove('input-success');
+                } else if (emailInput.value.trim()) {
+                    emailInput.classList.remove('input-error');
+                    emailInput.classList.add('input-success');
+                } else {
+                    emailInput.classList.remove('input-error', 'input-success');
+                }
+            });
+
+            // Format phone on blur
+            phoneInput.addEventListener('blur', () => {
+                if (phoneInput.value.trim()) {
+                    phoneInput.value = formatPhoneNumber(phoneInput.value.trim());
+                }
+            });
+
+            // Update aria-label when name changes
+            nameInput.addEventListener('input', () => {
+                const currentName = nameInput.value.trim() || 'contact';
+                removeBtn.setAttribute('aria-label', `Remove ${currentName}`);
+            });
+
+            // Add auto-save on input change
+            row.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', saveContactsToLocalStorage);
+            });
+
+            // Save when row is removed
+            removeBtn.addEventListener('click', () => {
+                row.remove();
+                saveContactsToLocalStorage();
+            });
+        }
+
+        document.getElementById('add-rep-btn').addEventListener('click', () => addContactRow(repsContainer));
+        document.getElementById('add-coach-btn').addEventListener('click', () => addContactRow(coachesContainer));
+
+        // Auto-save officials on textarea input
+        const strokeTurnTextarea = document.getElementById('stroke-turn-officials');
+        const starterRefTextarea = document.getElementById('starter-ref-officials');
+
+        function saveOfficialsToLocalStorage() {
+            const officials = {
+                strokeTurn: strokeTurnTextarea.value,
+                starterRef: starterRefTextarea.value
+            };
+            saveToLocalStorage(STORAGE_KEYS.officials, officials);
+        }
+
+        strokeTurnTextarea.addEventListener('input', saveOfficialsToLocalStorage);
+        starterRefTextarea.addEventListener('input', saveOfficialsToLocalStorage);
+
+        // Initialize with default rows (will be overwritten if localStorage data exists)
+        addContactRow(repsContainer);
+        addContactRow(coachesContainer);
+
+        // Load saved data from localStorage on page load
+        function loadSavedData() {
+            // Load contacts
+            const savedContacts = loadFromLocalStorage(STORAGE_KEYS.contacts);
+            if (savedContacts) {
+                // Clear default rows
+                repsContainer.innerHTML = '';
+                coachesContainer.innerHTML = '';
+
+                // Load saved reps
+                if (savedContacts.reps && savedContacts.reps.length > 0) {
+                    savedContacts.reps.forEach(rep => addContactRow(repsContainer, rep));
+                } else {
+                    addContactRow(repsContainer); // Add one empty row if no saved data
+                }
+
+                // Load saved coaches
+                if (savedContacts.coaches && savedContacts.coaches.length > 0) {
+                    savedContacts.coaches.forEach(coach => addContactRow(coachesContainer, coach));
+                } else {
+                    addContactRow(coachesContainer); // Add one empty row if no saved data
+                }
+            }
+
+            // Load officials
+            const savedOfficials = loadFromLocalStorage(STORAGE_KEYS.officials);
+            if (savedOfficials) {
+                strokeTurnTextarea.value = savedOfficials.strokeTurn || '';
+                starterRefTextarea.value = savedOfficials.starterRef || '';
+            }
+        }
+
+        // Load saved data after initialization
+        loadSavedData();
+
+        // Clear Roster Button
+        const clearRosterBtn = document.getElementById('clear-roster-btn');
+        clearRosterBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear the roster and upload a new file?')) {
+                // Clear the file input
+                fileInput.value = '';
+                document.getElementById('file-feedback-display').textContent = 'SwimTopia Athlete Roster (CSV)';
+
+                // Clear processed data
+                processedRosterData = null;
+
+                // Reset roster output
+                document.getElementById('roster-title').textContent = 'Team Roster';
+                document.getElementById('roster-date-preview').textContent = '';
+                rosterOutput.innerHTML = '<p class="text-center text-gray-500 py-10">Please upload a CSV file on the "Roster Input" tab to generate the roster.</p>';
+
+                // Hide clear button and switch to data tab
+                clearRosterBtn.classList.add('hidden');
+                setActiveTab('data');
+                showToast('Roster cleared successfully', 'success');
+            }
+        });
+
+        // Clear Contacts Button
+        document.getElementById('clear-contacts-btn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all contact information?')) {
+                // Clear all contact rows
+                repsContainer.innerHTML = '';
+                coachesContainer.innerHTML = '';
+
+                // Add fresh empty rows
+                addContactRow(repsContainer);
+                addContactRow(coachesContainer);
+
+                // Clear from localStorage
+                clearLocalStorage(STORAGE_KEYS.contacts);
+                showToast('Contacts cleared successfully', 'success');
+            }
+        });
+
+        // Clear Officials Button
+        document.getElementById('clear-officials-btn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all officials?')) {
+                strokeTurnTextarea.value = '';
+                starterRefTextarea.value = '';
+
+                // Clear from localStorage
+                clearLocalStorage(STORAGE_KEYS.officials);
+                showToast('Officials cleared successfully', 'success');
+            }
+        });
+
+        const fileInput = document.getElementById('csv-file');
+        const rosterOutput = document.getElementById('roster-output');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressStatus = document.getElementById('progress-status');
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0]; if (!file) return;
+            progressContainer.classList.remove('hidden');
+            const updateProgress = (p, s) => { progressBar.style.width = `${p}%`; progressBar.textContent = `${p}%`; progressStatus.textContent = s; };
+            updateProgress(0, 'Starting...');
+            setTimeout(() => {
+                updateProgress(25, `Reading file...`);
+                Papa.parse(file, {
+                    header: true, skipEmptyLines: true, transformHeader: h => h.trim(),
+                    complete: (results) => {
+                        updateProgress(75, 'Formatting roster...');
+                        try {
+                            processedRosterData = processData(results.data);
+                            renderRoster(processedRosterData);
+                            updateProgress(100, 'Done!');
+                            setActiveTab('roster');
+                            clearRosterBtn.classList.remove('hidden'); // Show clear button after successful processing
+                            showToast('Roster processed successfully!', 'success');
+                            setTimeout(() => progressContainer.classList.add('hidden'), 2000);
+                        } catch (error) {
+                            showToast(error.message, 'error', 6000);
+                            progressContainer.classList.add('hidden');
+                        }
+                    },
+                    error: (err) => {
+                        showToast(`Could not parse CSV file. Please ensure it's a valid SwimTopia export.`, 'error', 6000);
+                        progressContainer.classList.add('hidden');
+                    }
+                });
+            }, 100);
+        });
+
+        function processData(data) {
+            const requiredHeaders = ['AgeGroup', 'AthleteCompetitionCategory', 'AthleteDisplayName', 'AthleteAge'];
+            const fileHeaders = data.length ? Object.keys(data[0]) : [];
+            const missingHeaders = requiredHeaders.filter(h => !fileHeaders.includes(h));
+
+            if (missingHeaders.length > 0) {
+                throw new Error(`Missing required CSV columns: ${missingHeaders.join(', ')}. Please export from SwimTopia using Reports > Athlete Roster.`);
+            }
+
+            const roster = {};
+            data.forEach(row => {
+                const ageGroupRaw = row['AgeGroup']?.trim();
+                const genderRaw = row['AthleteCompetitionCategory']?.trim().toLowerCase();
+                const name = row['AthleteDisplayName']?.trim();
+                const age = row['AthleteAge']?.trim();
+                if (!ageGroupRaw || !genderRaw || !name || !age) return;
+                const ageGroup = ageGroupRaw.replace(/^(boys|girls|men|women)\s*/i, '').trim();
+                if (!roster[ageGroup]) roster[ageGroup] = { girls: [], boys: [] };
+                if (genderRaw === 'f') roster[ageGroup].girls.push({ name, age: parseInt(age, 10) });
+                else if (genderRaw === 'm') roster[ageGroup].boys.push({ name, age: parseInt(age, 10) });
+            });
+            
+            Object.values(roster).forEach(group => {
+                group.girls.sort((a, b) => a.name.localeCompare(b.name));
+                group.boys.sort((a, b) => a.name.localeCompare(b.name));
+            });
+            return roster;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getContactData(containerId) {
+            return Array.from(document.querySelectorAll(`#${containerId} .contact-row`)).map(row => ({
+                name: row.querySelector('.contact-name').value.trim(),
+                phone: row.querySelector('.contact-phone').value.trim(),
+                email: row.querySelector('.contact-email').value.trim()
+            })).filter(c => c.name || c.phone || c.email);
+        }
+
+        function checkDuplicateContacts() {
+            const reps = getContactData('reps-container');
+            const coaches = getContactData('coaches-container');
+            const allContacts = [...reps, ...coaches];
+
+            const names = allContacts.map(c => c.name.toLowerCase()).filter(Boolean);
+            const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
+
+            if (duplicates.length > 0) {
+                const uniqueDuplicates = [...new Set(duplicates)];
+                showToast(`Warning: Duplicate contact names found: ${uniqueDuplicates.join(', ')}`, 'warning', 6000);
+                return uniqueDuplicates;
+            }
+
+            return [];
+        }
+
+        function validateAllEmails() {
+            const allEmailInputs = document.querySelectorAll('.contact-email');
+            let invalidEmails = [];
+
+            allEmailInputs.forEach(input => {
+                if (input.value.trim() && !isValidEmail(input.value.trim())) {
+                    invalidEmails.push(input.value.trim());
+                    input.classList.add('input-error');
+                }
+            });
+
+            if (invalidEmails.length > 0) {
+                showToast(`Invalid email format: ${invalidEmails.join(', ')}`, 'error', 6000);
+                return false;
+            }
+
+            return true;
+        }
+
+        function generateContactsHTML() {
+            const reps = getContactData('reps-container');
+            const coaches = getContactData('coaches-container');
+            let html = `<div><h2 class="contacts-main-title">Team Contacts</h2>`;
+
+            const createSection = (title, contacts) => {
+                if (contacts.length === 0) return '';
+                let sectionHtml = `<div class="contact-section-wrapper"><div class="contact-header">${escapeHtml(title)}</div><table class="contact-table"><thead><tr><th class="contact-name-col">Name</th><th class="contact-phone-col">Phone</th><th class="contact-email-col">Email</th></tr></thead><tbody>`;
+                contacts.forEach(c => {
+                    const safeName = escapeHtml(c.name) || '';
+                    const safePhone = escapeHtml(c.phone) || '';
+                    const safeEmail = escapeHtml(c.email);
+                    const emailCell = c.email ? `<a href="mailto:${safeEmail}">${safeEmail}</a>` : '';
+                    sectionHtml += `<tr><td>${safeName}</td><td>${safePhone}</td><td>${emailCell}</td></tr>`;
+                });
+                return sectionHtml + `</tbody></table></div>`;
+            };
+            
+            html += createSection('GPSA Representatives', reps);
+            if (reps.length > 0 && coaches.length > 0) html += '<br>';
+            html += createSection('Coaches', coaches);
+            html += '</div>';
+
+            if (reps.length === 0 && coaches.length === 0) return '<p>No contact information was entered.</p>';
+            return html;
+        }
+
+        function generateOfficialsHTML() {
+            const strokeTurn = document.getElementById('stroke-turn-officials').value.split('\n').map(s => s.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+            const starterRef = document.getElementById('starter-ref-officials').value.split('\n').map(s => s.trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
+            if (strokeTurn.length === 0 && starterRef.length === 0) return '<p>No officials were entered.</p>';
+
+            let html = `<div><h2 class="officials-main-title">Certified Officials</h2><div class="officials-container">`;
+            html += '<div class="officials-column"><div class="officials-header">Stroke & Turn</div><ul class="officials-list">';
+            strokeTurn.forEach(name => { html += `<li>${escapeHtml(name)}</li>`; });
+            html += '</ul></div>';
+
+            html += '<div class="officials-column"><div class="officials-header">Starter / Referee</div><ul class="officials-list">';
+            starterRef.forEach(name => { html += `<li>${escapeHtml(name)}</li>`; });
+            html += '</ul></div>';
+
+            html += '</div></div>';
+            return html;
+        }
+
+        function generateRosterHTML(data, forExport = false) {
+            const ageGroups = Object.keys(data).sort((a, b) => (parseInt(a.split(' ')[0]) || 99) - (parseInt(b.split(' ')[0]) || 99));
+            if (ageGroups.length === 0) return `<p class="text-center text-gray-500">No valid athlete data found.</p>`;
+            
+            const totalAthletes = Object.values(data).reduce((acc, group) => acc + group.girls.length + group.boys.length, 0);
+            const publishDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            let html = forExport ? `<div class="roster-container" id="roster-top">` : '<div>';
+            
+            if (forExport) {
+                html += `<h2 class="roster-main-title">Athlete Roster (${totalAthletes})</h2>`;
+                html += `<p class="roster-publish-date">Published: ${publishDate}</p>`;
+                html += '<div class="roster-quick-links">';
+                ageGroups.forEach(ag => { html += `<a href="#roster-age-group-${ag.toLowerCase().replace(/[\s&]+/g, '-')}">${escapeHtml(ag)}</a>`; });
+                html += '</div>';
+            } else {
+                 html += `<div class="space-y-8">`;
+            }
+            
+            ageGroups.forEach(ageGroup => {
+                const { girls, boys } = data[ageGroup];
+                const maxRows = Math.max(girls.length, boys.length);
+                const anchorId = 'roster-age-group-' + ageGroup.toLowerCase().replace(/[\s&]+/g, '-');
+
+                if (forExport) {
+                    html += `<div class="roster-group" id="${anchorId}"><table class="roster-table"><colgroup><col class="name-col"><col class="age-col"><col class="name-col"><col class="age-col"></colgroup><thead><tr><th colspan="4" class="age-group-title">${escapeHtml(ageGroup)}</th></tr><tr><th colspan="2" class="gender-title">Girls</th><th colspan="2" class="gender-title">Boys</th></tr><tr><th class="column-header">Name</th><th class="column-header">Age</th><th class="column-header">Name</th><th class="column-header">Age</th></tr></thead><tbody>`;
+                    for (let i = 0; i < maxRows; i++) {
+                        const g = girls[i] || {}; const b = boys[i] || {};
+                        html += `<tr><td>${escapeHtml(g.name)||''}</td><td>${escapeHtml(g.age)||''}</td><td>${escapeHtml(b.name)||''}</td><td>${escapeHtml(b.age)||''}</td></tr>`;
+                    }
+                    html += `</tbody></table><div class="roster-footer"><a href="#roster-top">Top &uarr;</a></div></div>`;
+                } else {
+                    html += `<div class="overflow-x-auto border border-gray-300 rounded-lg"><h3 class="text-xl font-bold text-white p-3 text-center" style="background-color: #002366;">${escapeHtml(ageGroup)}</h3><table class="min-w-full"><thead class="bg-sky-100"><tr class="border-b-2 border-gray-300"><th colspan="2" class="px-4 py-2 text-center font-semibold text-gray-700 border-r w-1/2">Girls</th><th colspan="2" class="px-4 py-2 text-center font-semibold text-gray-700 w-1/2">Boys</th></tr><tr class="border-b-2 border-gray-300"><th class="p-2 text-left text-sm font-semibold">Name</th><th class="p-2 text-left text-sm font-semibold w-16">Age</th><th class="p-2 text-left text-sm font-semibold border-l">Name</th><th class="p-2 text-left text-sm font-semibold w-16">Age</th></tr></thead><tbody class="bg-white divide-y divide-gray-300">`;
+                    for (let i = 0; i < maxRows; i++) {
+                        const g = girls[i] || {}; const b = boys[i] || {};
+                        html += `<tr class="even:bg-gray-50"><td class="p-2">${escapeHtml(g.name)||''}</td><td class="p-2">${escapeHtml(g.age)||''}</td><td class="p-2 border-l">${escapeHtml(b.name)||''}</td><td class="p-2">${escapeHtml(b.age)||''}</td></tr>`;
+                    }
+                    html += `</tbody></table></div>`;
+                }
+            });
+            return html + '</div>';
+        }
+
+        function renderRoster(data) {
+            const totalAthletes = Object.values(data).reduce((acc, group) => acc + group.girls.length + group.boys.length, 0);
+            const publishDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('roster-title').textContent = `Team Roster (${totalAthletes})`;
+            document.getElementById('roster-date-preview').textContent = `Generated: ${publishDate}`;
+            rosterOutput.innerHTML = generateRosterHTML(data, false); 
+        }
+        
+        document.getElementById('print-btn').addEventListener('click', () => window.print());
+
+        const exportModal = document.getElementById('export-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const htmlExportCode = document.getElementById('html-export-code');
+        const copyHtmlBtn = document.getElementById('copy-html-btn');
+
+        const openExportModal = (title, content) => {
+            modalTitle.textContent = title;
+            htmlExportCode.value = content;
+            exportModal.classList.remove('hidden');
+
+            // Focus the textarea
+            setTimeout(() => htmlExportCode.focus(), 100);
+
+            // Trap focus within modal
+            const focusableElements = exportModal.querySelectorAll('textarea, button');
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+
+            const handleTabKey = (e) => {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusable) {
+                            e.preventDefault();
+                            lastFocusable.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusable) {
+                            e.preventDefault();
+                            firstFocusable.focus();
+                        }
+                    }
+                }
+            };
+
+            exportModal.addEventListener('keydown', handleTabKey);
+        };
+
+        const closeExportModal = () => {
+            exportModal.classList.add('hidden');
+        };
+        
+        document.getElementById('export-roster-btn').addEventListener('click', () => {
+            if (processedRosterData) {
+                openExportModal('Export Roster HTML', generateRosterHTML(processedRosterData, true));
+            } else {
+                showToast('Please upload and process a CSV file first.', 'warning');
+            }
+        });
+
+        document.getElementById('export-contacts-btn').addEventListener('click', () => {
+            // Validate emails before export
+            if (!validateAllEmails()) {
+                return; // Toast already shown by validateAllEmails()
+            }
+
+            // Check for duplicates (warning only, doesn't prevent export)
+            checkDuplicateContacts();
+
+            openExportModal('Export Contacts HTML', generateContactsHTML());
+        });
+
+        document.getElementById('export-officials-btn').addEventListener('click', () => {
+            openExportModal('Export Officials HTML', generateOfficialsHTML());
+        });
+
+        document.getElementById('close-modal-btn').addEventListener('click', closeExportModal);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Esc to close modal
+            if (e.key === 'Escape' && !exportModal.classList.contains('hidden')) {
+                closeExportModal();
+            }
+        });
+        copyHtmlBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(htmlExportCode.value);
+                copyHtmlBtn.textContent = 'Copied!';
+                showToast('Code copied to clipboard!', 'success');
+                setTimeout(() => { copyHtmlBtn.textContent = 'Copy Code'; }, 2000);
+            } catch (err) {
+                console.error('Failed to copy to clipboard:', err);
+                // Fallback to select text for manual copy
+                htmlExportCode.select();
+                htmlExportCode.setSelectionRange(0, 99999); // For mobile devices
+                copyHtmlBtn.textContent = 'Selected - Press Ctrl+C';
+                showToast('Text selected - Press Ctrl+C to copy', 'info');
+                setTimeout(() => { copyHtmlBtn.textContent = 'Copy Code'; }, 3000);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', e => {
+            if (e.target === exportModal) {
+                closeExportModal();
+            }
+        });
+    </script>
+</body>
+</html>

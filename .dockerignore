@@ -1,0 +1,28 @@
+# Git
+.git/
+.gitignore
+
+# GitHub Actions
+.github/
+
+# GitHub Pages content (not needed in image)
+index.html
+publicity.html
+roster.html
+CNAME
+README.md
+CLAUDE.md
+
+# Node modules (installed fresh in image)
+publicity-server/node_modules/
+
+# macOS
+.DS_Store
+
+# Working directories and raw files
+incoming/
+preview/
+temp/
+*.sd3
+*.zip
+*.log
