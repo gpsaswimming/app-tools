@@ -11,6 +11,9 @@ services:
       - PORT=8080
       # Set N8N_WEBHOOK_URL in a sibling .env file (see .env.example). Do not commit it.
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
+      # Optional shared-secret header for the n8n webhook (both empty = disabled).
+      - N8N_AUTH_HEADER=${N8N_AUTH_HEADER:-}
+      - N8N_AUTH_TOKEN=${N8N_AUTH_TOKEN:-}
     restart: unless-stopped
     read_only: true
     security_opt:

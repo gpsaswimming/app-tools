@@ -68,6 +68,7 @@ The reliable, human-driven front door into the same n8n publicity workflow — a
 
 - Auth is handled upstream by **Pangolin**; the app implements none of its own.
 - Webhook URL is configured via the `N8N_WEBHOOK_URL` env var (server-side only — never in client code, so there's no SSRF/CORS surface).
+- Optional shared-secret header auth: set `N8N_AUTH_HEADER` + `N8N_AUTH_TOKEN` and a matching n8n "Header Auth" credential. Both must be set or the header is omitted — don't enable Header Auth in n8n unless both are configured.
 - Uploads are memory-only (no disk writes), capped at 256KB, validated client- *and* server-side.
 - Compose publishes to `127.0.0.1` only; container runs non-root, read-only FS, all caps dropped.
 - Unlike `publicity-server`, this image does **not** use `lib/` — it just forwards the file untouched; n8n does the parsing.

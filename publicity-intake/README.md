@@ -28,9 +28,21 @@ This is the human/manual front door into the same workflow that
 | Env var           | Required | Default | Notes                                            |
 |-------------------|----------|---------|--------------------------------------------------|
 | `N8N_WEBHOOK_URL` | **yes**  | —       | The n8n webhook that receives the multipart POST |
+| `N8N_AUTH_HEADER` | no       | —       | Header name for the n8n "Header Auth" secret. Set with `N8N_AUTH_TOKEN` to enable. |
+| `N8N_AUTH_TOKEN`  | no       | —       | Secret value sent in `N8N_AUTH_HEADER`. Both must be set to enable auth. |
 | `PORT`            | no       | `8080`  |                                                  |
 | `HOST`            | no       | `0.0.0.0` | Bind address inside the container              |
 | `N8N_TIMEOUT_MS`  | no       | `15000` | Upstream request timeout                         |
+
+### Webhook auth (optional, recommended)
+
+Set both `N8N_AUTH_HEADER` and `N8N_AUTH_TOKEN`, then configure a matching
+**Header Auth** credential on the n8n webhook node (same header name + value).
+Every forwarded request then carries the secret, so n8n rejects any POST that
+doesn't — defence in depth on top of the URL being private. If either var is
+unset the header is omitted (so do **not** enable Header Auth in n8n unless both
+are set, or all submissions will fail with 401/403). `GET /health` reports
+`webhookAuth: true|false` so you can confirm it's active.
 
 Copy `.env.example` → `.env` and set `N8N_WEBHOOK_URL`. **Never commit `.env`.**
 
@@ -64,6 +76,7 @@ The image is built/pushed to `ghcr.io/gpsaswimming/publicity-intake` by CI.
 - **Memory-only uploads** — the file never touches disk (no temp files, no
   path-traversal surface). It's streamed straight to n8n.
 - **No SSRF** — the webhook URL is a fixed env var, never user-supplied.
+- **Optional shared-secret header** to the webhook (`N8N_AUTH_HEADER`/`N8N_AUTH_TOKEN`) so n8n can reject any POST that doesn't carry the secret, even if the URL leaks.
 - **Tight CSP** (`default-src 'none'`), `nosniff`, `X-Frame-Options: DENY`.
 - **Two runtime deps** (`express`, `multer`); `npm ci` against a committed
   lockfile, `--omit=dev`.

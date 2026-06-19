@@ -23,6 +23,14 @@ const HOST = process.env.HOST || '0.0.0.0';
 const WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 const WEBHOOK_TIMEOUT_MS = Number(process.env.N8N_TIMEOUT_MS || 15000);
 
+// Optional shared-secret header for the n8n webhook ("Header Auth" credential).
+// When both are set, every forwarded request includes this header so n8n can
+// reject anything that doesn't carry the secret — defence in depth on top of
+// the webhook URL being private. Leave unset to disable.
+const N8N_AUTH_HEADER = process.env.N8N_AUTH_HEADER || '';
+const N8N_AUTH_TOKEN = process.env.N8N_AUTH_TOKEN || '';
+const AUTH_ENABLED = Boolean(N8N_AUTH_HEADER && N8N_AUTH_TOKEN);
+
 // =============================================================================
 // Configuration
 // =============================================================================
@@ -115,6 +123,7 @@ app.get('/health', (req, res) => {
     res.json({
         status: 'healthy',
         webhookConfigured: Boolean(WEBHOOK_URL),
+        webhookAuth: AUTH_ENABLED,
         timestamp: new Date().toISOString()
     });
 });
@@ -155,9 +164,14 @@ app.post('/submit', upload.single('file'), async (req, res) => {
             req.file.originalname
         );
 
+        // Do NOT set Content-Type here — fetch derives the multipart boundary
+        // from the FormData. Only attach the optional shared-secret auth header.
+        const headers = AUTH_ENABLED ? { [N8N_AUTH_HEADER]: N8N_AUTH_TOKEN } : undefined;
+
         const upstream = await fetch(WEBHOOK_URL, {
             method: 'POST',
             body: form,
+            headers,
             signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS)
         });
 
