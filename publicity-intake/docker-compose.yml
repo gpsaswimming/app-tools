@@ -1,0 +1,25 @@
+services:
+  publicity-intake:
+    image: ghcr.io/gpsaswimming/publicity-intake:latest
+    pull_policy: always
+    # Publish to localhost only — the service is reached exclusively through the
+    # Pangolin tunnel, never directly from the network.
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      # Set N8N_WEBHOOK_URL in a sibling .env file (see .env.example). Do not commit it.
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/health').then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s

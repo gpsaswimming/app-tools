@@ -1,4 +1,4 @@
-name: Build and Publish Docker Image
+name: Build and Publish Intake Docker Image
 
 on:
   push:
@@ -6,12 +6,10 @@ on:
     branches:
       - '**'
     paths:
-      - 'publicity-server/**'
-      - 'lib/**'
-      - 'Dockerfile'
+      - 'publicity-intake/**'
   schedule:
-    # Weekly rebuild every Monday at 04:00 UTC — picks up base image security patches
-    - cron: '0 4 * * 1'
+    # Weekly rebuild every Monday at 04:15 UTC — picks up base image security patches
+    - cron: '15 4 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -20,7 +18,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/publicity-server
+  IMAGE_NAME: ${{ github.repository_owner }}/publicity-intake
 
 jobs:
   build-and-push:
@@ -57,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: publicity-intake/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
