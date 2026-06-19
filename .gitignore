@@ -18,6 +18,7 @@ publicity-intake/node_modules/
 
 # Secrets
 publicity-intake/.env
+publicity-intake/.env.dev
 
 # Working directories
 incoming/
