@@ -25,9 +25,13 @@ incoming/
 preview/
 temp/
 
-# Raw SDIF files
+# Raw meet-result files — real ones carry minors' birthdates/PII, never commit
 *.sd3
+*.hy3
 *.zip
+# Exception: swimparse golden-test fixtures are sanitized (fake public-figure data)
+!swimparse/test/fixtures/*.sd3
+!swimparse/test/fixtures/*.hy3
 
 # Logs
 *.log
