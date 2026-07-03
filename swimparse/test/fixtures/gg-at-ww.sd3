@@ -1,0 +1,453 @@
+A01Ver. 4.102                              SwimTopia           SwimTopia SwimTopia           877-856-294007012026                                               
+B11        2026 Glendale Gators at Wendwo                                                                               90629202606292026   0        S          
+B21        Wendwood Wahoos               320 Dominion Drive                          Newport News        VA23602                                                
+C11          WW  Wendwood Wahoos               Wendwood Wahoos 320 Dominion Drive                          Newport News        VA23602                          
+D01        Einstein, Albert            031409ALB*EIAUSA0314200917MM 1005  7 15180629202601:10.96S                  01:11.35S     1 3     1 5.0UO                
+D3031409ALB*EINS               X          NNNN                                                                                                         N        
+D01        Einstein, Albert            031409ALB*EIAUSA0314200917MM  501 19 15180629202600:28.15S                  00:28.05S     1 3     1 5.0UO                
+D01        Einstein, Albert            031409ALB*EIAUSA0314200917MM  503 29 15180629202600:35.55S                  00:36.97S     1 3     1 5.0UO                
+D01        Einstein, Albert            031409ALB*EIAUSA0314200917MM  504 51 15180629202600:31.22S                  00:32.91S     1 3     3 1.0UO                
+D01        Newton, Isaac               010410ISA*NEAUSA0104201016MM  501 19 15180629202600:37.25S                  00:38.36S     1 1     4 0.0UO                
+D3010410ISA*NEWT               X          NNNN                                                                                                         N        
+D01        Newton, Isaac               010410ISA*NEAUSA0104201016MM  503 29 15180629202601:02.51S                  01:04.48S     1 1     4 0.0UO                
+D01        Newton, Isaac               010410ISA*NEAUSA0104201016MM  502 41 15180629202600:53.38S                  00:55.43S     1 1     4 0.0UO                
+D01        Newton, Isaac               010410ISA*NEAUSA0104201016MM  504 51 15180629202600:55.27S                  DQ      S     1 1       0.0UO                
+D01        Darwin, Charles             021220CHA*DAAUSA02122020 6MM  251  9 UN060629202600:45.67S                  NS      S     1 3       0.0UO                
+D3021220CHA*DARW               X          NNNN                                                                                                         N        
+D01        Darwin, Charles             021220CHA*DAAUSA02122020 6MM  252 31 UN060629202601:06.29S                  00:51.81S     1 3     3 1.0UO                
+D01        Curie, Marie                110715MAR*CUAUSA1107201510FF 1005  2 UN100629202601:54.74S                  02:00.91S     1 1     4 0.0UO                
+D3110715MAR*CURI               X          NNNN                                                                                                         N        
+D01        Curie, Marie                110715MAR*CUAUSA1107201510FF  502 38 111206292026        S                  DQ      S     1 1       0.0UO                
+D01        Curie, Marie                110715MAR*CUAUSA1107201510FF  504 46 09100629202600:56.49S                  01:05.51S     1 1     4 0.0UO                
+D01        Earhart, Amelia             072419AME*EAAUSA07242019 6FF  251 10 UN060629202600:37.13S                  00:35.66S     1 3     2 3.0UO                
+D3072419AME*EARH               X          NNNN                                                                                                         N        
+D01        Earhart, Amelia             072419AME*EAAUSA07242019 6FF  253 22 UN080629202600:46.16S                  00:42.68S     1 1     4 0.0UO                
+D01        Earhart, Amelia             072419AME*EAAUSA07242019 6FF  252 32 UN060629202600:38.39S                  00:42.72S     1 3     2 3.0UO                
+D01        Lincoln, Abraham            021217ABR*LIAUSA02122017 9MM  501 13 09100629202600:49.48S                  00:49.60S     1 3     2 3.0UO                
+D3021217ABR*LINC               X          NNNN                                                                                                         N        
+D01        Lincoln, Abraham            021217ABR*LIAUSA02122017 9MM  503 23 09100629202601:07.64S                  01:09.16S     1 3     1 5.0UO                
+D01        Lincoln, Abraham            021217ABR*LIAUSA02122017 9MM  502 35 09100629202600:54.62S                  DQ      S     1 3       0.0UO                
+D01        Washington, George          022214GEO*WAAUSA0222201412MM 1005  3 11120629202601:19.95S                  01:24.10S     1 3     2 3.0UO                
+D3022214GEO*WASH               X          NNNN                                                                                                         N        
+D01        Washington, George          022214GEO*WAAUSA0222201412MM  503 25 11120629202600:41.94S                  00:43.94S     1 3     2 3.0UO                
+D01        Washington, George          022214GEO*WAAUSA0222201412MM  504 47 11120629202600:35.86S                  00:38.38S     1 3     2 3.0UO                
+D01        Lovelace, Ada               121011ADA*LOAUSA1210201114FF 1005  6 13140629202601:17.11S                  01:15.58S     1 3     1 5.0UO                
+D3121011ADA*LOVE               X          NNNN                                                                                                         N        
+D01        Lovelace, Ada               121011ADA*LOAUSA1210201114FF  501 18 13140629202600:30.98S                  00:31.39S     1 3     1 5.0UO                
+D01        Lovelace, Ada               121011ADA*LOAUSA1210201114FF  504 50 131406292026        S                  00:33.86S     1 1     1 5.0UO                
+D01        Austen, Jane                121615JAN*AUAUSA1216201510FF 1005  2 UN100629202601:34.27S                  01:34.43S     1 3     1 5.0UO                
+D3121615JAN*AUST               X          NNNN                                                                                                         N        
+D01        Austen, Jane                121615JAN*AUAUSA1216201510FF  501 14 09100629202600:37.98S                  00:38.95S     1 3     1 5.0UO                
+D01        Austen, Jane                121615JAN*AUAUSA1216201510FF  504 46 09100629202600:43.96S                  00:44.93S     1 3     1 5.0UO                
+D01        Kahlo, Frida                070611FRI*KAAUSA0706201114FF  501 20 15180629202600:42.49S                  00:44.05S     1 3     2 3.0UO                
+D3070611FRI*KAHL               X          NNNN                                                                                                         N        
+D01        Kahlo, Frida                070611FRI*KAAUSA0706201114FF  503 28 13140629202600:53.58S                  00:53.56S     1 3     3 1.0UO                
+D01        Kahlo, Frida                070611FRI*KAAUSA0706201114FF  502 40 13140629202600:52.10S                  00:51.76S     1 1     4 0.0UO                
+D01        Dickinson, Emily            121016EMI*DIAUSA12102016 9FF  501 14 09100629202600:42.52S                  00:46.37S     1 1     2 3.0UO                
+D3121016EMI*DICK               X          NNNN                                                                                                         N        
+D01        Dickinson, Emily            121016EMI*DIAUSA12102016 9FF  503 24 09100629202601:03.82S                  01:03.39S     1 1     4 0.0UO                
+D01        Dickinson, Emily            121016EMI*DIAUSA12102016 9FF  502 36 09100629202600:50.30S                  DQ      S     1 3       0.0UO                
+D01        Douglass, Frederick         021415FRE*DOAUSA0214201511MM 1005  3 11120629202601:27.66S                  01:43.36S     1 1     3 1.0UO                
+D3021415FRE*DOUG               X          NNNN                                                                                                         N        
+D01        Douglass, Frederick         021415FRE*DOAUSA0214201511MM  502 37 11120629202600:38.77S                  00:40.76S     1 1     2 3.0UO                
+D01        Douglass, Frederick         021415FRE*DOAUSA0214201511MM  504 47 11120629202600:36.28S                  00:36.21S     1 1     1 5.0UO                
+D01        Angelou, Maya               040417MAY*ANAUSA04042017 9FF 1005  4 11120629202602:05.79S                  02:07.00S     1 3     3 1.0UO                
+D3040417MAY*ANGE               X          NNNN                                                                                                         N        
+D01        Angelou, Maya               040417MAY*ANAUSA04042017 9FF  501 16 11120629202600:46.19S                  00:48.10S     1 1     4 0.0UO                
+D01        Angelou, Maya               040417MAY*ANAUSA04042017 9FF  502 36 09100629202600:55.21S                  00:57.57S     1 1     3 1.0UO                
+D01        Hepburn, Audrey             050421AUD*HEAUSA05042021 5FF  251 10 UN060629202601:28.55S                  02:07.32S     2 1       0.0UO                
+D3050421AUD*HEPB               X          NNNN                                                                                                         N        
+D01        Monroe, Marilyn             060119MAR*MOAUSA06012019 7FF  251 12 07080629202600:38.14S                  00:38.00S     1 3     3 1.0UO                
+D3060119MAR*MONR               X          NNNN                                                                                                         N        
+D01        Monroe, Marilyn             060119MAR*MOAUSA06012019 7FF  252 34 07080629202600:37.86S                  00:33.34S     1 1     4 0.0UO                
+D01        Obama, Barack               080411BAR*OBAUSA0804201114MM 1005  5 13140629202601:17.85S                  01:18.86S     1 3     2 3.0UO                
+D3080411BAR*OBAM               X          NNNN                                                                                                         N        
+D01        Obama, Barack               080411BAR*OBAUSA0804201114MM  501 17 13140629202600:30.42S                  00:31.92S     1 3     2 3.0UO                
+D01        Obama, Barack               080411BAR*OBAUSA0804201114MM  502 39 13140629202600:35.38S                  00:37.39S     1 3     2 3.0UO                
+D01        Obama, Barack               080411BAR*OBAUSA0804201114MM  504 49 13140629202600:33.16S                  00:32.86S     1 3     1 5.0UO                
+D01        Vinci, Leonardo             041514LEO*VIAUSA0415201412MM  501 15 11120629202600:32.27S                  00:33.00S     1 3     2 3.0UO                
+D3041514LEO*VINC               X          NNNN                                                                                                         N        
+D01        Vinci, Leonardo             041514LEO*VIAUSA0415201412MM  502 37 11120629202600:35.47S                  00:37.61S     1 3     1 5.0UO                
+D01        Vinci, Leonardo             041514LEO*VIAUSA0415201412MM  502 41 15180629202600:35.47S                  00:37.35S     1 3     2 3.0UO                
+D01        Mozart, Wolfgang            012713WOL*MOAUSA0127201313MM 1005  5 13140629202601:20.03S                  01:20.25S     1 1     4 0.0UO                
+D3012713WOL*MOZA               X          NNNN                                                                                                         N        
+D01        Mozart, Wolfgang            012713WOL*MOAUSA0127201313MM  501 17 13140629202600:31.57S                  00:32.55S     1 1     3 1.0UO                
+D01        Mozart, Wolfgang            012713WOL*MOAUSA0127201313MM  503 27 13140629202600:43.29S                  00:44.90S     1 3     2 3.0UO                
+D01        Mozart, Wolfgang            012713WOL*MOAUSA0127201313MM  504 49 13140629202600:37.54S                  00:38.12S     1 1     3 1.0UO                
+D01        Hepburn, Katharine          051217KAT*HEAUSA05122017 9FF  251 12 070806292026        S                  00:53.21S     3 4       0.0UO                
+D3051217KAT*HEPB               X          NNNN                                                                                                         N        
+D01        Hopper, Grace               120912GRA*HOAUSA1209201213FF  501 20 151806292026        S                  00:44.78S     1 1     3 1.0UO                
+D3120912GRA*HOPP               X          NNNN                                                                                                         N        
+D01        Hopper, Grace               120912GRA*HOAUSA1209201213FF  503 30 151806292026        S                  01:01.37S     1 3     3 1.0UO                
+D01        Hopper, Grace               120912GRA*HOAUSA1209201213FF  502 42 15180629202600:55.33S                  00:55.99S     1 3     3 1.0UO                
+D01        Frank, Anne                 061219ANN*FRAUSA06122019 6FF  251 10 UN060629202600:46.46S                  00:39.93S     1 1     4 0.0UO                
+D3061219ANN*FRAN               X          NNNN                                                                                                         N        
+D01        Frank, Anne                 061219ANN*FRAUSA06122019 6FF  252 32 UN060629202600:56.20S                  00:44.44S     1 1     3 1.0UO                
+D01        Shakespeare, William        042314WIL*SHAUSA0423201412MM  501 15 11120629202600:35.86S                  00:37.10S     1 1     3 1.0UO                
+D3042314WIL*SHAK               X          NNNN                                                                                                         N        
+D01        Shakespeare, William        042314WIL*SHAUSA0423201412MM  503 25 11120629202600:48.85S                  00:52.86S     1 1     3 1.0UO                
+D01        Shakespeare, William        042314WIL*SHAUSA0423201412MM  503 27 13140629202600:48.85S                  00:51.90S     1 1     3 1.0UO                
+D01        Keller, Helen               062716HEL*KEAUSA06272016 9FF  501 14 09100629202600:48.86S                  00:49.52S     2 2       0.0UO                
+D3062716HEL*KELL               X          NNNN                                                                                                         N        
+D01        Keller, Helen               062716HEL*KEAUSA06272016 9FF  503 26 11120629202601:03.85S                  01:01.94S     1 3     3 1.0UO                
+D01        Keller, Helen               062716HEL*KEAUSA06272016 9FF  502 38 11120629202601:05.61S                  01:01.72S     1 3     3 1.0UO                
+D01        Twain, Mark                 113012MAR*TWAUSA1130201213MM  501 17 13140629202600:55.39S                  NS      S     2 1       0.0UO                
+D3113012MAR*TWAI               X          NNNN                                                                                                         N        
+D01        Twain, Mark                 113012MAR*TWAUSA1130201213MM  503 27 131406292026        S                  NS      S     2 2       0.0UO                
+D01        Twain, Mark                 113012MAR*TWAUSA1130201213MM  502 39 131406292026        S                  NS      S     1 1       0.0UO                
+D01        Hemingway, Ernest           072119ERN*HEAUSA07212019 6MM  251  9 UN060629202600:53.65S                  00:45.93S     1 1     3 1.0UO                
+D3072119ERN*HEMI               X          NNNN                                                                                                         N        
+D01        Hemingway, Ernest           072119ERN*HEAUSA07212019 6MM  252 31 UN060629202601:17.40S                  01:06.44S     1 1     4 0.0UO                
+D01        Gogh, Vincent               033017VIN*GOAUSA03302017 9MM  501 13 09100629202600:58.75S                  00:58.07S     1 1     3 1.0UO                
+D3033017VIN*GOGH               X          NNNN                                                                                                         N        
+D01        Gogh, Vincent               033017VIN*GOAUSA03302017 9MM  503 23 091006292026        S                  DQ      S     1 1       0.0UO                
+D01        Gogh, Vincent               033017VIN*GOAUSA03302017 9MM  502 35 09100629202601:03.58S                  01:02.33S     1 1     2 3.0UO                
+D01        Williams, Serena            092611SER*WIAUSA0926201114FF 1005  8 15180629202601:48.60S                  DQ      S     1 3       0.0UO                
+D3092611SER*WILL               X          NNNN                                                                                                         N        
+D01        Williams, Serena            092611SER*WIAUSA0926201114FF  503 28 13140629202600:56.35S                  00:58.75S     1 1     4 0.0UO                
+D01        Williams, Serena            092611SER*WIAUSA0926201114FF  502 40 13140629202600:47.21S                  00:46.75S     1 3     2 3.0UO                
+D01        Picasso, Pablo              102515PAB*PIAUSA1025201510MM  501 13 091006292026        S                  01:13.62S     2 2       0.0UO                
+D3102515PAB*PICA               X          NNNN                                                                                                         N        
+D01        King, Billie                112215BIL*KIAUSA1122201510FF  501 16 11120629202600:45.83S                  00:45.42S     1 3     3 1.0UO                
+D3112215BIL*KING               X          NNNN                                                                                                         N        
+D01        King, Billie                112215BIL*KIAUSA1122201510FF  503 24 09100629202600:54.66S                  00:56.54S     1 3     1 5.0UO                
+D01        King, Billie                112215BIL*KIAUSA1122201510FF  504 48 11120629202601:40.15S                  01:03.23S     1 3     3 1.0UO                
+D01        Biles, Simone               031418SIM*BIAUSA03142018 8FF  251 12 07080629202600:28.81S                  00:33.03S     2 3       0.0UO                
+D3031418SIM*BILE               X          NNNN                                                                                                         N        
+D01        Biles, Simone               031418SIM*BIAUSA03142018 8FF  253 22 UN080629202600:35.97S                  00:40.10S     1 3     3 1.0UO                
+D01        Biles, Simone               031418SIM*BIAUSA03142018 8FF  252 34 07080629202600:30.89S                  00:32.89S     1 3     3 1.0UO                
+D01        Biles, Simone               031418SIM*BIAUSA03142018 8FF  254 44 UN080629202600:38.20S                  DQ      S     1 3       0.0UO                
+D01        Hamm, Mia                   031719MIA*HAAUSA03172019 7FF  251 12 07080629202600:43.67S                  DQ      S     1 1       0.0UO                
+D3031719MIA*HAMM               X          NNNN                                                                                                         N        
+D01        Hamm, Mia                   031719MIA*HAAUSA03172019 7FF  253 22 UN0806292026        S                  DQ      S     2 2       0.0UO                
+D01        Hamm, Mia                   031719MIA*HAAUSA03172019 7FF  252 34 07080629202600:54.45S                  00:50.94S     3 3       0.0UO                
+D01        Rudolph, Wilma              062311WIL*RUAUSA0623201114FF 1005  6 13140629202601:46.63S                  01:49.73S     1 1     4 0.0UO                
+D3062311WIL*RUDO               X          NNNN                                                                                                         N        
+D01        Rudolph, Wilma              062311WIL*RUAUSA0623201114FF  501 18 13140629202600:38.77S                  00:40.26S     1 1     3 1.0UO                
+D01        Rudolph, Wilma              062311WIL*RUAUSA0623201114FF  504 50 13140629202600:47.73S                  00:51.49S     1 3     4 0.0UO                
+E01        A    WW  X 1006  0 UN08   0629202602:27.75S                  02:18.08S     1 3     1 0.0UO                                                           
+F01                WWAEarhart, Amelia                                                                                                                           
+F01                WWAMonroe, Marilyn                                                                                                                           
+F01                WWAHamm, Mia                                                                                                                                 
+F01                WWABiles, Simone                                                                                                                             
+E01        B    WW  X 1006  0 UN08   0629202603:54.33S                  03:45.32S     1 1     4 0.0UO                                                           
+F01                WWBFrank, Anne                                                                                                                               
+F01                WWBHemingway, Ernest                                                                                                                         
+F01                WWBHepburn, Audrey                                                                                                                           
+F01                WWBDarwin, Charles                                                                                                                           
+E01        A    WW  M 2007 53 UNOV   0629202602:49.24S                  02:49.45S     1 3     2 0.0UO                                                           
+F01                WWADouglass, Frederick                                                                                                                       
+F01                WWAWashington, George                                                                                                                        
+F01                WWAMozart, Wolfgang                                                                                                                          
+F01                WWAMandela, Nelson                                                                                                                           
+D3062311WIL*RUDO               X          NNNN                                                                                                         N        
+E01        A    WW  F 2007 54 UNOV   0629202603:22.41S                  DQ      S     1 3       0.0UO                                                           
+F01                WWAKing, Billie                                                                                                                              
+F01                WWAKahlo, Frida                                                                                                                              
+F01                WWAWilliams, Serena                                                                                                                          
+F01                WWACurie, Marie                                                                                                                              
+E01        A    WW  M 2006 55 UNOV   0629202602:20.32S                  02:22.02S     1 3     2 0.0UO                                                           
+F01                WWAObama, Barack                                                                                                                             
+F01                WWAVinci, Leonardo                                                                                                                           
+F01                WWALincoln, Abraham                                                                                                                          
+F01                WWAEinstein, Albert                                                                                                                          
+E01        A    WW  F 2006 56 UNOV   0629202602:30.25S                  02:34.90S     1 3     2 0.0UO                                                           
+F01                WWALovelace, Ada                                                                                                                             
+F01                WWADickinson, Emily                                                                                                                          
+F01                WWARudolph, Wilma                                                                                                                            
+F01                WWAAusten, Jane                                                                                                                              
+C11          GG  Glendale Gators               Glendale Gators PO Box 6414                                 Newport News        VA23606                          
+D01        Comaneci, Nadia             111218NAD*COAUSA11122018 7FF  251 12 07080629202600:39.56S                  00:43.15S     3 2       0.0UO                
+D3111218NAD*COMA               X          NNNN                                                                                                         N        
+D01        Ledecky, Katie              031718KAT*LEAUSA03172018 8FF  251 12 07080629202600:27.92S                  00:25.81S     2 2       0.0UO                
+D3031718KAT*LEDE               X          NNNN                                                                                                         N        
+D01        Ledecky, Katie              031718KAT*LEAUSA03172018 8FF  253 22 UN0806292026        S                  00:37.22S     2 3       0.0UO                
+D01        Edison, Thomas              021120THO*EDAUSA02112020 6MM  251  9 UN060629202601:11.75S                  01:04.53S     2 4       0.0UO                
+D3021120THO*EDIS               X          NNNN                                                                                                         N        
+D01        Galilei, Galileo            021515GAL*GAAUSA0215201511MM 1005  3 11120629202601:55.51S                  01:54.45S     1 4     4 0.0UO                
+D3021515GAL*GALI               X          NNNN                                                                                                         N        
+D01        Galilei, Galileo            021515GAL*GAAUSA0215201511MM  504 47 11120629202600:51.39S                  00:51.43S     1 2     3 1.0UO                
+D01        Winfrey, Oprah              012918OPR*WIAUSA01292018 8FF  253 22 UN0806292026        S                  00:34.03S     2 1       0.0UO                
+D3012918OPR*WINF               X          NNNN                                                                                                         N        
+D01        Winfrey, Oprah              012918OPR*WIAUSA01292018 8FF  252 34 070806292026        S                  00:34.94S     3 1       0.0UO                
+D01        Degeneres, Ellen            012614ELL*DEAUSA0126201412FF 1005  4 11120629202601:39.48S                  01:37.65S     1 2     1 5.0UO                
+D3012614ELL*DEGE               X          NNNN                                                                                                         N        
+D01        Degeneres, Ellen            012614ELL*DEAUSA0126201412FF  502 38 11120629202600:45.84S                  00:45.59S     1 2     1 5.0UO                
+D01        Bolt, Usain                 082114USA*BOAUSA0821201411MM  503 25 111206292026        S                  01:02.99S     2 1       0.0UO                
+D3082114USA*BOLT               X          NNNN                                                                                                         N        
+D01        Bolt, Usain                 082114USA*BOAUSA0821201411MM  502 37 11120629202601:00.90S                  00:58.25S     1 2     3 1.0UO                
+D01        Roberts, Julia              102809JUL*ROAUSA1028200916FF 1005  8 15180629202601:35.66S                  01:37.52S     1 2     1 5.0UO                
+D3102809JUL*ROBE               X          NNNN                                                                                                         N        
+D01        Roberts, Julia              102809JUL*ROAUSA1028200916FF  503 30 15180629202600:47.71S                  00:49.42S     1 2     1 5.0UO                
+D01        Federer, Roger              080819ROG*FEAUSA08082019 6MM  251  9 UN060629202600:42.54S                  00:39.23S     1 4     2 3.0UO                
+D3080819ROG*FEDE               X          NNNN                                                                                                         N        
+D01        Federer, Roger              080819ROG*FEAUSA08082019 6MM  252 31 UN060629202600:46.80S                  00:42.28S     1 4     1 5.0UO                
+D01        Phelps, Michael             063015MIC*PHAUSA0630201510MM 1005  1 UN100629202601:34.92S                  01:37.32S     1 2     1 5.0UO                
+D3063015MIC*PHEL               X          NNNN                                                                                                         N        
+D01        Phelps, Michael             063015MIC*PHAUSA0630201510MM  503 23 09100629202600:50.58S                  DQ      S     1 2       0.0UO                
+D01        Phelps, Michael             063015MIC*PHAUSA0630201510MM  502 35 09100629202600:47.48S                  00:44.66S     1 2     1 5.0UO                
+D01        Owens, Jesse                091208JES*OWAUSA0912200817MM  501 19 15180629202600:37.05S                  00:36.44S     2 1       0.0UO                
+D3091208JES*OWEN               X          NNNN                                                                                                         N        
+D01        Jolie, Angelina             060413ANG*JOAUSA0604201312FF  501 16 11120629202600:39.76S                  00:38.55S     1 4     2 3.0UO                
+D3060413ANG*JOLI               X          NNNN                                                                                                         N        
+D01        Jolie, Angelina             060413ANG*JOAUSA0604201312FF  502 38 11120629202600:52.34S                  00:52.76S     1 4     2 3.0UO                
+D01        Kidman, Nicole              062013NIC*KIAUSA0620201312FF  503 26 111206292026        S                  00:52.68S     1 1       0.0UO                
+D3062013NIC*KIDM               X          NNNN                                                                                                         N        
+D01        Kidman, Nicole              062013NIC*KIAUSA0620201312FF  504 48 111206292026        S                  00:45.66S     1 1       0.0UO                
+D01        Robinson, Jackie            013117JAC*ROAUSA01312017 9MM 1005  1 UN100629202602:01.12S                  02:02.15S     1 4     2 3.0UO                
+D3013117JAC*ROBI               X          NNNN                                                                                                         N        
+D01        Robinson, Jackie            013117JAC*ROAUSA01312017 9MM  501 13 09100629202600:47.30S                  00:43.60S     1 2     1 5.0UO                
+D01        Robinson, Jackie            013117JAC*ROAUSA01312017 9MM  504 45 09100629202601:07.87S                  DQ      S     1 2       0.0UO                
+D01        Lee, Bruce                  112714BRU*LEAUSA1127201411MM  503 25 11120629202601:09.73S                  DQ      S     1 4       0.0UO                
+D3112714BRU*LEE*               X          NNNN                                                                                                         N        
+D01        Lawrence, Jennifer          081517JEN*LAAUSA08152017 8FF  252 34 07080629202600:41.32S                  00:37.80S     2 4       0.0UO                
+D3081517JEN*LAWR               X          NNNN                                                                                                         N        
+D01        Watson, Emma                041516EMM*WAAUSA0415201610FF  501 14 09100629202601:09.31S                  01:05.76S     2 1       0.0UO                
+D3041516EMM*WATS               X          NNNN                                                                                                         N        
+D01        Stone, Emma                 110618EMM*STAUSA11062018 7FF  251 12 07080629202600:36.13S                  00:36.81S     2 1       0.0UO                
+D3110618EMM*STON               X          NNNN                                                                                                         N        
+D01        Stone, Emma                 110618EMM*STAUSA11062018 7FF  252 34 070806292026        S                  00:43.68S     3 4       0.0UO                
+D01        Johansson, Scarlett         112219SCA*JOAUSA11222019 6FF  251 10 UN060629202600:34.88S                  00:37.40S     1 4     3 1.0UO                
+D3112219SCA*JOHA               X          NNNN                                                                                                         N        
+D01        Johansson, Scarlett         112219SCA*JOAUSA11222019 6FF  252 32 UN0606292026        S                  00:53.87S     2 4       0.0UO                
+D01        Swift, Taylor               121307TAY*SWAUSA1213200718FF 1005  8 151806292026        S                  01:49.01S     1 1       0.0UO                
+D3121307TAY*SWIF               X          NNNN                                                                                                         N        
+D01        Swift, Taylor               121307TAY*SWAUSA1213200718FF  503 30 15180629202601:04.15S                  00:58.80S     1 4     2 3.0UO                
+D01        Knowles, Beyonce            090409BEY*KNAUSA0904200916FF  501 20 15180629202600:58.75S                  00:51.40S     1 4     4 0.0UO                
+D3090409BEY*KNOW               X          NNNN                                                                                                         N        
+D01        Knowles, Beyonce            090409BEY*KNAUSA0904200916FF  502 42 151806292026        S                  01:07.30S     1 1       0.0UO                
+D01        Disney, Walt                120516WAL*DIAUSA12052016 9MM  501 13 091006292026        S                  01:04.94S     2 1       0.0UO                
+D3120516WAL*DISN               X          NNNN                                                                                                         N        
+D01        Disney, Walt                120516WAL*DIAUSA12052016 9MM  503 23 09100629202601:28.00S                  01:21.15S     1 4     2 3.0UO                
+D01        Disney, Walt                120516WAL*DIAUSA12052016 9MM  504 45 09100629202601:41.56S                  DQ      S     1 4       0.0UO                
+D01        Jobs, Steve                 022412STE*JOAUSA0224201214MM  501 17 13140629202600:36.64S                  00:38.68S     2 2       0.0UO                
+D3022412STE*JOBS               X          NNNN                                                                                                         N        
+D01        Jobs, Steve                 022412STE*JOAUSA0224201214MM  503 27 131406292026        S                  00:52.23S     2 3       0.0UO                
+D01        Jobs, Steve                 022412STE*JOAUSA0224201214MM  502 39 13140629202600:54.54S                  00:55.46S     1 4     3 1.0UO                
+D01        Ciccone, Madonna            081614MAD*CIAUSA0816201411FF  501 16 111206292026        S                  00:44.08S     2 1       0.0UO                
+D3081614MAD*CICC               X          NNNN                                                                                                         N        
+D01        Ciccone, Madonna            081614MAD*CIAUSA0816201411FF  503 26 11120629202600:55.07S                  00:55.10S     1 4     2 3.0UO                
+D01        Presley, Elvis              010809ELV*PRAUSA0108200917MM  501 19 15180629202600:27.98S                  00:28.20S     1 2     2 3.0UO                
+D3010809ELV*PRES               X          NNNN                                                                                                         N        
+D01        Presley, Elvis              010809ELV*PRAUSA0108200917MM  503 29 15180629202600:37.85S                  00:37.69S     1 2     2 3.0UO                
+D01        Presley, Elvis              010809ELV*PRAUSA0108200917MM  504 51 15180629202600:30.06S                  00:31.18S     1 2     1 5.0UO                
+D01        Houston, Whitney            080918WHI*HOAUSA08092018 7FF  251 12 07080629202600:38.09S                  00:38.32S     2 4       0.0UO                
+D3080918WHI*HOUS               X          NNNN                                                                                                         N        
+D01        Dylan, Bob                  052413BOB*DYAUSA0524201313MM  503 27 13140629202600:52.65S                  00:51.73S     1 4     4 0.0UO                
+D3052413BOB*DYLA               X          NNNN                                                                                                         N        
+D01        Mercury, Freddie            090519FRE*MEAUSA09052019 6MM  251  9 UN060629202601:00.19S                  00:56.94S     2 3       0.0UO                
+D3090519FRE*MERC               X          NNNN                                                                                                         N        
+D01        Franklin, Aretha            032517ARE*FRAUSA03252017 9FF  501 14 09100629202600:47.70S                  00:50.41S     1 4     4 0.0UO                
+D3032517ARE*FRAN               X          NNNN                                                                                                         N        
+D01        Franklin, Aretha            032517ARE*FRAUSA03252017 9FF  503 24 091006292026        S                  01:06.37S     2 4       0.0UO                
+D01        Fitzgerald, Ella            042518ELL*FIAUSA04252018 8FF  253 22 UN080629202600:28.65S                  00:29.96S     1 2     1 5.0UO                
+D3042518ELL*FITZ               X          NNNN                                                                                                         N        
+D01        Fitzgerald, Ella            042518ELL*FIAUSA04252018 8FF  254 44 UN080629202600:30.27S                  DQ      S     1 4       0.0UO                
+D01        Sinatra, Frank              121210FRA*SIAUSA1212201015MM  501 19 15180629202600:35.30S                  00:35.86S     2 3       0.0UO                
+D3121210FRA*SINA               X          NNNN                                                                                                         N        
+D01        Sinatra, Frank              121210FRA*SIAUSA1212201015MM  502 41 15180629202600:48.68S                  00:44.63S     1 4     3 1.0UO                
+D01        Armstrong, Louis            080413LOU*ARAUSA0804201312MM 1005  3 11120629202601:16.06S                  01:17.98S     1 2     1 5.0UO                
+D3080413LOU*ARMS               X          NNNN                                                                                                         N        
+D01        Armstrong, Louis            080413LOU*ARAUSA0804201312MM  501 15 11120629202600:29.82S                  00:30.68S     1 2     1 5.0UO                
+D01        Armstrong, Louis            080413LOU*ARAUSA0804201312MM  503 25 11120629202600:39.09S                  00:41.48S     1 2     1 5.0UO                
+D01        Holiday, Billie             040717BIL*HOAUSA04072017 9FF  501 14 09100629202600:59.95S                  00:58.57S     2 3       0.0UO                
+D3040717BIL*HOLI               X          NNNN                                                                                                         N        
+D01        Parton, Dolly               011917DOL*PAAUSA01192017 9FF  503 24 09100629202600:58.94S                  00:58.54S     1 4     3 1.0UO                
+D3011917DOL*PART               X          NNNN                                                                                                         N        
+D01        Parton, Dolly               011917DOL*PAAUSA01192017 9FF  504 46 09100629202600:58.21S                  00:57.35S     1 2     2 3.0UO                
+D01        Roosevelt, Franklin         013008FRA*ROAUSA0130200818MM  501 19 15180629202600:34.64S                  00:34.69S     2 2       0.0UO                
+D3013008FRA*ROOS               X          NNNN                                                                                                         N        
+D01        Roosevelt, Franklin         013008FRA*ROAUSA0130200818MM  503 29 15180629202600:40.99S                  00:41.23S     1 4     3 1.0UO                
+D01        Dion, Celine                033020CEL*DIAUSA03302020 6FF  252 32 UN060629202600:53.24S                  00:49.05S     2 2       0.0UO                
+D3033020CEL*DION               X          NNNN                                                                                                         N        
+D01        Armstrong, Neil             080516NEI*ARAUSA08052016 9MM  501 13 09100629202601:19.57S                  01:04.87S     1 4     4 0.0UO                
+D3080516NEI*ARMS               X          NNNN                                                                                                         N        
+D01        Carey, Mariah               032713MAR*CAAUSA0327201313FF  501 18 13140629202600:33.59S                  00:34.05S     1 2     2 3.0UO                
+D3032713MAR*CARE               X          NNNN                                                                                                         N        
+D01        Carey, Mariah               032713MAR*CAAUSA0327201313FF  504 50 13140629202600:38.84S                  00:39.78S     1 2     2 3.0UO                
+D01        Sagan, Carl                 110918CAR*SAAUSA11092018 7MM  251 11 07080629202600:40.03S                  00:38.73S     1 4       0.0UO                
+D3110918CAR*SAGA               X          NNNN                                                                                                         N        
+D01        Fenty, Rihanna              022010RIH*FEAUSA0220201016FF  503 30 151806292026        S                  01:19.03S     1 1       0.0UO                
+D3022010RIH*FENT               X          NNNN                                                                                                         N        
+D01        Fenty, Rihanna              022010RIH*FEAUSA0220201016FF  504 52 15180629202601:01.94S                  01:02.62S     1 4     2 3.0UO                
+D01        Steinem, Gloria             032517GLO*STAUSA03252017 9FF  503 24 09100629202601:26.51S                  DQ      S     2 3       0.0UO                
+D3032517GLO*STEI               X          NNNN                                                                                                         N        
+D01        Yousafzai, Malala           071213MAL*YOAUSA0712201312FF  501 16 111206292026        S                  00:46.55S     2 4       0.0UO                
+D3071213MAL*YOUS               X          NNNN                                                                                                         N        
+D01        Yousafzai, Malala           071213MAL*YOAUSA0712201312FF  504 48 11120629202600:55.57S                  00:56.19S     1 4     2 3.0UO                
+D01        Bello, Michelle             011713MIC*BEAUSA0117201313FF  503 28 13140629202600:54.68S                  00:51.37S     1 4     2 3.0UO                
+D3011713MIC*BELL               X          NNNN                                                                                                         N        
+D01        Bello, Michelle             011713MIC*BEAUSA0117201313FF  502 40 13140629202600:42.08S                  00:41.77S     1 2     1 5.0UO                
+D01        Clinton, Hillary            102616HIL*CLAUSA10262016 9FF  502 36 091006292026        S                  01:01.87S     2 3       0.0UO                
+D3102616HIL*CLIN               X          NNNN                                                                                                         N        
+D01        Merkel, Angela              071716ANG*MEAUSA07172016 9FF  503 24 091006292026        S                  01:21.58S     2 1       0.0UO                
+D3071716ANG*MERK               X          NNNN                                                                                                         N        
+D01        Merkel, Angela              071716ANG*MEAUSA07172016 9FF  502 36 09100629202601:01.42S                  00:55.88S     2 1       0.0UO                
+D01        Thatcher, Margaret          101315MAR*THAUSA1013201510FF  501 14 09100629202600:45.75S                  00:47.37S     1 2     3 1.0UO                
+D3101315MAR*THAT               X          NNNN                                                                                                         N        
+D01        Gandhi, Indira              111917IND*GAAUSA11192017 8FF  251 12 07080629202600:20.95S                  00:21.99S     1 2     1 5.0UO                
+D3111917IND*GAND               X          NNNN                                                                                                         N        
+D01        Gandhi, Indira              111917IND*GAAUSA11192017 8FF  254 44 UN080629202600:25.98S                  00:24.88S     1 2     1 5.0UO                
+D01        Dickens, Charles            020720CHA*DIAUSA02072020 6MM  251  9 UN060629202600:37.29S                  00:35.45S     1 2     1 5.0UO                
+D3020720CHA*DICK               X          NNNN                                                                                                         N        
+D01        Dickens, Charles            020720CHA*DIAUSA02072020 6MM  252 31 UN060629202600:39.02S                  00:44.90S     1 2     2 3.0UO                
+D01        Windsor, Victoria           052416VIC*WIAUSA0524201610FF  503 24 09100629202600:58.90S                  00:57.94S     1 2     2 3.0UO                
+D3052416VIC*WIND               X          NNNN                                                                                                         N        
+D01        Windsor, Victoria           052416VIC*WIAUSA0524201610FF  504 46 09100629202600:58.23S                  01:01.78S     1 4     3 1.0UO                
+D01        Wilde, Oscar                101612OSC*WIAUSA1016201213MM  501 17 13140629202600:43.44S                  00:41.97S     2 3       0.0UO                
+D3101612OSC*WILD               X          NNNN                                                                                                         N        
+D01        Verne, Jules                020812JUL*VEAUSA0208201214MM 1005  5 13140629202601:20.47S                  01:19.28S     1 4     3 1.0UO                
+D3020812JUL*VERN               X          NNNN                                                                                                         N        
+D01        Verne, Jules                020812JUL*VEAUSA0208201214MM  501 17 13140629202600:29.23S                  00:29.89S     1 2     1 5.0UO                
+D01        Verne, Jules                020812JUL*VEAUSA0208201214MM  503 27 13140629202600:37.15S                  00:38.32S     1 2     1 5.0UO                
+D01        Romanov, Catherine          050218CAT*ROAUSA05022018 8FF  253 22 UN080629202600:30.05S                  00:30.13S     1 4     2 3.0UO                
+D3050218CAT*ROMA               X          NNNN                                                                                                         N        
+D01        Romanov, Catherine          050218CAT*ROAUSA05022018 8FF  252 34 07080629202600:26.09S                  00:30.99S     1 2     2 3.0UO                
+D01        Tubman, Harriet             031518HAR*TUAUSA03152018 8FF  252 34 07080629202600:39.56S                  00:41.75S     2 1       0.0UO                
+D3031518HAR*TUBM               X          NNNN                                                                                                         N        
+D01        Anthony, Susan              021511SUS*ANAUSA0215201115FF 1005  8 15180629202601:48.09S                  01:46.44S     1 4     2 3.0UO                
+D3021511SUS*ANTH               X          NNNN                                                                                                         N        
+D01        Anthony, Susan              021511SUS*ANAUSA0215201115FF  504 52 15180629202600:44.68S                  00:45.81S     1 2     1 5.0UO                
+D01        Asimov, Isaac               010209ISA*ASAUSA0102200917MM 1005  7 15180629202601:22.83S                  01:22.91S     1 4     3 1.0UO                
+D3010209ISA*ASIM               X          NNNN                                                                                                         N        
+D01        Asimov, Isaac               010209ISA*ASAUSA0102200917MM  501 19 15180629202600:30.93S                  00:31.23S     1 4     3 1.0UO                
+D01        Ride, Sally                 052618SAL*RIAUSA05262018 8FF  252 34 07080629202600:35.00S                  00:35.72S     2 3       0.0UO                
+D3052618SAL*RIDE               X          NNNN                                                                                                         N        
+D01        Tereshkova, Valentina       030616VAL*TEAUSA0306201610FF  502 36 09100629202600:59.27S                  01:01.44S     2 2       0.0UO                
+D3030616VAL*TERE               X          NNNN                                                                                                         N        
+D01        Carson, Rachel              052710RAC*CAAUSA0527201016FF  502 42 15180629202600:46.06S                  00:44.97S     1 4     2 3.0UO                
+D3052710RAC*CARS               X          NNNN                                                                                                         N        
+D01        Carson, Rachel              052710RAC*CAAUSA0527201016FF  504 52 151806292026        S                  00:51.04S     1 3       0.0UO                
+D01        Franklin, Rosalind          072514ROS*FRAUSA0725201411FF 1005  4 11120629202601:52.80S                  01:56.03S     1 1       0.0UO                
+D3072514ROS*FRAN               X          NNNN                                                                                                         N        
+D01        Lamarr, Hedy                110920HED*LAAUSA11092020 5FF  251 10 UN060629202600:51.31S                  00:53.94S     2 2       0.0UO                
+D3110920HED*LAMA               X          NNNN                                                                                                         N        
+D01        Lamarr, Hedy                110920HED*LAAUSA11092020 5FF  252 32 UN0606292026        S                  00:48.06S     2 1       0.0UO                
+D01        Blackwell, Katherine        020318KAT*BLAUSA02032018 8FF  254 44 UN080629202600:49.10S                  00:38.33S     1 1       0.0UO                
+D3020318KAT*BLAC               X          NNNN                                                                                                         N        
+D01        Jemison, Mae                101718MAE*JEAUSA10172018 7FF  251 12 07080629202600:24.27S                  00:24.37S     1 4     2 3.0UO                
+D3101718MAE*JEMI               X          NNNN                                                                                                         N        
+D01        Jemison, Mae                101718MAE*JEAUSA10172018 7FF  252 34 07080629202600:29.18S                  00:28.89S     1 4     1 5.0UO                
+D01        Morrison, Toni              021813TON*MOAUSA0218201313FF 1005  6 13140629202601:39.69S                  01:38.14S     1 2     2 3.0UO                
+D3021813TON*MORR               X          NNNN                                                                                                         N        
+D01        Morrison, Toni              021813TON*MOAUSA0218201313FF  503 28 13140629202600:50.00S                  00:49.54S     1 2     1 5.0UO                
+D01        Dali, Salvador              051120SAL*DAAUSA05112020 6MM  251  9 UN060629202601:09.94S                  01:19.79S     2 1       0.0UO                
+D3051120SAL*DALI               X          NNNN                                                                                                         N        
+D01        Hugo, Victor                022615VIC*HUAUSA0226201511MM  503 25 111206292026        S                  DQ      S     2 2       0.0UO                
+D3022615VIC*HUGO               X          NNNN                                                                                                         N        
+D01        Kafka, Franz                070318FRA*KAAUSA07032018 7MM  251 11 07080629202600:32.11S                  00:34.07S     1 1       0.0UO                
+D3070318FRA*KAFK               X          NNNN                                                                                                         N        
+D01        Kafka, Franz                070318FRA*KAAUSA07032018 7MM  253 21 UN080629202600:46.86S                  DQ      S     1 4       0.0UO                
+D01        Kafka, Franz                070318FRA*KAAUSA07032018 7MM  254 43 UN080629202600:58.21S                  00:51.71S     1 4     2 3.0UO                
+D01        Rowling, Joanne             073115JOA*ROAUSA0731201510FF 1005  2 UN100629202601:55.11S                  01:53.75S     1 2     2 3.0UO                
+D3073115JOA*ROWL               X          NNNN                                                                                                         N        
+D01        Rowling, Joanne             073115JOA*ROAUSA0731201510FF  502 36 09100629202600:49.83S                  00:49.98S     1 2     1 5.0UO                
+D01        Lee, Harper                 042816HAR*LEAUSA0428201610FF  501 14 09100629202601:15.74S                  01:16.31S     2 4       0.0UO                
+D3042816HAR*LEE*               X          NNNN                                                                                                         N        
+D01        Bronte, Emily               073017EMI*BRAUSA07302017 8FF  252 34 07080629202600:50.19S                  00:42.35S     3 2       0.0UO                
+D3073017EMI*BRON               X          NNNN                                                                                                         N        
+D01        Bronte, Charlotte           042121CHA*BRAUSA04212021 5FF  251 10 UN060629202601:56.12S                  02:09.53S     2 4       0.0UO                
+D3042121CHA*BRON               X          NNNN                                                                                                         N        
+D01        Rachmaninoff, Sergei        040119SER*RAAUSA04012019 7MM  251 11 07080629202600:22.59S                  00:24.44S     1 2     1 5.0UO                
+D3040119SER*RACH               X          NNNN                                                                                                         N        
+D01        Rachmaninoff, Sergei        040119SER*RAAUSA04012019 7MM  253 21 UN080629202600:36.50S                  DQ      S     1 2       0.0UO                
+D01        Rachmaninoff, Sergei        040119SER*RAAUSA04012019 7MM  254 43 UN080629202600:29.53S                  00:33.30S     1 2     1 5.0UO                
+D01        Alcott, Louisa              112916LOU*ALAUSA11292016 9FF 1005  2 UN100629202601:55.36S                  01:57.61S     1 4     3 1.0UO                
+D3112916LOU*ALCO               X          NNNN                                                                                                         N        
+D01        Alcott, Louisa              112916LOU*ALAUSA11292016 9FF  502 36 09100629202600:53.69S                  00:55.89S     1 4     2 3.0UO                
+D01        Potter, Beatrix             072814BEA*POAUSA0728201411FF  501 16 11120629202600:39.11S                  00:37.72S     1 2     1 5.0UO                
+D3072814BEA*POTT               X          NNNN                                                                                                         N        
+D01        Potter, Beatrix             072814BEA*POAUSA0728201411FF  503 26 11120629202600:50.50S                  00:50.91S     1 2     1 5.0UO                
+D01        Beauvoir, Simone            010920SIM*BEAUSA01092020 6FF  251 10 UN060629202600:25.38S                  00:26.78S     1 2     1 5.0UO                
+D3010920SIM*BEAU               X          NNNN                                                                                                         N        
+D01        Beauvoir, Simone            010920SIM*BEAUSA01092020 6FF  252 32 UN060629202600:34.37S                  DQ      S     1 2       0.0UO                
+D01        Goethe, Johann              082819JOH*GOAUSA08282019 6MM  251  9 UN060629202600:42.31S                  00:46.75S     2 2       0.0UO                
+D3082819JOH*GOET               X          NNNN                                                                                                         N        
+D01        Dostoevsky, Fyodor          111115FYO*DOAUSA1111201510MM  502 35 09100629202601:55.53S                  DQ      S     1 4       0.0UO                
+D3111115FYO*DOST               X          NNNN                                                                                                         N        
+D01        Sotomayor, Sonia            062517SON*SOAUSA06252017 8FF  252 34 07080629202600:32.46S                  00:32.38S     2 2       0.0UO                
+D3062517SON*SOTO               X          NNNN                                                                                                         N        
+D01        Adams, Ansel                022015ANS*ADAUSA0220201511MM  503 25 111206292026        S                  01:22.46S     2 3       0.0UO                
+D3022015ANS*ADAM               X          NNNN                                                                                                         N        
+D01        Adams, Ansel                022015ANS*ADAUSA0220201511MM  504 47 11120629202601:22.66S                  DQ      S     1 4       0.0UO                
+D01        OConnor, Sandra             032620SAN*OCAUSA03262020 6FF  251 10 UN060629202600:56.64S                  00:59.89S     2 3       0.0UO                
+D3032620SAN*OCON               X          NNNN                                                                                                         N        
+D01        Davis, Miles                052612MIL*DAAUSA0526201214MM  501 17 13140629202600:35.15S                  00:35.55S     1 4     4 0.0UO                
+D3052612MIL*DAVI               X          NNNN                                                                                                         N        
+D01        Davis, Miles                052612MIL*DAAUSA0526201214MM  503 27 131406292026        S                  00:50.65S     2 1       0.0UO                
+D01        Davis, Miles                052612MIL*DAAUSA0526201214MM  504 49 13140629202600:48.78S                  00:48.68S     1 4     4 0.0UO                
+D01        Charles, Ray                092308RAY*CHAUSA0923200817MM 1005  7 15180629202601:13.70S                  01:13.98S     1 2     2 3.0UO                
+D3092308RAY*CHAR               X          NNNN                                                                                                         N        
+D01        Charles, Ray                092308RAY*CHAUSA0923200817MM  502 41 15180629202600:34.29S                  00:33.97S     1 2     1 5.0UO                
+D01        Charles, Ray                092308RAY*CHAUSA0923200817MM  504 51 151806292026        S                  00:32.34S     1 4     2 3.0UO                
+D01        Piaf, Edith                 121912EDI*PIAUSA1219201213FF  501 18 13140629202600:43.95S                  00:43.18S     1 4     4 0.0UO                
+D3121912EDI*PIAF               X          NNNN                                                                                                         N        
+D01        Pavlova, Anna               021215ANN*PAAUSA0212201511FF  501 16 11120629202600:46.66S                  00:49.17S     2 2       0.0UO                
+D3021215ANN*PAVL               X          NNNN                                                                                                         N        
+D01        Wonder, Stevie              051314STE*WOAUSA0513201412MM  501 15 11120629202600:47.57S                  00:51.15S     1 4     4 0.0UO                
+D3051314STE*WOND               X          NNNN                                                                                                         N        
+D01        Wonder, Stevie              051314STE*WOAUSA0513201412MM  502 37 11120629202601:02.59S                  01:02.08S     1 4     4 0.0UO                
+D01        Marley, Bob                 020619BOB*MAAUSA02062019 7MM  252 33 07080629202600:58.31S                  01:01.20S     1 4     2 3.0UO                
+D3020619BOB*MARL               X          NNNN                                                                                                         N        
+D01        Garland, Judy               061015JUD*GAAUSA0610201510FF  502 36 09100629202601:17.68S                  01:24.11S     2 4       0.0UO                
+D3061015JUD*GARL               X          NNNN                                                                                                         N        
+D01        Davis, Bette                040514BET*DAAUSA0405201412FF 1005  4 11120629202601:39.75S                  01:39.97S     1 4     2 3.0UO                
+D3040514BET*DAVI               X          NNNN                                                                                                         N        
+D01        Davis, Bette                040514BET*DAAUSA0405201412FF  504 48 11120629202600:47.91S                  00:45.70S     1 2     1 5.0UO                
+D01        Kelly, Grace                111214GRA*KEAUSA1112201411FF  501 16 111206292026        S                  01:13.91S     2 3       0.0UO                
+D3111214GRA*KELL               X          NNNN                                                                                                         N        
+D01        Taylor, Elizabeth           022719ELI*TAAUSA02272019 7FF  251 12 07080629202600:43.75S                  00:42.15S     3 1       0.0UO                
+D3022719ELI*TAYL               X          NNNN                                                                                                         N        
+D01        Hayworth, Rita              101712RIT*HAAUSA1017201213FF 1005  6 13140629202601:49.37S                  01:48.84S     1 4     3 1.0UO                
+D3101712RIT*HAYW               X          NNNN                                                                                                         N        
+D01        Hayworth, Rita              101712RIT*HAAUSA1017201213FF  502 40 13140629202600:49.25S                  00:50.15S     1 4     3 1.0UO                
+D01        Hayworth, Rita              101712RIT*HAAUSA1017201213FF  504 50 13140629202600:44.37S                  00:50.23S     1 4     3 1.0UO                
+D01        Holly, Buddy                090711BUD*HOAUSA0907201114MM 1005  5 13140629202601:13.49S                  01:17.30S     1 2     1 5.0UO                
+D3090711BUD*HOLL               X          NNNN                                                                                                         N        
+D01        Holly, Buddy                090711BUD*HOAUSA0907201114MM  502 39 13140629202600:37.53S                  00:37.00S     1 2     1 5.0UO                
+D01        Holly, Buddy                090711BUD*HOAUSA0907201114MM  504 49 13140629202600:33.15S                  00:33.21S     1 2     2 3.0UO                
+D01        Bardot, Brigitte            092819BRI*BAAUSA09282019 6FF  252 32 UN0606292026        S                  00:44.19S     2 3       0.0UO                
+D3092819BRI*BARD               X          NNNN                                                                                                         N        
+D01        Keaton, Diane               010520DIA*KEAUSA01052020 6FF  252 32 UN060629202600:42.54S                  00:39.61S     1 4     1 5.0UO                
+D3010520DIA*KEAT               X          NNNN                                                                                                         N        
+D01        Foster, Jodie               111917JOD*FOAUSA11192017 8FF  251 12 07080629202600:41.00S                  00:41.77S     3 3       0.0UO                
+D3111917JOD*FOST               X          NNNN                                                                                                         N        
+D01        Weaver, Sigourney           100807SIG*WEAUSA1008200718FF  501 20 15180629202600:39.12S                  00:36.26S     1 2     1 5.0UO                
+D3100807SIG*WEAV               X          NNNN                                                                                                         N        
+D01        Weaver, Sigourney           100807SIG*WEAUSA1008200718FF  502 42 15180629202600:42.76S                  00:42.75S     1 2     1 5.0UO                
+D01        Berry, Chuck                101818CHU*BEAUSA10182018 7MM  251 11 07080629202600:30.07S                  00:30.04S     1 3     2 3.0UO                
+D3101818CHU*BERR               X          NNNN                                                                                                         N        
+D01        Berry, Chuck                101818CHU*BEAUSA10182018 7MM  252 33 07080629202600:27.94S                  00:29.71S     1 2     1 5.0UO                
+D01        Sarandon, Susan             100415SUS*SAAUSA1004201510FF  503 24 09100629202601:12.50S                  01:11.58S     2 2       0.0UO                
+D3100415SUS*SARA               X          NNNN                                                                                                         N        
+E01        A    GG  X 1006  0 UN08   0629202602:28.40S                  02:22.83S     1 2     2 0.0UO                                                           
+F01                GGAMarley, Bob                                                                                                                               
+F01                GGASotomayor, Sonia                                                                                                                          
+F01                GGATubman, Harriet                                                                                                                           
+F01                GGALawrence, Jennifer                                                                                                                        
+E01        B    GG  X 1006  0 UN08   0629202602:30.19S                  02:32.38S     1 4     3 0.0UO                                                           
+F01                GGBSagan, Carl                                                                                                                               
+F01                GGBRide, Sally                                                                                                                               
+F01                GGBStone, Emma                                                                                                                               
+F01                GGBBronte, Emily                                                                                                                             
+E01        A    GG  M 2007 53 UNOV   06292026        S                  02:28.89S     1 2     1 7.0UO                                                           
+F01                GGAPhelps, Michael                                                                                                                           
+F01                GGAVerne, Jules                                                                                                                              
+F01                GGACharles, Ray                                                                                                                              
+F01                GGAArmstrong, Louis                                                                                                                          
+E01        A    GG  F 2007 54 UNOV   0629202602:57.11S                  02:58.36S     1 2     1 7.0UO                                                           
+F01                GGARowling, Joanne                                                                                                                           
+F01                GGAMorrison, Toni                                                                                                                            
+F01                GGAWeaver, Sigourney                                                                                                                         
+F01                GGADavis, Bette                                                                                                                              
+E01        A    GG  M 2006 55 UNOV   0629202602:29.57S                  02:21.63S     1 2     1 7.0UO                                                           
+F01                GGARobinson, Jackie                                                                                                                          
+F01                GGAHolly, Buddy                                                                                                                              
+F01                GGAGalilei, Galileo                                                                                                                          
+F01                GGAPresley, Elvis                                                                                                                            
+E01        A    GG  F 2006 56 UNOV   0629202602:34.95S                  02:32.42S     1 2     1 7.0UO                                                           
+F01                GGAPotter, Beatrix                                                                                                                           
+F01                GGAWindsor, Victoria                                                                                                                         
+F01                GGABello, Michelle                                                                                                                           
+F01                GGACarey, Mariah                                                                                                                             
+Z01        02                                   1       2         130   12    48                                                                                

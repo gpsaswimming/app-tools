@@ -1,0 +1,28 @@
+name: swimparse tests
+
+on:
+  push:
+    paths:
+      - 'swimparse/**'
+      - '.github/workflows/test.yml'
+  pull_request:
+    paths:
+      - 'swimparse/**'
+      - '.github/workflows/test.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: swimparse
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      # Zero runtime deps — nothing to install; just run the test suite.
+      - run: node --test
