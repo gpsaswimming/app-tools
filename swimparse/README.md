@@ -12,18 +12,50 @@ one JSON contract instead of re-implementing fixed-width parsing.
 ## Usage
 
 ```js
-import { parse, detectFormat, score } from '@gpsa/swimparse';
+import { parse, detectFormat, score, GPSA } from '@gpsa/swimparse';
 
 const meet = parse(fileText, { filename: 'GG_at_WW.hy3' }); // auto-detects format
 const totals = score(meet);                                  // { GG: 320, WW: 146 }
+
+// With a league profile: adds census age-groups and strips birthdates.
+const safe = parse(fileText, { league: GPSA });         // DOB-free output
 ```
 
 CLI:
 
 ```bash
-swimparse meet.hy3 --pretty            # NormalizedMeet JSON to stdout
-swimparse a.sd3 b.hy3 -d out/          # one <name>.json per input
+swimparse meet.hy3 --pretty              # NormalizedMeet JSON to stdout
+swimparse a.sd3 b.hy3 -d out/            # one <name>.json per input
+swimparse meet.hy3 --league gpsa         # DOB-free + census age-groups
+swimparse meet.hy3 --league-file x.json  # custom league profile
 ```
+
+## League profiles
+
+A **league profile** is a plain object carrying what a league defines for itself:
+its age-up reference date, its age-group bands, and its scoring point values. The
+built-in `GPSA` lives in [`src/league.js`](src/league.js); a portable copy is
+[`leagues/gpsa.json`](leagues/gpsa.json) (kept equal by a test, and the shape
+app-census's editable YAML will mirror).
+
+```js
+{
+  id: 'gpsa',
+  ageUp: { reference: '06-01' },          // age "as of" June 1 of the meet season year
+  ageGroups: [ { label: '6&U', max: 6 }, { label: '7-8', min: 7, max: 8 }, /* … */ ],
+  scoring: { individualPlaces: [5, 3, 1], relayPlaces: [7], entriesScoredPerTeam: 2 },
+}
+```
+
+Passing a profile to `parse()` makes the **parse boundary a PII firewall**: swimparse
+computes each swimmer's `ageGroup` from their birthdate, then **removes `birthDate`
+and `usasId`** from the output and stamps `meet.ageProfile`. That output is DOB-free
+and no longer confidential. Without a profile the parse is the raw, lossless
+(DOB-bearing) artifact — see Privacy below.
+
+Point *values* come from the profile's `scoring` block; the *structural* rules
+(single-gender numbered relays only; mixed 8 & Under "B" relays score 0) stay in the
+engine as policy.
 
 ## The NormalizedMeet contract
 
@@ -51,9 +83,11 @@ individual 5-3-1-0, relay winner 7 (single-gender numbered relays only; mixed
 
 ## Privacy
 
-`swimmers[].birthDate` / `usasId` are PII for minors — a populated `NormalizedMeet`
-is a confidential artifact. Do not publish raw parser output publicly without
-sanitizing. Test fixtures use public figures with shifted birth years; see
+`swimmers[].birthDate` / `usasId` are PII for minors — a `NormalizedMeet` parsed
+**without** a league profile carries them and is a confidential artifact. Do not
+publish raw parser output publicly without sanitizing. Parsing **with** a league
+profile strips those fields (see [League profiles](#league-profiles)) and is safe
+to publish. Test fixtures use public figures with shifted birth years; see
 [`test/fixtures/README.md`](test/fixtures/README.md).
 
 ## Tests

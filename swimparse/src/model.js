@@ -13,6 +13,9 @@
  * PRIVACY: `swimmers[].birthDate` and `usasId` are PII for minors. A
  * NormalizedMeet with these populated is a confidential artifact — see the
  * fixture-sanitization guardrail before committing one to a public repo.
+ * Parsing WITH a league profile (see league.js) computes each swimmer's
+ * `ageGroup`, strips birthDate/usasId, and stamps `ageProfile` — that output is
+ * DOB-free and no longer confidential.
  */
 
 /**
@@ -30,6 +33,9 @@
  * @property {Team[]} teams
  * @property {Swimmer[]} swimmers             Deduped registry (name + birthdate).
  * @property {Event[]} events
+ * @property {string} [ageProfile]            League profile id used to age-group +
+ *                                            strip DOB (present only when parsed
+ *                                            with a league, e.g. "gpsa").
  */
 
 /**
@@ -60,9 +66,13 @@
  * @property {string} [middleInitial]
  * @property {string} fullName                "Last, First".
  * @property {'M'|'F'} [gender]
- * @property {string|null} birthDate          ISO, or null. PII.
- * @property {string|null} [usasId]           PII.
+ * @property {string|null} [birthDate]        ISO, or null. PII. Omitted when
+ *                                            parsed with a league profile.
+ * @property {string|null} [usasId]           PII. Omitted when parsed with a league.
  * @property {number|null} [age]
+ * @property {string|null} [ageGroup]         Census age-group label (e.g. "9-10"),
+ *                                            computed from DOB + league profile.
+ *                                            Present only when parsed with a league.
  */
 
 /**
@@ -84,7 +94,8 @@
  * @property {string} [swimmerId]             Links to Swimmer.id when resolvable.
  * @property {string} swimmerName             "Last, First" as in the file.
  * @property {string} teamCode
- * @property {string|null} birthDate          ISO. PII.
+ * @property {string|null} [birthDate]        ISO. PII. Omitted when parsed with a
+ *                                            league (join to Swimmer for ageGroup).
  * @property {SwimTime|null} seedTime
  * @property {SwimTime|null} finalTime        The time swum. NOTE: for HY3 this is
  *                                            retained even on a DQ; for SDIF it is
