@@ -8,6 +8,7 @@
  *   swimparse meet.hy3 --pretty            # 2-space indented
  *   swimparse meet.hy3 --league gpsa       # DOB-free + census age-groups
  *   swimparse meet.hy3 --league-file x.json# custom league profile
+ *   swimparse meet.hy3 --score             # fill GPSA dual-meet points
  *
  * PRIVACY: WITHOUT a league, output contains swimmer birthdates (PII) — do not
  * publish it without sanitizing (see the fixture guardrail). WITH `--league`,
@@ -17,6 +18,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, join, extname } from 'node:path';
 import { parse } from './src/index.js';
+import { score } from './src/score.js';
 import { BUILTIN_LEAGUES } from './src/league.js';
 
 function main(argv) {
@@ -26,12 +28,14 @@ function main(argv) {
     let outDir = null;
     let pretty = false;
     let league = null;
+    let doScore = false;
 
     for (let i = 0; i < args.length; i++) {
         const a = args[i];
         if (a === '-o' || a === '--out') outFile = args[++i];
         else if (a === '-d' || a === '--out-dir') outDir = args[++i];
         else if (a === '--pretty') pretty = true;
+        else if (a === '--score') doScore = true;
         else if (a === '--league') {
             const name = args[++i];
             league = BUILTIN_LEAGUES[name];
@@ -50,6 +54,7 @@ function main(argv) {
 
     for (const file of inputs) {
         const meet = parse(readFileSync(file, 'latin1'), { filename: file, league });
+        if (doScore) score(meet); // fill result.points via the GPSA engine (both formats)
         const json = JSON.stringify(meet, null, indent);
         if (outDir) {
             const name = basename(file, extname(file)) + '.json';
@@ -72,7 +77,9 @@ function help(codeNum) {
         '  Parses SDIF (.sd3) or Hy-Tek (.hy3) results into NormalizedMeet JSON.\n' +
         `  --league <name>       apply a built-in league profile (${Object.keys(BUILTIN_LEAGUES).join(', ')});\n` +
         '                        computes census age-groups and strips birthdates.\n' +
-        '  --league-file <path>  apply a custom league profile (JSON).\n'
+        '  --league-file <path>  apply a custom league profile (JSON).\n' +
+        '  --score               fill GPSA dual-meet points (needed for HY3, which\n' +
+        '                        carries none; SDIF points are recomputed to match).\n'
     );
     return codeNum;
 }
