@@ -88,4 +88,8 @@ function fail(msg) {
     return 2;
 }
 
-process.exit(main(process.argv));
+// Set exitCode rather than process.exit(): process.exit() can terminate before
+// a large stdout write drains to a pipe, truncating JSON at ~64KB (fine to a TTY
+// or file, broken when a parent process captures stdout). Letting the event loop
+// empty naturally flushes the write first.
+process.exitCode = main(process.argv);
