@@ -13,5 +13,26 @@
     "individualPlaces": [5, 3, 1],
     "relayPlaces": [7],
     "entriesScoredPerTeam": 2
-  }
+  },
+  "teams": [
+    { "code": "BLMAR", "aliases": ["BLMA"] },
+    { "code": "COL" },
+    { "code": "CV" },
+    { "code": "EL" },
+    { "code": "GG" },
+    { "code": "HW" },
+    { "code": "JRCC" },
+    { "code": "KCD" },
+    { "code": "MBKMT", "aliases": ["MBKM"] },
+    { "code": "NHM" },
+    { "code": "POQ" },
+    { "code": "RMMR" },
+    { "code": "RRST" },
+    { "code": "VG" },
+    { "code": "WO" },
+    { "code": "WPPIR", "aliases": ["WPPI"] },
+    { "code": "WW" },
+    { "code": "WYCC" },
+    { "code": "WYTH", "name": "Wythe Wahoos", "aliases": ["GWRA", "WYTHE"] }
+  ]
 }

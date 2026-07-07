@@ -25,6 +25,8 @@ export {
     ageGroupLabel,
     ageOn,
     seasonReferenceDate,
+    teamRegistry,
+    canonicalizeTeams,
 } from './league.js';
 export * from './model.js';
 

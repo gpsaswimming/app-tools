@@ -22,6 +22,8 @@ import {
     ageOn,
     ageGroupLabel,
     seasonReferenceDate,
+    teamRegistry,
+    canonicalizeTeams,
 } from '../src/index.js';
 
 const dir = new URL('./fixtures/', import.meta.url);
@@ -51,6 +53,80 @@ test('ageGroupLabel maps ages onto GPSA bands, edges included', () => {
     assert.equal(on('2016-01-01'), '9-10');  // age 10
     assert.equal(on('2008-01-01'), '15-18'); // age 18
     assert.equal(on('2007-01-01'), null);    // age 19 — out of range
+});
+
+// ── team canonicalization ────────────────────────────────────────────────────
+
+test('teamRegistry indexes canonical codes + aliases (keys upper-cased)', () => {
+    const index = teamRegistry(GPSA);
+    assert.equal(index.get('WYTH').code, 'WYTH');   // Wythe canonical (re-branded)
+    assert.equal(index.get('GWRA').code, 'WYTH');   // legacy code → alias
+    assert.equal(index.get('WYTHE').code, 'WYTH');  // second alias
+    assert.equal(index.get('MBKM').code, 'MBKMT');  // truncation alias
+    assert.equal(index.get('ZZZ'), undefined);      // unknown
+    assert.equal(teamRegistry({ id: 'x' }), null);  // no registry → null
+});
+
+test('canonicalizeTeams matches case-insensitively', () => {
+    const meet = {
+        teams: [{ code: 'gwra', fullCode: 'gwra', name: 'x' }],
+        swimmers: [{ teamCode: 'gwra' }],
+        events: [{ results: [{ teamCode: 'gwra' }] }],
+    };
+    canonicalizeTeams(meet, GPSA);
+    assert.equal(meet.teams[0].code, 'WYTH');
+    assert.equal(meet.events[0].results[0].teamCode, 'WYTH');
+});
+
+test('canonicalizeTeams collapses a legacy code across the whole meet', () => {
+    const meet = {
+        teams: [
+            { code: 'GWRA', fullCode: 'VAGWRA', name: 'George Wythe Wahoos' },
+            { code: 'GG', fullCode: 'GG', name: 'Glendale Gators' },
+        ],
+        swimmers: [{ teamCode: 'GWRA' }, { teamCode: 'GG' }],
+        events: [{
+            results: [
+                { kind: 'individual', teamCode: 'GWRA' },
+                { kind: 'relay', teamCode: 'GWRA', legs: [{ name: 'x' }] },
+                { kind: 'individual', teamCode: 'GG' },
+            ],
+        }],
+    };
+    canonicalizeTeams(meet, GPSA);
+
+    // Team row: legacy GWRA → current WYTH, re-brand name override, fullCode kept.
+    const wythe = meet.teams.find((t) => t.fullCode === 'VAGWRA');
+    assert.equal(wythe.code, 'WYTH');
+    assert.equal(wythe.name, 'Wythe Wahoos');
+    // Every teamCode reference is remapped; the untouched team is left alone.
+    assert.deepStrictEqual(meet.swimmers.map((s) => s.teamCode), ['WYTH', 'GG']);
+    assert.deepStrictEqual(
+        meet.events[0].results.map((r) => r.teamCode),
+        ['WYTH', 'WYTH', 'GG'],
+    );
+});
+
+test('canonicalizeTeams leaves unknown teams and no-registry profiles untouched', () => {
+    const meet = {
+        teams: [{ code: 'XYZ', fullCode: 'XYZ', name: 'Somewhere' }],
+        swimmers: [{ teamCode: 'XYZ' }],
+        events: [{ results: [{ teamCode: 'XYZ' }] }],
+    };
+    canonicalizeTeams(meet, GPSA);           // unknown code → unchanged
+    assert.equal(meet.teams[0].code, 'XYZ');
+    assert.equal(meet.events[0].results[0].teamCode, 'XYZ');
+
+    const meet2 = { teams: [{ code: 'WYTH', fullCode: 'WYTH' }], swimmers: [], events: [] };
+    canonicalizeTeams(meet2, { id: 'x' });   // no registry → no-op
+    assert.equal(meet2.teams[0].code, 'WYTH');
+});
+
+test('a leagued real-fixture parse keeps already-canonical codes and is recognized', () => {
+    const meet = leagued('gg-at-ww.sd3');
+    assert.deepStrictEqual(meet.teams.map((t) => t.code).sort(), ['GG', 'WW']);
+    const index = teamRegistry(GPSA);
+    for (const t of meet.teams) assert.ok(index.has(t.code), `${t.code} in registry`);
 });
 
 // ── the DOB firewall ─────────────────────────────────────────────────────────

@@ -27,11 +27,20 @@
  *                                               meet's season year) or "meet-date".
  * @property {AgeGroupBand[]} ageGroups          Ordered bands; first match wins.
  * @property {ScoringProfile} scoring
+ * @property {TeamEntry[]} [teams]               Optional canonical team registry: collapses
+ *                                               drifting/legacy codes onto one league code.
  *
  * @typedef {Object} AgeGroupBand
  * @property {string} label                      e.g. "9-10".
  * @property {number} [min]                      Inclusive lower bound (default 0).
  * @property {number} [max]                      Inclusive upper bound (default ∞).
+ *
+ * @typedef {Object} TeamEntry
+ * @property {string} code                       Canonical league code (e.g. "GWRA").
+ * @property {string} [name]                     Canonical display-name override (e.g. after a
+ *                                               re-brand); when omitted the file's name is kept.
+ * @property {string[]} [aliases]                Drifting / legacy / truncated codes that
+ *                                               collapse onto `code` (e.g. "GWRA", "MBKM").
  *
  * @typedef {Object} ScoringProfile
  * @property {number[]} individualPlaces         Points by place, index 0 = 1st.
@@ -48,6 +57,13 @@
  * year, so the profile carries no season — `ageUp.reference` is a bare month-day
  * anchored to each meet's own season year at compute time. If a rule ever does
  * change, bump `id` semantically (e.g. "gpsa-v2"), not by calendar year.
+ *
+ * `teams` is the canonical league roster + alias map. SDIF/HY3 codes drift
+ * (a re-brand like Wythe's legacy `GWRA`/`WYTHE` → its current `WYTH`, or
+ * truncations like `MBKM`→`MBKMT`); the registry collapses those onto one code so a team's
+ * multi-season history doesn't fragment. Canonical codes follow the portfolio
+ * league abbreviations. `name` is set only where a re-brand needs it (otherwise
+ * the file's team name is kept). Unlisted codes pass through untouched.
  */
 export const GPSA = {
     id: 'gpsa',
@@ -65,6 +81,27 @@ export const GPSA = {
         relayPlaces: [7], // winner only
         entriesScoredPerTeam: 2,
     },
+    teams: [
+        { code: 'BLMAR', aliases: ['BLMA'] },       // Beaconsdale
+        { code: 'COL' },                            // Colony
+        { code: 'CV' },                             // Coventry
+        { code: 'EL' },                             // Elizabeth Lake
+        { code: 'GG' },                             // Glendale
+        { code: 'HW' },                             // Hidenwood
+        { code: 'JRCC' },                           // James River
+        { code: 'KCD' },                            // Kiln Creek
+        { code: 'MBKMT', aliases: ['MBKM'] },       // Marlbank
+        { code: 'NHM' },                            // Northampton (historical)
+        { code: 'POQ' },                            // Poquoson
+        { code: 'RMMR' },                           // Running Man
+        { code: 'RRST' },                           // Riverdale
+        { code: 'VG' },                             // Village Green
+        { code: 'WO' },                             // Willow Oaks
+        { code: 'WPPIR', aliases: ['WPPI'] },       // Windy Point
+        { code: 'WW' },                             // Wendwood
+        { code: 'WYCC' },                           // Warwick Yacht
+        { code: 'WYTH', name: 'Wythe Wahoos', aliases: ['GWRA', 'WYTHE'] }, // Wythe (re-brand; was GWRA)
+    ],
 };
 
 /** Built-in profiles selectable by name (CLI `--league <name>`). */
@@ -121,7 +158,63 @@ export function ageGroupLabel(birthDate, meetDate, profile) {
 }
 
 /**
+ * Builds a case-insensitive index from every known code + alias to its canonical
+ * team entry. Returns null when the profile carries no team registry.
+ * @param {LeagueProfile} profile
+ * @returns {Map<string, TeamEntry>|null}
+ */
+export function teamRegistry(profile) {
+    if (!profile?.teams?.length) return null;
+    const index = new Map();
+    for (const entry of profile.teams) {
+        index.set(entry.code.toUpperCase(), entry);
+        for (const alias of entry.aliases ?? []) index.set(alias.toUpperCase(), entry);
+    }
+    return index;
+}
+
+/**
+ * Canonicalizes team codes (and names, where the registry overrides them) across
+ * a NormalizedMeet, in place, using the league's team registry.
+ *
+ * SDIF/HY3 codes drift between seasons — a re-brand (`GWRA`/`WYTHE` → `WYTH`) or a
+ * truncation (`MBKM` → `MBKMT`) — which otherwise fragments a team's multi-season
+ * history. Each team is matched by its display code or raw `fullCode`; on a hit
+ * the canonical code replaces it everywhere it appears (team list, every result
+ * and relay, and swimmer `teamCode`). Unknown teams are left untouched, and the
+ * whole step is a no-op when the profile has no `teams` registry (so other
+ * leagues and no-league parses are unaffected).
+ *
+ * @param {import('./model.js').NormalizedMeet} meet
+ * @param {LeagueProfile} profile
+ * @returns {import('./model.js').NormalizedMeet}
+ */
+export function canonicalizeTeams(meet, profile) {
+    const index = teamRegistry(profile);
+    if (!index) return meet;
+
+    const remap = new Map(); // parsed display code → canonical code
+    for (const team of meet.teams) {
+        const entry = index.get((team.code || '').toUpperCase())
+            ?? index.get((team.fullCode || '').toUpperCase());
+        if (!entry) continue;
+        if (team.code !== entry.code) remap.set(team.code, entry.code);
+        team.code = entry.code;
+        if (entry.name) team.name = entry.name;
+    }
+    if (remap.size === 0) return meet;
+
+    const fix = (code) => remap.get(code) ?? code;
+    for (const s of meet.swimmers) s.teamCode = fix(s.teamCode);
+    for (const ev of meet.events) {
+        for (const r of ev.results) r.teamCode = fix(r.teamCode);
+    }
+    return meet;
+}
+
+/**
  * Applies a league profile to a freshly-parsed NormalizedMeet, in place:
+ *   0. canonicalizes team codes/names via the league registry (see canonicalizeTeams),
  *   1. computes each swimmer's census `ageGroup` from their birthdate,
  *   2. **re-keys swimmer ids** off DOB (the raw id is `name|birthDate`) onto a
  *      DOB-free `name|ageGroup` key, remapping every `swimmerId` reference,
@@ -141,6 +234,8 @@ export function ageGroupLabel(birthDate, meetDate, profile) {
  * @returns {import('./model.js').NormalizedMeet}
  */
 export function applyLeague(meet, profile) {
+    canonicalizeTeams(meet, profile);
+
     const meetDate = meet.meet?.startDate ?? null;
     const remap = new Map(); // raw DOB-based id → DOB-free id
 
