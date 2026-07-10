@@ -1333,8 +1333,8 @@
           "teamCode": "WW",
           "birthDate": "2009-03-14",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "1:10.96",
+            "seconds": 70.96
           },
           "finalTime": {
             "text": "1:11.35",
@@ -1351,7 +1351,10 @@
           "swimmerName": "Charles, Ray",
           "teamCode": "GG",
           "birthDate": "2008-09-23",
-          "seedTime": null,
+          "seedTime": {
+            "text": "1:13.70",
+            "seconds": 73.7
+          },
           "finalTime": {
             "text": "1:13.98",
             "seconds": 73.98
@@ -1368,8 +1371,8 @@
           "teamCode": "GG",
           "birthDate": "2009-01-02",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "1:22.83",
+            "seconds": 82.83
           },
           "finalTime": {
             "text": "1:22.91",
@@ -1402,8 +1405,8 @@
           "teamCode": "WW",
           "birthDate": "2009-03-14",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "28.15",
+            "seconds": 28.15
           },
           "finalTime": {
             "text": "28.05",
@@ -1421,8 +1424,8 @@
           "teamCode": "GG",
           "birthDate": "2009-01-08",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "27.98",
+            "seconds": 27.98
           },
           "finalTime": {
             "text": "28.20",
@@ -1440,8 +1443,8 @@
           "teamCode": "GG",
           "birthDate": "2009-01-02",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "30.93",
+            "seconds": 30.93
           },
           "finalTime": {
             "text": "31.23",
@@ -1459,8 +1462,8 @@
           "teamCode": "WW",
           "birthDate": "2010-01-04",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "37.25",
+            "seconds": 37.25
           },
           "finalTime": {
             "text": "38.36",
@@ -1478,8 +1481,8 @@
           "teamCode": "GG",
           "birthDate": "2008-09-12",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "37.05",
+            "seconds": 37.05
           },
           "finalTime": {
             "text": "36.44",
@@ -1496,7 +1499,10 @@
           "swimmerName": "Sinatra, Frank",
           "teamCode": "GG",
           "birthDate": "2010-12-12",
-          "seedTime": null,
+          "seedTime": {
+            "text": "35.30",
+            "seconds": 35.3
+          },
           "finalTime": {
             "text": "35.86",
             "seconds": 35.86
@@ -1513,8 +1519,8 @@
           "teamCode": "GG",
           "birthDate": "2008-01-30",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "34.64",
+            "seconds": 34.64
           },
           "finalTime": {
             "text": "34.69",
@@ -1547,8 +1553,8 @@
           "teamCode": "WW",
           "birthDate": "2009-03-14",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "35.55",
+            "seconds": 35.55
           },
           "finalTime": {
             "text": "36.97",
@@ -1566,8 +1572,8 @@
           "teamCode": "GG",
           "birthDate": "2009-01-08",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "37.85",
+            "seconds": 37.85
           },
           "finalTime": {
             "text": "37.69",
@@ -1585,8 +1591,8 @@
           "teamCode": "GG",
           "birthDate": "2008-01-30",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "40.99",
+            "seconds": 40.99
           },
           "finalTime": {
             "text": "41.23",
@@ -1604,8 +1610,8 @@
           "teamCode": "WW",
           "birthDate": "2010-01-04",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "1:02.51",
+            "seconds": 62.51
           },
           "finalTime": {
             "text": "1:04.48",
@@ -1638,8 +1644,8 @@
           "teamCode": "GG",
           "birthDate": "2009-01-08",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "30.06",
+            "seconds": 30.06
           },
           "finalTime": {
             "text": "31.18",
@@ -1673,8 +1679,8 @@
           "teamCode": "WW",
           "birthDate": "2009-03-14",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "31.22",
+            "seconds": 31.22
           },
           "finalTime": {
             "text": "32.91",
@@ -1692,8 +1698,8 @@
           "teamCode": "WW",
           "birthDate": "2010-01-04",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "55.27",
+            "seconds": 55.27
           },
           "finalTime": null,
           "status": "dq",
@@ -1723,8 +1729,8 @@
           "teamCode": "GG",
           "birthDate": "2008-09-23",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "34.29",
+            "seconds": 34.29
           },
           "finalTime": {
             "text": "33.97",
@@ -1742,8 +1748,8 @@
           "teamCode": "WW",
           "birthDate": "2014-04-15",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "35.47",
+            "seconds": 35.47
           },
           "finalTime": {
             "text": "37.35",
@@ -1761,8 +1767,8 @@
           "teamCode": "GG",
           "birthDate": "2010-12-12",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "48.68",
+            "seconds": 48.68
           },
           "finalTime": {
             "text": "44.63",
@@ -1780,8 +1786,8 @@
           "teamCode": "WW",
           "birthDate": "2010-01-04",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "53.38",
+            "seconds": 53.38
           },
           "finalTime": {
             "text": "55.43",
@@ -1814,8 +1820,8 @@
           "teamCode": "GG",
           "birthDate": "2020-02-07",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "37.29",
+            "seconds": 37.29
           },
           "finalTime": {
             "text": "35.45",
@@ -1833,8 +1839,8 @@
           "teamCode": "GG",
           "birthDate": "2019-08-08",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "42.54",
+            "seconds": 42.54
           },
           "finalTime": {
             "text": "39.23",
@@ -1852,8 +1858,8 @@
           "teamCode": "WW",
           "birthDate": "2019-07-21",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "53.65",
+            "seconds": 53.65
           },
           "finalTime": {
             "text": "45.93",
@@ -1871,8 +1877,8 @@
           "teamCode": "WW",
           "birthDate": "2020-02-12",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "45.67",
+            "seconds": 45.67
           },
           "finalTime": null,
           "status": "ns",
@@ -1887,8 +1893,8 @@
           "teamCode": "GG",
           "birthDate": "2020-02-11",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:11.75",
+            "seconds": 71.75
           },
           "finalTime": {
             "text": "1:04.53",
@@ -1906,8 +1912,8 @@
           "teamCode": "GG",
           "birthDate": "2019-09-05",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "1:00.19",
+            "seconds": 60.19
           },
           "finalTime": {
             "text": "56.94",
@@ -1925,8 +1931,8 @@
           "teamCode": "GG",
           "birthDate": "2020-05-11",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "1:09.94",
+            "seconds": 69.94
           },
           "finalTime": {
             "text": "1:19.79",
@@ -1944,8 +1950,8 @@
           "teamCode": "GG",
           "birthDate": "2019-08-28",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "42.31",
+            "seconds": 42.31
           },
           "finalTime": {
             "text": "46.75",
@@ -1977,7 +1983,10 @@
           "swimmerName": "Federer, Roger",
           "teamCode": "GG",
           "birthDate": "2019-08-08",
-          "seedTime": null,
+          "seedTime": {
+            "text": "46.80",
+            "seconds": 46.8
+          },
           "finalTime": {
             "text": "42.28",
             "seconds": 42.28
@@ -1994,8 +2003,8 @@
           "teamCode": "GG",
           "birthDate": "2020-02-07",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "39.02",
+            "seconds": 39.02
           },
           "finalTime": {
             "text": "44.90",
@@ -2013,8 +2022,8 @@
           "teamCode": "WW",
           "birthDate": "2020-02-12",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "1:06.29",
+            "seconds": 66.29
           },
           "finalTime": {
             "text": "51.81",
@@ -2031,7 +2040,10 @@
           "swimmerName": "Hemingway, Ernest",
           "teamCode": "WW",
           "birthDate": "2019-07-21",
-          "seedTime": null,
+          "seedTime": {
+            "text": "1:17.40",
+            "seconds": 77.4
+          },
           "finalTime": {
             "text": "1:06.44",
             "seconds": 66.44
@@ -2063,8 +2075,8 @@
           "teamCode": "WW",
           "birthDate": "2015-12-16",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "1:34.27",
+            "seconds": 94.27
           },
           "finalTime": {
             "text": "1:34.43",
@@ -2082,8 +2094,8 @@
           "teamCode": "GG",
           "birthDate": "2015-07-31",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "1:55.11",
+            "seconds": 115.11
           },
           "finalTime": {
             "text": "1:53.75",
@@ -2101,8 +2113,8 @@
           "teamCode": "GG",
           "birthDate": "2016-11-29",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "1:55.36",
+            "seconds": 115.36
           },
           "finalTime": {
             "text": "1:57.61",
@@ -2120,8 +2132,8 @@
           "teamCode": "WW",
           "birthDate": "2015-11-07",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "1:54.74",
+            "seconds": 114.74
           },
           "finalTime": {
             "text": "2:00.91",
@@ -2154,8 +2166,8 @@
           "teamCode": "GG",
           "birthDate": "2014-01-26",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "45.84",
+            "seconds": 45.84
           },
           "finalTime": {
             "text": "45.59",
@@ -2173,8 +2185,8 @@
           "teamCode": "GG",
           "birthDate": "2013-06-04",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "52.34",
+            "seconds": 52.34
           },
           "finalTime": {
             "text": "52.76",
@@ -2192,8 +2204,8 @@
           "teamCode": "WW",
           "birthDate": "2016-06-27",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "1:05.61",
+            "seconds": 65.61
           },
           "finalTime": {
             "text": "1:01.72",
@@ -2239,8 +2251,8 @@
           "teamCode": "WW",
           "birthDate": "2015-12-16",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "43.96",
+            "seconds": 43.96
           },
           "finalTime": {
             "text": "44.93",
@@ -2258,8 +2270,8 @@
           "teamCode": "GG",
           "birthDate": "2017-01-19",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "58.21",
+            "seconds": 58.21
           },
           "finalTime": {
             "text": "57.35",
@@ -2277,8 +2289,8 @@
           "teamCode": "GG",
           "birthDate": "2016-05-24",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "58.23",
+            "seconds": 58.23
           },
           "finalTime": {
             "text": "1:01.78",
@@ -2296,8 +2308,8 @@
           "teamCode": "WW",
           "birthDate": "2015-11-07",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "56.49",
+            "seconds": 56.49
           },
           "finalTime": {
             "text": "1:05.51",
@@ -2330,8 +2342,8 @@
           "teamCode": "GG",
           "birthDate": "2020-01-09",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "25.38",
+            "seconds": 25.38
           },
           "finalTime": {
             "text": "26.78",
@@ -2349,8 +2361,8 @@
           "teamCode": "WW",
           "birthDate": "2019-07-24",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "37.13",
+            "seconds": 37.13
           },
           "finalTime": {
             "text": "35.66",
@@ -2368,8 +2380,8 @@
           "teamCode": "GG",
           "birthDate": "2019-11-22",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "34.88",
+            "seconds": 34.88
           },
           "finalTime": {
             "text": "37.40",
@@ -2387,8 +2399,8 @@
           "teamCode": "WW",
           "birthDate": "2019-06-12",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "46.46",
+            "seconds": 46.46
           },
           "finalTime": {
             "text": "39.93",
@@ -2406,8 +2418,8 @@
           "teamCode": "WW",
           "birthDate": "2021-05-04",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:28.55",
+            "seconds": 88.55
           },
           "finalTime": {
             "text": "2:07.32",
@@ -2425,8 +2437,8 @@
           "teamCode": "GG",
           "birthDate": "2020-11-09",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "51.31",
+            "seconds": 51.31
           },
           "finalTime": {
             "text": "53.94",
@@ -2444,8 +2456,8 @@
           "teamCode": "GG",
           "birthDate": "2021-04-21",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "1:56.12",
+            "seconds": 116.12
           },
           "finalTime": {
             "text": "2:09.53",
@@ -2463,8 +2475,8 @@
           "teamCode": "GG",
           "birthDate": "2020-03-26",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "56.64",
+            "seconds": 56.64
           },
           "finalTime": {
             "text": "59.89",
@@ -2497,8 +2509,8 @@
           "teamCode": "GG",
           "birthDate": "2018-04-25",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "28.65",
+            "seconds": 28.65
           },
           "finalTime": {
             "text": "29.96",
@@ -2516,8 +2528,8 @@
           "teamCode": "GG",
           "birthDate": "2018-05-02",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "30.05",
+            "seconds": 30.05
           },
           "finalTime": {
             "text": "30.13",
@@ -2535,8 +2547,8 @@
           "teamCode": "WW",
           "birthDate": "2018-03-14",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "35.97",
+            "seconds": 35.97
           },
           "finalTime": {
             "text": "40.10",
@@ -2554,8 +2566,8 @@
           "teamCode": "WW",
           "birthDate": "2019-07-24",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "46.16",
+            "seconds": 46.16
           },
           "finalTime": {
             "text": "42.68",
@@ -2633,8 +2645,8 @@
           "teamCode": "GG",
           "birthDate": "2020-01-05",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "42.54",
+            "seconds": 42.54
           },
           "finalTime": {
             "text": "39.61",
@@ -2652,8 +2664,8 @@
           "teamCode": "WW",
           "birthDate": "2019-07-24",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "38.39",
+            "seconds": 38.39
           },
           "finalTime": {
             "text": "42.72",
@@ -2670,7 +2682,10 @@
           "swimmerName": "Frank, Anne",
           "teamCode": "WW",
           "birthDate": "2019-06-12",
-          "seedTime": null,
+          "seedTime": {
+            "text": "56.20",
+            "seconds": 56.2
+          },
           "finalTime": {
             "text": "44.44",
             "seconds": 44.44
@@ -2703,8 +2718,8 @@
           "teamCode": "GG",
           "birthDate": "2020-03-30",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "53.24",
+            "seconds": 53.24
           },
           "finalTime": {
             "text": "49.05",
@@ -2738,8 +2753,8 @@
           "teamCode": "GG",
           "birthDate": "2020-01-09",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "34.37",
+            "seconds": 34.37
           },
           "finalTime": null,
           "status": "dq",
@@ -2784,7 +2799,10 @@
           "swimmerName": "Robinson, Jackie",
           "teamCode": "GG",
           "birthDate": "2017-01-31",
-          "seedTime": null,
+          "seedTime": {
+            "text": "47.30",
+            "seconds": 47.3
+          },
           "finalTime": {
             "text": "43.60",
             "seconds": 43.6
@@ -2801,8 +2819,8 @@
           "teamCode": "WW",
           "birthDate": "2017-02-12",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "49.48",
+            "seconds": 49.48
           },
           "finalTime": {
             "text": "49.60",
@@ -2820,8 +2838,8 @@
           "teamCode": "WW",
           "birthDate": "2017-03-30",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "58.75",
+            "seconds": 58.75
           },
           "finalTime": {
             "text": "58.07",
@@ -2839,8 +2857,8 @@
           "teamCode": "GG",
           "birthDate": "2016-08-05",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "1:19.57",
+            "seconds": 79.57
           },
           "finalTime": {
             "text": "1:04.87",
@@ -2905,8 +2923,8 @@
           "teamCode": "WW",
           "birthDate": "2017-02-12",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "1:07.64",
+            "seconds": 67.64
           },
           "finalTime": {
             "text": "1:09.16",
@@ -2923,7 +2941,10 @@
           "swimmerName": "Disney, Walt",
           "teamCode": "GG",
           "birthDate": "2016-12-05",
-          "seedTime": null,
+          "seedTime": {
+            "text": "1:28.00",
+            "seconds": 88
+          },
           "finalTime": {
             "text": "1:21.15",
             "seconds": 81.15
@@ -2953,8 +2974,8 @@
           "teamCode": "GG",
           "birthDate": "2015-06-30",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "50.58",
+            "seconds": 50.58
           },
           "finalTime": null,
           "status": "dq",
@@ -2984,8 +3005,8 @@
           "teamCode": "GG",
           "birthDate": "2015-06-30",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "47.48",
+            "seconds": 47.48
           },
           "finalTime": {
             "text": "44.66",
@@ -3003,8 +3024,8 @@
           "teamCode": "WW",
           "birthDate": "2017-03-30",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "1:03.58",
+            "seconds": 63.58
           },
           "finalTime": {
             "text": "1:02.33",
@@ -3022,8 +3043,8 @@
           "teamCode": "WW",
           "birthDate": "2017-02-12",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "54.62",
+            "seconds": 54.62
           },
           "finalTime": null,
           "status": "dq",
@@ -3038,8 +3059,8 @@
           "teamCode": "GG",
           "birthDate": "2015-11-11",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "1:55.53",
+            "seconds": 115.53
           },
           "finalTime": null,
           "status": "dq",
@@ -3069,8 +3090,8 @@
           "teamCode": "GG",
           "birthDate": "2013-08-04",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "1:16.06",
+            "seconds": 76.06
           },
           "finalTime": {
             "text": "1:17.98",
@@ -3088,8 +3109,8 @@
           "teamCode": "WW",
           "birthDate": "2014-02-22",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:19.95",
+            "seconds": 79.95
           },
           "finalTime": {
             "text": "1:24.10",
@@ -3107,8 +3128,8 @@
           "teamCode": "WW",
           "birthDate": "2015-02-14",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "1:27.66",
+            "seconds": 87.66
           },
           "finalTime": {
             "text": "1:43.36",
@@ -3126,8 +3147,8 @@
           "teamCode": "GG",
           "birthDate": "2015-02-15",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "1:55.51",
+            "seconds": 115.51
           },
           "finalTime": {
             "text": "1:54.45",
@@ -3160,8 +3181,8 @@
           "teamCode": "GG",
           "birthDate": "2013-08-04",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "39.09",
+            "seconds": 39.09
           },
           "finalTime": {
             "text": "41.48",
@@ -3179,8 +3200,8 @@
           "teamCode": "WW",
           "birthDate": "2014-02-22",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "41.94",
+            "seconds": 41.94
           },
           "finalTime": {
             "text": "43.94",
@@ -3198,8 +3219,8 @@
           "teamCode": "WW",
           "birthDate": "2014-04-23",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "48.85",
+            "seconds": 48.85
           },
           "finalTime": {
             "text": "52.86",
@@ -3233,8 +3254,8 @@
           "teamCode": "GG",
           "birthDate": "2014-11-27",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "1:09.73",
+            "seconds": 69.73
           },
           "finalTime": null,
           "status": "dq",
@@ -3293,8 +3314,8 @@
           "teamCode": "WW",
           "birthDate": "2015-02-14",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "36.28",
+            "seconds": 36.28
           },
           "finalTime": {
             "text": "36.21",
@@ -3312,8 +3333,8 @@
           "teamCode": "WW",
           "birthDate": "2014-02-22",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "35.86",
+            "seconds": 35.86
           },
           "finalTime": {
             "text": "38.38",
@@ -3331,8 +3352,8 @@
           "teamCode": "GG",
           "birthDate": "2015-02-15",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "51.39",
+            "seconds": 51.39
           },
           "finalTime": {
             "text": "51.43",
@@ -3350,8 +3371,8 @@
           "teamCode": "GG",
           "birthDate": "2015-02-20",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "1:22.66",
+            "seconds": 82.66
           },
           "finalTime": null,
           "status": "dq",
@@ -3381,8 +3402,8 @@
           "teamCode": "WW",
           "birthDate": "2011-12-10",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "1:17.11",
+            "seconds": 77.11
           },
           "finalTime": {
             "text": "1:15.58",
@@ -3400,8 +3421,8 @@
           "teamCode": "GG",
           "birthDate": "2013-02-18",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "1:39.69",
+            "seconds": 99.69
           },
           "finalTime": {
             "text": "1:38.14",
@@ -3419,8 +3440,8 @@
           "teamCode": "GG",
           "birthDate": "2012-10-17",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "1:49.37",
+            "seconds": 109.37
           },
           "finalTime": {
             "text": "1:48.84",
@@ -3438,8 +3459,8 @@
           "teamCode": "WW",
           "birthDate": "2011-06-23",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "1:46.63",
+            "seconds": 106.63
           },
           "finalTime": {
             "text": "1:49.73",
@@ -3472,8 +3493,8 @@
           "teamCode": "WW",
           "birthDate": "2011-12-10",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "30.98",
+            "seconds": 30.98
           },
           "finalTime": {
             "text": "31.39",
@@ -3491,8 +3512,8 @@
           "teamCode": "GG",
           "birthDate": "2013-03-27",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "33.59",
+            "seconds": 33.59
           },
           "finalTime": {
             "text": "34.05",
@@ -3510,8 +3531,8 @@
           "teamCode": "WW",
           "birthDate": "2011-06-23",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "38.77",
+            "seconds": 38.77
           },
           "finalTime": {
             "text": "40.26",
@@ -3529,8 +3550,8 @@
           "teamCode": "GG",
           "birthDate": "2012-12-19",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "43.95",
+            "seconds": 43.95
           },
           "finalTime": {
             "text": "43.18",
@@ -3579,8 +3600,8 @@
           "teamCode": "GG",
           "birthDate": "2013-03-27",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "38.84",
+            "seconds": 38.84
           },
           "finalTime": {
             "text": "39.78",
@@ -3598,8 +3619,8 @@
           "teamCode": "GG",
           "birthDate": "2012-10-17",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "44.37",
+            "seconds": 44.37
           },
           "finalTime": {
             "text": "50.23",
@@ -3617,8 +3638,8 @@
           "teamCode": "WW",
           "birthDate": "2011-06-23",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "47.73",
+            "seconds": 47.73
           },
           "finalTime": {
             "text": "51.49",
@@ -3651,8 +3672,8 @@
           "teamCode": "WW",
           "birthDate": "2015-12-16",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "37.98",
+            "seconds": 37.98
           },
           "finalTime": {
             "text": "38.95",
@@ -3670,8 +3691,8 @@
           "teamCode": "WW",
           "birthDate": "2016-12-10",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "42.52",
+            "seconds": 42.52
           },
           "finalTime": {
             "text": "46.37",
@@ -3689,8 +3710,8 @@
           "teamCode": "GG",
           "birthDate": "2015-10-13",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "45.75",
+            "seconds": 45.75
           },
           "finalTime": {
             "text": "47.37",
@@ -3707,7 +3728,10 @@
           "swimmerName": "Franklin, Aretha",
           "teamCode": "GG",
           "birthDate": "2017-03-25",
-          "seedTime": null,
+          "seedTime": {
+            "text": "47.70",
+            "seconds": 47.7
+          },
           "finalTime": {
             "text": "50.41",
             "seconds": 50.41
@@ -3724,8 +3748,8 @@
           "teamCode": "WW",
           "birthDate": "2016-06-27",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "48.86",
+            "seconds": 48.86
           },
           "finalTime": {
             "text": "49.52",
@@ -3743,8 +3767,8 @@
           "teamCode": "GG",
           "birthDate": "2016-04-15",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "1:09.31",
+            "seconds": 69.31
           },
           "finalTime": {
             "text": "1:05.76",
@@ -3762,8 +3786,8 @@
           "teamCode": "GG",
           "birthDate": "2017-04-07",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "59.95",
+            "seconds": 59.95
           },
           "finalTime": {
             "text": "58.57",
@@ -3781,8 +3805,8 @@
           "teamCode": "GG",
           "birthDate": "2016-04-28",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "1:15.74",
+            "seconds": 75.74
           },
           "finalTime": {
             "text": "1:16.31",
@@ -3815,8 +3839,8 @@
           "teamCode": "GG",
           "birthDate": "2007-10-08",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "39.12",
+            "seconds": 39.12
           },
           "finalTime": {
             "text": "36.26",
@@ -3834,8 +3858,8 @@
           "teamCode": "WW",
           "birthDate": "2011-07-06",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "42.49",
+            "seconds": 42.49
           },
           "finalTime": {
             "text": "44.05",
@@ -3869,8 +3893,8 @@
           "teamCode": "GG",
           "birthDate": "2009-09-04",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "58.75",
+            "seconds": 58.75
           },
           "finalTime": {
             "text": "51.40",
@@ -3902,7 +3926,10 @@
           "swimmerName": "Morrison, Toni",
           "teamCode": "GG",
           "birthDate": "2013-02-18",
-          "seedTime": null,
+          "seedTime": {
+            "text": "50.00",
+            "seconds": 50
+          },
           "finalTime": {
             "text": "49.54",
             "seconds": 49.54
@@ -3919,8 +3946,8 @@
           "teamCode": "GG",
           "birthDate": "2013-01-17",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "54.68",
+            "seconds": 54.68
           },
           "finalTime": {
             "text": "51.37",
@@ -3938,8 +3965,8 @@
           "teamCode": "WW",
           "birthDate": "2011-07-06",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "53.58",
+            "seconds": 53.58
           },
           "finalTime": {
             "text": "53.56",
@@ -3957,8 +3984,8 @@
           "teamCode": "WW",
           "birthDate": "2011-09-26",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "56.35",
+            "seconds": 56.35
           },
           "finalTime": {
             "text": "58.75",
@@ -3991,8 +4018,8 @@
           "teamCode": "GG",
           "birthDate": "2013-01-17",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "42.08",
+            "seconds": 42.08
           },
           "finalTime": {
             "text": "41.77",
@@ -4010,8 +4037,8 @@
           "teamCode": "WW",
           "birthDate": "2011-09-26",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "47.21",
+            "seconds": 47.21
           },
           "finalTime": {
             "text": "46.75",
@@ -4029,8 +4056,8 @@
           "teamCode": "GG",
           "birthDate": "2012-10-17",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "49.25",
+            "seconds": 49.25
           },
           "finalTime": {
             "text": "50.15",
@@ -4047,7 +4074,10 @@
           "swimmerName": "Kahlo, Frida",
           "teamCode": "WW",
           "birthDate": "2011-07-06",
-          "seedTime": null,
+          "seedTime": {
+            "text": "52.10",
+            "seconds": 52.1
+          },
           "finalTime": {
             "text": "51.76",
             "seconds": 51.76
@@ -4079,8 +4109,8 @@
           "teamCode": "WW",
           "birthDate": "2015-11-22",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "54.66",
+            "seconds": 54.66
           },
           "finalTime": {
             "text": "56.54",
@@ -4097,7 +4127,10 @@
           "swimmerName": "Windsor, Victoria",
           "teamCode": "GG",
           "birthDate": "2016-05-24",
-          "seedTime": null,
+          "seedTime": {
+            "text": "58.90",
+            "seconds": 58.9
+          },
           "finalTime": {
             "text": "57.94",
             "seconds": 57.94
@@ -4114,8 +4147,8 @@
           "teamCode": "GG",
           "birthDate": "2017-01-19",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "58.94",
+            "seconds": 58.94
           },
           "finalTime": {
             "text": "58.54",
@@ -4133,8 +4166,8 @@
           "teamCode": "WW",
           "birthDate": "2016-12-10",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "1:03.82",
+            "seconds": 63.82
           },
           "finalTime": {
             "text": "1:03.39",
@@ -4168,8 +4201,8 @@
           "teamCode": "GG",
           "birthDate": "2017-03-25",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "1:26.51",
+            "seconds": 86.51
           },
           "finalTime": null,
           "status": "dq",
@@ -4199,7 +4232,10 @@
           "swimmerName": "Sarandon, Susan",
           "teamCode": "GG",
           "birthDate": "2015-10-04",
-          "seedTime": null,
+          "seedTime": {
+            "text": "1:12.50",
+            "seconds": 72.5
+          },
           "finalTime": {
             "text": "1:11.58",
             "seconds": 71.58
@@ -4231,8 +4267,8 @@
           "teamCode": "GG",
           "birthDate": "2015-07-31",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "49.83",
+            "seconds": 49.83
           },
           "finalTime": {
             "text": "49.98",
@@ -4250,8 +4286,8 @@
           "teamCode": "GG",
           "birthDate": "2016-11-29",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "53.69",
+            "seconds": 53.69
           },
           "finalTime": {
             "text": "55.89",
@@ -4269,8 +4305,8 @@
           "teamCode": "WW",
           "birthDate": "2017-04-04",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "55.21",
+            "seconds": 55.21
           },
           "finalTime": {
             "text": "57.57",
@@ -4287,7 +4323,10 @@
           "swimmerName": "Dickinson, Emily",
           "teamCode": "WW",
           "birthDate": "2016-12-10",
-          "seedTime": null,
+          "seedTime": {
+            "text": "50.30",
+            "seconds": 50.3
+          },
           "finalTime": null,
           "status": "dq",
           "disqualified": true,
@@ -4317,8 +4356,8 @@
           "teamCode": "GG",
           "birthDate": "2016-07-17",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "1:01.42",
+            "seconds": 61.42
           },
           "finalTime": {
             "text": "55.88",
@@ -4336,8 +4375,8 @@
           "teamCode": "GG",
           "birthDate": "2016-03-06",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "59.27",
+            "seconds": 59.27
           },
           "finalTime": {
             "text": "1:01.44",
@@ -4355,8 +4394,8 @@
           "teamCode": "GG",
           "birthDate": "2015-06-10",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "1:17.68",
+            "seconds": 77.68
           },
           "finalTime": {
             "text": "1:24.11",
@@ -4389,8 +4428,8 @@
           "teamCode": "WW",
           "birthDate": "2014-04-15",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "35.47",
+            "seconds": 35.47
           },
           "finalTime": {
             "text": "37.61",
@@ -4408,8 +4447,8 @@
           "teamCode": "WW",
           "birthDate": "2015-02-14",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "38.77",
+            "seconds": 38.77
           },
           "finalTime": {
             "text": "40.76",
@@ -4426,7 +4465,10 @@
           "swimmerName": "Bolt, Usain",
           "teamCode": "GG",
           "birthDate": "2014-08-21",
-          "seedTime": null,
+          "seedTime": {
+            "text": "1:00.90",
+            "seconds": 60.9
+          },
           "finalTime": {
             "text": "58.25",
             "seconds": 58.25
@@ -4443,8 +4485,8 @@
           "teamCode": "GG",
           "birthDate": "2014-05-13",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "1:02.59",
+            "seconds": 62.59
           },
           "finalTime": {
             "text": "1:02.08",
@@ -4477,8 +4519,8 @@
           "teamCode": "GG",
           "birthDate": "2014-01-26",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "1:39.48",
+            "seconds": 99.48
           },
           "finalTime": {
             "text": "1:37.65",
@@ -4496,8 +4538,8 @@
           "teamCode": "GG",
           "birthDate": "2014-04-05",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:39.75",
+            "seconds": 99.75
           },
           "finalTime": {
             "text": "1:39.97",
@@ -4515,8 +4557,8 @@
           "teamCode": "WW",
           "birthDate": "2017-04-04",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "2:05.79",
+            "seconds": 125.79
           },
           "finalTime": {
             "text": "2:07.00",
@@ -4533,7 +4575,10 @@
           "swimmerName": "Franklin, Rosalind",
           "teamCode": "GG",
           "birthDate": "2014-07-25",
-          "seedTime": null,
+          "seedTime": {
+            "text": "1:52.80",
+            "seconds": 112.8
+          },
           "finalTime": {
             "text": "1:56.03",
             "seconds": 116.03
@@ -4565,8 +4610,8 @@
           "teamCode": "GG",
           "birthDate": "2014-07-28",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "39.11",
+            "seconds": 39.11
           },
           "finalTime": {
             "text": "37.72",
@@ -4584,8 +4629,8 @@
           "teamCode": "GG",
           "birthDate": "2013-06-04",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "39.76",
+            "seconds": 39.76
           },
           "finalTime": {
             "text": "38.55",
@@ -4603,8 +4648,8 @@
           "teamCode": "WW",
           "birthDate": "2015-11-22",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "45.83",
+            "seconds": 45.83
           },
           "finalTime": {
             "text": "45.42",
@@ -4622,8 +4667,8 @@
           "teamCode": "WW",
           "birthDate": "2017-04-04",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "46.19",
+            "seconds": 46.19
           },
           "finalTime": {
             "text": "48.10",
@@ -4673,8 +4718,8 @@
           "teamCode": "GG",
           "birthDate": "2015-02-12",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "46.66",
+            "seconds": 46.66
           },
           "finalTime": {
             "text": "49.17",
@@ -4723,8 +4768,8 @@
           "teamCode": "GG",
           "birthDate": "2017-11-19",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "20.95",
+            "seconds": 20.95
           },
           "finalTime": {
             "text": "21.99",
@@ -4742,8 +4787,8 @@
           "teamCode": "GG",
           "birthDate": "2018-10-17",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "24.27",
+            "seconds": 24.27
           },
           "finalTime": {
             "text": "24.37",
@@ -4761,8 +4806,8 @@
           "teamCode": "WW",
           "birthDate": "2019-06-01",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "38.14",
+            "seconds": 38.14
           },
           "finalTime": {
             "text": "38.00",
@@ -4796,8 +4841,8 @@
           "teamCode": "WW",
           "birthDate": "2018-03-14",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "28.81",
+            "seconds": 28.81
           },
           "finalTime": {
             "text": "33.03",
@@ -4815,8 +4860,8 @@
           "teamCode": "WW",
           "birthDate": "2019-03-17",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "43.67",
+            "seconds": 43.67
           },
           "finalTime": null,
           "status": "dq",
@@ -4831,8 +4876,8 @@
           "teamCode": "GG",
           "birthDate": "2018-11-12",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "39.56",
+            "seconds": 39.56
           },
           "finalTime": {
             "text": "43.15",
@@ -4850,8 +4895,8 @@
           "teamCode": "GG",
           "birthDate": "2018-03-17",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "27.92",
+            "seconds": 27.92
           },
           "finalTime": {
             "text": "25.81",
@@ -4869,8 +4914,8 @@
           "teamCode": "GG",
           "birthDate": "2018-11-06",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "36.13",
+            "seconds": 36.13
           },
           "finalTime": {
             "text": "36.81",
@@ -4888,8 +4933,8 @@
           "teamCode": "GG",
           "birthDate": "2018-08-09",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "38.09",
+            "seconds": 38.09
           },
           "finalTime": {
             "text": "38.32",
@@ -4907,8 +4952,8 @@
           "teamCode": "GG",
           "birthDate": "2019-02-27",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "43.75",
+            "seconds": 43.75
           },
           "finalTime": {
             "text": "42.15",
@@ -4925,7 +4970,10 @@
           "swimmerName": "Foster, Jodie",
           "teamCode": "GG",
           "birthDate": "2017-11-19",
-          "seedTime": null,
+          "seedTime": {
+            "text": "41.00",
+            "seconds": 41
+          },
           "finalTime": {
             "text": "41.77",
             "seconds": 41.77
@@ -4957,8 +5005,8 @@
           "teamCode": "GG",
           "birthDate": "2018-10-17",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "29.18",
+            "seconds": 29.18
           },
           "finalTime": {
             "text": "28.89",
@@ -4976,8 +5024,8 @@
           "teamCode": "GG",
           "birthDate": "2018-05-02",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "26.09",
+            "seconds": 26.09
           },
           "finalTime": {
             "text": "30.99",
@@ -4995,8 +5043,8 @@
           "teamCode": "WW",
           "birthDate": "2018-03-14",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "30.89",
+            "seconds": 30.89
           },
           "finalTime": {
             "text": "32.89",
@@ -5014,8 +5062,8 @@
           "teamCode": "WW",
           "birthDate": "2019-06-01",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "37.86",
+            "seconds": 37.86
           },
           "finalTime": {
             "text": "33.34",
@@ -5033,8 +5081,8 @@
           "teamCode": "WW",
           "birthDate": "2019-03-17",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "54.45",
+            "seconds": 54.45
           },
           "finalTime": {
             "text": "50.94",
@@ -5068,8 +5116,8 @@
           "teamCode": "GG",
           "birthDate": "2017-08-15",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "41.32",
+            "seconds": 41.32
           },
           "finalTime": {
             "text": "37.80",
@@ -5103,8 +5151,8 @@
           "teamCode": "GG",
           "birthDate": "2018-03-15",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "39.56",
+            "seconds": 39.56
           },
           "finalTime": {
             "text": "41.75",
@@ -5121,7 +5169,10 @@
           "swimmerName": "Ride, Sally",
           "teamCode": "GG",
           "birthDate": "2018-05-26",
-          "seedTime": null,
+          "seedTime": {
+            "text": "35.00",
+            "seconds": 35
+          },
           "finalTime": {
             "text": "35.72",
             "seconds": 35.72
@@ -5138,8 +5189,8 @@
           "teamCode": "GG",
           "birthDate": "2017-07-30",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "50.19",
+            "seconds": 50.19
           },
           "finalTime": {
             "text": "42.35",
@@ -5157,8 +5208,8 @@
           "teamCode": "GG",
           "birthDate": "2017-06-25",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "32.46",
+            "seconds": 32.46
           },
           "finalTime": {
             "text": "32.38",
@@ -5191,8 +5242,8 @@
           "teamCode": "GG",
           "birthDate": "2011-09-07",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "1:13.49",
+            "seconds": 73.49
           },
           "finalTime": {
             "text": "1:17.30",
@@ -5210,8 +5261,8 @@
           "teamCode": "WW",
           "birthDate": "2011-08-04",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:17.85",
+            "seconds": 77.85
           },
           "finalTime": {
             "text": "1:18.86",
@@ -5229,8 +5280,8 @@
           "teamCode": "GG",
           "birthDate": "2012-02-08",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "1:20.47",
+            "seconds": 80.47
           },
           "finalTime": {
             "text": "1:19.28",
@@ -5248,8 +5299,8 @@
           "teamCode": "WW",
           "birthDate": "2013-01-27",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "1:20.03",
+            "seconds": 80.03
           },
           "finalTime": {
             "text": "1:20.25",
@@ -5282,8 +5333,8 @@
           "teamCode": "GG",
           "birthDate": "2012-02-08",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "29.23",
+            "seconds": 29.23
           },
           "finalTime": {
             "text": "29.89",
@@ -5301,8 +5352,8 @@
           "teamCode": "WW",
           "birthDate": "2011-08-04",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "30.42",
+            "seconds": 30.42
           },
           "finalTime": {
             "text": "31.92",
@@ -5320,8 +5371,8 @@
           "teamCode": "WW",
           "birthDate": "2013-01-27",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "31.57",
+            "seconds": 31.57
           },
           "finalTime": {
             "text": "32.55",
@@ -5339,8 +5390,8 @@
           "teamCode": "GG",
           "birthDate": "2012-05-26",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "35.15",
+            "seconds": 35.15
           },
           "finalTime": {
             "text": "35.55",
@@ -5358,8 +5409,8 @@
           "teamCode": "WW",
           "birthDate": "2012-11-30",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "55.39",
+            "seconds": 55.39
           },
           "finalTime": null,
           "status": "ns",
@@ -5374,8 +5425,8 @@
           "teamCode": "GG",
           "birthDate": "2012-02-24",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "36.64",
+            "seconds": 36.64
           },
           "finalTime": {
             "text": "38.68",
@@ -5393,8 +5444,8 @@
           "teamCode": "GG",
           "birthDate": "2012-10-16",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "43.44",
+            "seconds": 43.44
           },
           "finalTime": {
             "text": "41.97",
@@ -5427,8 +5478,8 @@
           "teamCode": "GG",
           "birthDate": "2011-09-07",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "37.53",
+            "seconds": 37.53
           },
           "finalTime": {
             "text": "37.00",
@@ -5446,8 +5497,8 @@
           "teamCode": "WW",
           "birthDate": "2011-08-04",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "35.38",
+            "seconds": 35.38
           },
           "finalTime": {
             "text": "37.39",
@@ -5465,8 +5516,8 @@
           "teamCode": "GG",
           "birthDate": "2012-02-24",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "54.54",
+            "seconds": 54.54
           },
           "finalTime": {
             "text": "55.46",
@@ -5512,8 +5563,8 @@
           "teamCode": "WW",
           "birthDate": "2011-08-04",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "33.16",
+            "seconds": 33.16
           },
           "finalTime": {
             "text": "32.86",
@@ -5531,8 +5582,8 @@
           "teamCode": "GG",
           "birthDate": "2011-09-07",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "33.15",
+            "seconds": 33.15
           },
           "finalTime": {
             "text": "33.21",
@@ -5550,8 +5601,8 @@
           "teamCode": "WW",
           "birthDate": "2013-01-27",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "37.54",
+            "seconds": 37.54
           },
           "finalTime": {
             "text": "38.12",
@@ -5569,8 +5620,8 @@
           "teamCode": "GG",
           "birthDate": "2012-05-26",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "48.78",
+            "seconds": 48.78
           },
           "finalTime": {
             "text": "48.68",
@@ -5603,8 +5654,8 @@
           "teamCode": "GG",
           "birthDate": "2013-08-04",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "29.82",
+            "seconds": 29.82
           },
           "finalTime": {
             "text": "30.68",
@@ -5622,8 +5673,8 @@
           "teamCode": "WW",
           "birthDate": "2014-04-15",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "32.27",
+            "seconds": 32.27
           },
           "finalTime": {
             "text": "33.00",
@@ -5641,8 +5692,8 @@
           "teamCode": "WW",
           "birthDate": "2014-04-23",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "35.86",
+            "seconds": 35.86
           },
           "finalTime": {
             "text": "37.10",
@@ -5660,8 +5711,8 @@
           "teamCode": "GG",
           "birthDate": "2014-05-13",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "47.57",
+            "seconds": 47.57
           },
           "finalTime": {
             "text": "51.15",
@@ -5694,8 +5745,8 @@
           "teamCode": "GG",
           "birthDate": "2012-02-08",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "37.15",
+            "seconds": 37.15
           },
           "finalTime": {
             "text": "38.32",
@@ -5713,8 +5764,8 @@
           "teamCode": "WW",
           "birthDate": "2013-01-27",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "43.29",
+            "seconds": 43.29
           },
           "finalTime": {
             "text": "44.90",
@@ -5732,8 +5783,8 @@
           "teamCode": "WW",
           "birthDate": "2014-04-23",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "48.85",
+            "seconds": 48.85
           },
           "finalTime": {
             "text": "51.90",
@@ -5751,8 +5802,8 @@
           "teamCode": "GG",
           "birthDate": "2013-05-24",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "52.65",
+            "seconds": 52.65
           },
           "finalTime": {
             "text": "51.73",
@@ -5830,8 +5881,8 @@
           "teamCode": "GG",
           "birthDate": "2009-10-28",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "47.71",
+            "seconds": 47.71
           },
           "finalTime": {
             "text": "49.42",
@@ -5849,8 +5900,8 @@
           "teamCode": "GG",
           "birthDate": "2007-12-13",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:04.15",
+            "seconds": 64.15
           },
           "finalTime": {
             "text": "58.80",
@@ -5915,8 +5966,8 @@
           "teamCode": "GG",
           "birthDate": "2007-10-08",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "42.76",
+            "seconds": 42.76
           },
           "finalTime": {
             "text": "42.75",
@@ -5934,8 +5985,8 @@
           "teamCode": "GG",
           "birthDate": "2010-05-27",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "46.06",
+            "seconds": 46.06
           },
           "finalTime": {
             "text": "44.97",
@@ -5953,8 +6004,8 @@
           "teamCode": "WW",
           "birthDate": "2012-12-09",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "55.33",
+            "seconds": 55.33
           },
           "finalTime": {
             "text": "55.99",
@@ -6002,7 +6053,10 @@
           "swimmerName": "Potter, Beatrix",
           "teamCode": "GG",
           "birthDate": "2014-07-28",
-          "seedTime": null,
+          "seedTime": {
+            "text": "50.50",
+            "seconds": 50.5
+          },
           "finalTime": {
             "text": "50.91",
             "seconds": 50.91
@@ -6019,8 +6073,8 @@
           "teamCode": "GG",
           "birthDate": "2014-08-16",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "55.07",
+            "seconds": 55.07
           },
           "finalTime": {
             "text": "55.10",
@@ -6038,8 +6092,8 @@
           "teamCode": "WW",
           "birthDate": "2016-06-27",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:03.85",
+            "seconds": 63.85
           },
           "finalTime": {
             "text": "1:01.94",
@@ -6088,8 +6142,8 @@
           "teamCode": "GG",
           "birthDate": "2009-10-28",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "1:35.66",
+            "seconds": 95.66
           },
           "finalTime": {
             "text": "1:37.52",
@@ -6107,8 +6161,8 @@
           "teamCode": "GG",
           "birthDate": "2011-02-15",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "1:48.09",
+            "seconds": 108.09
           },
           "finalTime": {
             "text": "1:46.44",
@@ -6125,7 +6179,10 @@
           "swimmerName": "Williams, Serena",
           "teamCode": "WW",
           "birthDate": "2011-09-26",
-          "seedTime": null,
+          "seedTime": {
+            "text": "1:48.60",
+            "seconds": 108.6
+          },
           "finalTime": null,
           "status": "dq",
           "disqualified": true,
@@ -6170,8 +6227,8 @@
           "teamCode": "GG",
           "birthDate": "2014-04-05",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "47.91",
+            "seconds": 47.91
           },
           "finalTime": {
             "text": "45.70",
@@ -6189,8 +6246,8 @@
           "teamCode": "GG",
           "birthDate": "2013-07-12",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "55.57",
+            "seconds": 55.57
           },
           "finalTime": {
             "text": "56.19",
@@ -6208,8 +6265,8 @@
           "teamCode": "WW",
           "birthDate": "2015-11-22",
           "seedTime": {
-            "text": "5.00",
-            "seconds": 5
+            "text": "1:40.15",
+            "seconds": 100.15
           },
           "finalTime": {
             "text": "1:03.23",
@@ -6258,8 +6315,8 @@
           "teamCode": "GG",
           "birthDate": "2017-11-19",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "25.98",
+            "seconds": 25.98
           },
           "finalTime": {
             "text": "24.88",
@@ -6276,7 +6333,10 @@
           "swimmerName": "Biles, Simone",
           "teamCode": "WW",
           "birthDate": "2018-03-14",
-          "seedTime": null,
+          "seedTime": {
+            "text": "38.20",
+            "seconds": 38.2
+          },
           "finalTime": null,
           "status": "dq",
           "disqualified": true,
@@ -6290,8 +6350,8 @@
           "teamCode": "GG",
           "birthDate": "2018-04-25",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "30.27",
+            "seconds": 30.27
           },
           "finalTime": null,
           "status": "dq",
@@ -6305,7 +6365,10 @@
           "swimmerName": "Blackwell, Katherine",
           "teamCode": "GG",
           "birthDate": "2018-02-03",
-          "seedTime": null,
+          "seedTime": {
+            "text": "49.10",
+            "seconds": 49.1
+          },
           "finalTime": {
             "text": "38.33",
             "seconds": 38.33
@@ -6793,8 +6856,8 @@
           "teamCode": "GG",
           "birthDate": "2015-06-30",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "1:34.92",
+            "seconds": 94.92
           },
           "finalTime": {
             "text": "1:37.32",
@@ -6812,8 +6875,8 @@
           "teamCode": "GG",
           "birthDate": "2017-01-31",
           "seedTime": {
-            "text": "2.00",
-            "seconds": 2
+            "text": "2:01.12",
+            "seconds": 121.12
           },
           "finalTime": {
             "text": "2:02.15",
@@ -6846,8 +6909,8 @@
           "teamCode": "GG",
           "birthDate": "2017-01-31",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "1:07.87",
+            "seconds": 67.87
           },
           "finalTime": null,
           "status": "dq",
@@ -6862,8 +6925,8 @@
           "teamCode": "GG",
           "birthDate": "2016-12-05",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "1:41.56",
+            "seconds": 101.56
           },
           "finalTime": null,
           "status": "dq",
@@ -6893,8 +6956,8 @@
           "teamCode": "GG",
           "birthDate": "2019-04-01",
           "seedTime": {
-            "text": "9.00",
-            "seconds": 9
+            "text": "22.59",
+            "seconds": 22.59
           },
           "finalTime": {
             "text": "24.44",
@@ -6912,8 +6975,8 @@
           "teamCode": "GG",
           "birthDate": "2018-10-18",
           "seedTime": {
-            "text": "7.00",
-            "seconds": 7
+            "text": "30.07",
+            "seconds": 30.07
           },
           "finalTime": {
             "text": "30.04",
@@ -6931,8 +6994,8 @@
           "teamCode": "GG",
           "birthDate": "2018-11-09",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "40.03",
+            "seconds": 40.03
           },
           "finalTime": {
             "text": "38.73",
@@ -6950,8 +7013,8 @@
           "teamCode": "GG",
           "birthDate": "2018-07-03",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "32.11",
+            "seconds": 32.11
           },
           "finalTime": {
             "text": "34.07",
@@ -6984,8 +7047,8 @@
           "teamCode": "GG",
           "birthDate": "2011-02-15",
           "seedTime": {
-            "text": "8.00",
-            "seconds": 8
+            "text": "44.68",
+            "seconds": 44.68
           },
           "finalTime": {
             "text": "45.81",
@@ -7003,8 +7066,8 @@
           "teamCode": "GG",
           "birthDate": "2010-02-20",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "1:01.94",
+            "seconds": 61.94
           },
           "finalTime": {
             "text": "1:02.62",
@@ -7053,8 +7116,8 @@
           "teamCode": "GG",
           "birthDate": "2018-07-03",
           "seedTime": {
-            "text": "6.00",
-            "seconds": 6
+            "text": "46.86",
+            "seconds": 46.86
           },
           "finalTime": null,
           "status": "dq",
@@ -7068,7 +7131,10 @@
           "swimmerName": "Rachmaninoff, Sergei",
           "teamCode": "GG",
           "birthDate": "2019-04-01",
-          "seedTime": null,
+          "seedTime": {
+            "text": "36.50",
+            "seconds": 36.5
+          },
           "finalTime": null,
           "status": "dq",
           "disqualified": true,
@@ -7097,8 +7163,8 @@
           "teamCode": "GG",
           "birthDate": "2019-04-01",
           "seedTime": {
-            "text": "3.00",
-            "seconds": 3
+            "text": "29.53",
+            "seconds": 29.53
           },
           "finalTime": {
             "text": "33.30",
@@ -7116,8 +7182,8 @@
           "teamCode": "GG",
           "birthDate": "2018-07-03",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "58.21",
+            "seconds": 58.21
           },
           "finalTime": {
             "text": "51.71",
@@ -7150,8 +7216,8 @@
           "teamCode": "GG",
           "birthDate": "2018-10-18",
           "seedTime": {
-            "text": "4.00",
-            "seconds": 4
+            "text": "27.94",
+            "seconds": 27.94
           },
           "finalTime": {
             "text": "29.71",
@@ -7169,8 +7235,8 @@
           "teamCode": "GG",
           "birthDate": "2019-02-06",
           "seedTime": {
-            "text": "1.00",
-            "seconds": 1
+            "text": "58.31",
+            "seconds": 58.31
           },
           "finalTime": {
             "text": "1:01.20",
