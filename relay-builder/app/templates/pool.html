@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Swimmer Pool — GPSA Relay Builder{% endblock %}
+{% block content %}
+
+<!-- Import -->
+<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+    <h2 class="text-lg font-bold text-gray-800 mb-1">Import entry files</h2>
+    <p class="text-gray-600 text-sm mb-5">Drop in each team's <span class="font-semibold">.sd3</span> or <span class="font-semibold">.hy3</span> entry file — or a <span class="font-semibold">.zip</span> containing several. Re-importing a team updates it in place.</p>
+
+    <form id="import-form" novalidate>
+        <label id="file-dropzone" for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-44 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                <svg id="file-icon-empty" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <svg id="file-icon-selected" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <p id="file-prompt" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose files</span> or drag them here</p>
+                <p id="file-name" class="text-xs text-gray-500">Accepted: .sd3, .hy3, or .zip &middot; multiple allowed</p>
+            </div>
+            <input id="file-upload" name="files" type="file" accept=".sd3,.hy3,.zip" class="hidden" multiple required />
+        </label>
+        <p id="file-error" class="hidden mt-2 text-sm text-red-600"></p>
+
+        <button id="submit-button" type="submit"
+                class="mt-5 w-full btn-primary font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all disabled:opacity-50">
+            Import
+        </button>
+    </form>
+
+    <div id="result" class="hidden mt-6 p-4 rounded-lg text-sm" role="status" aria-live="polite"></div>
+</div>
+
+{% if imports %}
+<details class="bg-white rounded-xl shadow-sm p-4 mb-6 text-sm">
+    <summary class="cursor-pointer font-semibold text-gray-700">{{ imports|length }} import{{ 's' if imports|length != 1 }}</summary>
+    <ul class="mt-3 space-y-1 text-gray-600">
+        {% for imp in imports %}
+        <li><span class="font-semibold text-gray-800">{{ imp.team or '—' }}</span> &middot; {{ imp.filename }} &middot; {{ imp.swimmers }} swimmers <span class="text-gray-400">({{ imp.fmt }}, {{ imp.imported_at }})</span></li>
+        {% endfor %}
+    </ul>
+</details>
+{% endif %}
+
+<!-- Pool -->
+<div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-bold text-gray-800">Swimmer pool
+        <span class="ml-1 inline-block align-middle bg-[#002366] text-white text-xs font-semibold rounded-full px-2 py-0.5">{{ total }}</span>
+    </h2>
+    {% if total %}
+    <form id="reset-form">
+        <button type="submit" class="text-sm font-semibold text-red-600 border border-red-600 rounded-lg px-3 py-1.5 hover:bg-red-600 hover:text-white transition-colors">Reset pool</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if not total %}
+<div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400 italic">No swimmers yet — import an entry file above to build the pool.</div>
+{% endif %}
+
+{% for age, by_gender in groups %}
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+    <h3 class="text-base font-bold text-[#002366] border-b-2 border-gray-100 pb-2 mb-4">{{ age }}</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        {% for gcode, label in [('F', 'Girls'), ('M', 'Boys')] %}
+        {% set swimmers = by_gender.get(gcode) or [] %}
+        <div>
+            <h4 class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">{{ label }}
+                <span class="ml-1 inline-block bg-gray-200 text-gray-700 text-[0.65rem] font-semibold rounded-full px-1.5">{{ swimmers|length }}</span>
+            </h4>
+            {% if swimmers %}
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-gray-500 border-b border-gray-200">
+                        <th class="text-left font-semibold py-1.5 px-2">Swimmer</th>
+                        <th class="text-left font-semibold py-1.5 px-2">Team</th>
+                        <th class="text-right font-semibold py-1.5 px-2">25&nbsp;Free</th>
+                        <th class="text-right font-semibold py-1.5 px-2">50&nbsp;Free</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in swimmers|sort(attribute='full_name') %}
+                    <tr class="border-b border-gray-50">
+                        <td class="py-1.5 px-2 text-gray-800">{{ s.full_name }}</td>
+                        <td class="py-1.5 px-2 text-gray-400" style="font-variant: small-caps;">{{ s.team }}</td>
+                        <td class="py-1.5 px-2 text-right tabular-nums {{ 'text-red-500' if not s.free25 else 'text-gray-700' }}">{{ '%.2f'|format(s.free25) if s.free25 else '—' }}</td>
+                        <td class="py-1.5 px-2 text-right tabular-nums {{ 'text-red-500' if not s.free50 else 'text-gray-700' }}">{{ '%.2f'|format(s.free50) if s.free50 else '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-sm text-gray-400">none</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

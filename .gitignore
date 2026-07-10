@@ -16,6 +16,11 @@ __pycache__/
 publicity-server/node_modules/
 publicity-intake/node_modules/
 
+# relay-builder local state (SQLite pool DB — never commit swimmer data)
+relay-builder/.venv/
+relay-builder/data/
+*.db
+
 # Secrets
 publicity-intake/.env
 publicity-intake/.env.dev

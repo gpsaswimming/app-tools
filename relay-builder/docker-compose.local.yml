@@ -1,0 +1,20 @@
+# Local build (from source) instead of pulling the GHCR image. Build context is
+# the repo root so ../swimparse is available to COPY.
+#   docker compose -f docker-compose.local.yml up --build
+services:
+  relay-builder:
+    build:
+      context: ..
+      dockerfile: relay-builder/Dockerfile
+    image: gpsa-relay-builder:local
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - relay-data:/data
+    environment:
+      - RELAY_DB=/data/relay.db
+    tmpfs:
+      - /tmp
+
+volumes:
+  relay-data:

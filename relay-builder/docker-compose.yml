@@ -1,0 +1,29 @@
+services:
+  relay-builder:
+    image: ghcr.io/gpsaswimming/relay-builder:latest
+    pull_policy: always
+    # Localhost only — this is an internal admin tool, never network-exposed.
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - relay-data:/data
+    environment:
+      - RELAY_DB=/data/relay.db
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      # Uploaded entry files are written here transiently during parsing.
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').getcode()==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  relay-data:
