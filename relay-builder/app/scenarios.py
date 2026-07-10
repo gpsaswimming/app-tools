@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import sqlite3
 
-from .balance import balance_category, resolve_categories
+from .balance import assign_heats, balance_category, resolve_categories
 
 
 def _eligible(conn: sqlite3.Connection, age_groups, gender, leg):
@@ -127,3 +127,23 @@ def detail(conn: sqlite3.Connection, scenario_id: int) -> list[dict]:
         cat["count"] = len(cat["relays"])
         out.append(cat)
     return out
+
+
+def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8):
+    """Seed each category's relays into heats/lanes for the deck output.
+
+    Returns (plan, cards): `plan` is per-category heats for the heat sheet;
+    `cards` is a flat, program-order list of relays annotated with heat + lane
+    for the relay cards.
+    """
+    plan, cards = [], []
+    for cat in detail(conn, scenario_id):
+        heats = assign_heats(cat["relays"], lanes)
+        for heat in heats:
+            for slot in heat["lanes"]:
+                relay = slot["relay"]
+                relay["heat"] = heat["heat"]
+                relay["lane"] = slot["lane"]
+                cards.append({"category": cat["label"], "leg": cat["leg"], **relay})
+        plan.append({"label": cat["label"], "leg": cat["leg"], "heats": heats})
+    return plan, cards

@@ -13,12 +13,14 @@
                 {% if sc.grouping == 'open' %}&middot; {{ sc.open_leg }}m legs{% endif %}
             </p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap">
+            <a href="/scenarios/{{ sc.id }}/heatsheet" class="btn-primary text-sm font-semibold py-2 px-4 rounded-lg">Heat sheet</a>
+            <a href="/scenarios/{{ sc.id }}/cards" class="text-sm font-semibold text-[#002366] border border-[#002366] rounded-lg py-2 px-4 hover:bg-[#002366] hover:text-white transition-colors">Relay cards</a>
             <form action="/scenarios/{{ sc.id }}/rebalance" method="post">
-                <button type="submit" class="btn-primary text-sm font-semibold py-2 px-4 rounded-lg">Re-balance</button>
+                <button type="submit" class="text-sm font-semibold text-gray-600 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors">Re-balance</button>
             </form>
             <form action="/scenarios/{{ sc.id }}/clone" method="post">
-                <button type="submit" class="text-sm font-semibold text-[#002366] border border-[#002366] rounded-lg py-2 px-4 hover:bg-[#002366] hover:text-white transition-colors">Clone</button>
+                <button type="submit" class="text-sm font-semibold text-gray-600 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors">Clone</button>
             </form>
         </div>
     </div>

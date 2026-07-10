@@ -128,3 +128,45 @@ def balance_category(seeded: list[tuple[str, float]]):
     """Full pipeline for one category's seeded swimmers → (relays, remainder)."""
     relays, remainder = snake_draft(sorted(seeded, key=lambda x: x[1]))
     return refine(relays), remainder
+
+
+def center_out(lanes: int) -> list[int]:
+    """Lane fill order from the centre outward. 8 lanes → [4,5,3,6,2,7,1,8]."""
+    center = (lanes + 1) // 2
+    order = [center]
+    step = 1
+    while len(order) < lanes:
+        if center + step <= lanes:
+            order.append(center + step)
+        if center - step >= 1:
+            order.append(center - step)
+        step += 1
+    return order
+
+
+def assign_heats(relays: list, lanes: int = 8) -> list[dict]:
+    """Seed built relays into heats, standard-meet style.
+
+    Fastest relays swim last, in the centre lanes; the first heat is the small,
+    slow one. Each relay dict must carry 'total'. Returns heats numbered from 1
+    (slowest) with lane assignments, e.g.
+        [{"heat": 1, "lanes": [{"lane": 4, "relay": {...}}, ...]}, ...]
+    """
+    seeds = sorted(relays, key=lambda r: r["total"])  # fastest first
+    k = len(seeds)
+    if k == 0:
+        return []
+    order = center_out(lanes)
+    num_heats = (k + lanes - 1) // lanes
+    first_size = k - lanes * (num_heats - 1)  # the slow heat 1 takes the remainder
+
+    heats: list[dict] = [None] * num_heats  # type: ignore[list-item]
+    pos = 0
+    for h in range(num_heats - 1, -1, -1):  # fill the last (fastest) heat first
+        size = first_size if h == 0 else lanes
+        chunk = seeds[pos : pos + size]
+        pos += size
+        laned = [{"lane": order[i], "relay": chunk[i]} for i in range(len(chunk))]
+        laned.sort(key=lambda slot: slot["lane"])
+        heats[h] = {"heat": h + 1, "lanes": laned}
+    return heats

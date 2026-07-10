@@ -9,6 +9,11 @@ document.querySelectorAll('form[data-confirm]').forEach((f) =>
     }),
 );
 
+// Print buttons: any element with data-print triggers the browser print dialog.
+document.querySelectorAll('[data-print]').forEach((b) =>
+    b.addEventListener('click', () => window.print()),
+);
+
 // --- Import dropzone (pool page only) ---
 const fileDropzone = document.getElementById('file-dropzone');
 if (fileDropzone) {

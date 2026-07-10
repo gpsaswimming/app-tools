@@ -55,7 +55,7 @@ docker compose up -d
 
 - [x] Phase 1 — import (bulk + incremental) → pooled swimmer view
 - [x] Phase 2 — scenarios (grouping / gender switches) + snake-draft balancing
-- [ ] Phase 3 — printable relay cards + 8-lane heat sheet
+- [x] Phase 3 — printable relay cards + 8-lane heat sheet
 
 ### Scenarios
 
@@ -70,3 +70,13 @@ gender mode. Build several and compare relay counts, alternates, and time spread
   100m relays, 50 free for 200m).
 - **Alternates** — swimmers eligible but unplaced: the remainder past a multiple
   of four, or missing a time at the leg distance (flagged in red).
+
+### Deck output
+
+From a scenario, print-optimized views (site chrome hidden on print):
+
+- **Heat sheet** (`/scenarios/{id}/heatsheet`) — each category's relays seeded
+  into 8-lane heats: fastest relays swim last in the centre lanes
+  (`4-5-3-6-2-7-1-8`), the first heat is the small/slow one.
+- **Relay cards** (`/scenarios/{id}/cards`) — one card per relay with swimmers,
+  per-leg times, projected total, and its heat + lane.

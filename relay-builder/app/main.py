@@ -190,6 +190,26 @@ def scenario_detail(request: Request, scenario_id: int):
     )
 
 
+@app.get("/scenarios/{scenario_id}/heatsheet")
+def scenario_heatsheet(request: Request, scenario_id: int):
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if not sc:
+            return RedirectResponse(url="/scenarios", status_code=303)
+        plan, _ = scenarios.heat_plan(conn, scenario_id)
+    return templates.TemplateResponse(request=request, name="heatsheet.html", context={"sc": sc, "plan": plan})
+
+
+@app.get("/scenarios/{scenario_id}/cards")
+def scenario_cards(request: Request, scenario_id: int):
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if not sc:
+            return RedirectResponse(url="/scenarios", status_code=303)
+        _, cards = scenarios.heat_plan(conn, scenario_id)
+    return templates.TemplateResponse(request=request, name="cards.html", context={"sc": sc, "cards": cards})
+
+
 @app.post("/scenarios/{scenario_id}/rebalance")
 def scenario_rebalance(scenario_id: int):
     with db.connect() as conn:

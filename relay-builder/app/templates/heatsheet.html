@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Heat Sheet — {{ sc.name }}{% endblock %}
+{% block content %}
+<style>
+  @media print {
+    @page { margin: 0.5in; }
+    body { background: #fff; }
+    .cat-block { break-before: page; }
+    .cat-block:first-of-type { break-before: avoid; }
+    .heat-block { break-inside: avoid; }
+  }
+</style>
+
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6 print:hidden">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <a href="/scenarios/{{ sc.id }}" class="text-xs text-gray-400 hover:underline">&larr; {{ sc.name }}</a>
+      <h2 class="text-xl font-bold text-gray-800">Heat sheet</h2>
+      <p class="text-sm text-gray-500">8-lane seeding &middot; fastest relays swim last, in the centre lanes.</p>
+    </div>
+    <button type="button" data-print class="btn-primary font-semibold py-2 px-4 rounded-lg">Print</button>
+  </div>
+</div>
+
+<h1 class="hidden print:block text-lg font-bold mb-3">{{ sc.name }} &mdash; Relay Heat Sheet</h1>
+
+{% for cat in plan %}
+<div class="cat-block bg-white rounded-xl shadow-lg p-6 mb-6 print:shadow-none print:rounded-none print:p-0 print:mb-4">
+  <h3 class="text-base font-bold text-[#002366] mb-3">{{ cat.label }}{% if cat.leg %} <span class="font-normal text-gray-500">&middot; {{ cat.leg * 4 }}m relay</span>{% endif %}</h3>
+  {% for heat in cat.heats %}
+  <div class="heat-block mb-4">
+    <h4 class="text-sm font-semibold text-gray-700 mb-1">Heat {{ heat.heat }} <span class="text-gray-400 font-normal">of {{ cat.heats|length }}</span></h4>
+    <table class="w-full text-sm border-collapse">
+      <thead>
+        <tr class="bg-gray-100 print:bg-gray-200 text-gray-600 text-left">
+          <th class="border border-gray-300 px-2 py-1 text-center w-14">Lane</th>
+          <th class="border border-gray-300 px-2 py-1 w-16">Relay</th>
+          <th class="border border-gray-300 px-2 py-1">Swimmers</th>
+          <th class="border border-gray-300 px-2 py-1 text-right w-24">Seed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for slot in heat.lanes %}
+        <tr>
+          <td class="border border-gray-300 px-2 py-1 text-center font-bold">{{ slot.lane }}</td>
+          <td class="border border-gray-300 px-2 py-1">#{{ slot.relay.idx }}</td>
+          <td class="border border-gray-300 px-2 py-1">
+            {% for leg in slot.relay.legs %}{{ leg.full_name }}<span class="text-gray-400 text-xs" style="font-variant: small-caps;"> {{ leg.team }}</span>{% if not loop.last %} &middot; {% endif %}{% endfor %}
+          </td>
+          <td class="border border-gray-300 px-2 py-1 text-right tabular-nums">{{ slot.relay.total|mmss }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+</div>
+{% endfor %}
+
+{% if not plan %}
+<div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400 italic">No relays to seed — build relays for this scenario first.</div>
+{% endif %}
+
+{% endblock %}
