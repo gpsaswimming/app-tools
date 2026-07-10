@@ -11,6 +11,7 @@ from __future__ import annotations
 import io
 import tempfile
 import zipfile
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, Form, Request, UploadFile
@@ -192,14 +193,27 @@ def scenario_detail(request: Request, scenario_id: int):
     )
 
 
+POOL_LANES = 8
+
+
 @app.get("/scenarios/{scenario_id}/heatsheet")
 def scenario_heatsheet(request: Request, scenario_id: int):
     with db.connect() as conn:
         sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
         if not sc:
             return RedirectResponse(url="/scenarios", status_code=303)
-        plan, _ = scenarios.heat_plan(conn, scenario_id)
-    return templates.TemplateResponse(request=request, name="heatsheet.html", context={"sc": sc, "plan": plan})
+        plan, _ = scenarios.heat_plan(conn, scenario_id, lanes=POOL_LANES)
+    # Expand each heat to a full lane list (1..8), empties as None — like a meet sheet.
+    for cat in plan:
+        for heat in cat["heats"]:
+            by_lane = {slot["lane"]: slot["relay"] for slot in heat["lanes"]}
+            heat["rows"] = [(lane, by_lane.get(lane)) for lane in range(1, POOL_LANES + 1)]
+    printed = datetime.now().strftime("%m/%d/%y %I:%M %p")
+    return templates.TemplateResponse(
+        request=request,
+        name="heatsheet.html",
+        context={"sc": sc, "plan": plan, "printed": printed, "lanes": POOL_LANES},
+    )
 
 
 @app.get("/scenarios/{scenario_id}/cards")
