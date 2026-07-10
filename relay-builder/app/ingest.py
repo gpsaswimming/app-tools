@@ -53,7 +53,10 @@ def ingest_meet(conn: sqlite3.Connection, meet: dict, *, filename: str) -> dict:
         for r in ev.get("results") or []:
             seed = r.get("seedTime")
             sid = r.get("swimmerId")
-            if not seed or sid is None:
+            secs = seed.get("seconds") if seed else None
+            # Skip "no time" entries — swimparse reports NT/blank seeds as 0, which
+            # would otherwise sort as impossibly fast and poison a relay.
+            if sid is None or not secs or secs <= 0:
                 continue
             conn.execute(
                 """
@@ -61,7 +64,7 @@ def ingest_meet(conn: sqlite3.Connection, meet: dict, *, filename: str) -> dict:
                 VALUES (?, ?, ?, ?)
                 ON CONFLICT(swimmer_id, distance, stroke) DO UPDATE SET seconds = excluded.seconds
                 """,
-                (sid, distance, stroke, seed["seconds"]),
+                (sid, distance, stroke, secs),
             )
             time_count += 1
 

@@ -36,7 +36,7 @@
     <ol class="space-y-1 text-sm">
       {% for leg in c.legs %}
       <li class="flex justify-between">
-        <span class="text-gray-800"><span class="text-gray-400 mr-1">{{ leg.leg_order }}.</span>{{ leg.full_name }} <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ leg.team }}</span></span>
+        <span class="text-gray-800"><span class="text-gray-400 mr-1">{{ leg.leg_order }}.</span>{{ leg.full_name }} <span class="text-[#0033a0] text-xs font-medium">{{ leg.age_group }}</span> <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ leg.team }}</span></span>
         <span class="text-gray-500 tabular-nums">{{ leg.seconds|mmss }}</span>
       </li>
       {% endfor %}

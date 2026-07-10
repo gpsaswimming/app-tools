@@ -45,7 +45,7 @@
           <td class="border border-gray-300 px-2 py-1 text-center font-bold">{{ slot.lane }}</td>
           <td class="border border-gray-300 px-2 py-1">#{{ slot.relay.idx }}</td>
           <td class="border border-gray-300 px-2 py-1">
-            {% for leg in slot.relay.legs %}{{ leg.full_name }}<span class="text-gray-400 text-xs" style="font-variant: small-caps;"> {{ leg.team }}</span>{% if not loop.last %} &middot; {% endif %}{% endfor %}
+            {% for leg in slot.relay.legs %}{{ leg.full_name }} <span class="text-[#0033a0] text-xs">{{ leg.age_group }}</span><span class="text-gray-400 text-xs" style="font-variant: small-caps;"> {{ leg.team }}</span>{% if not loop.last %} &middot; {% endif %}{% endfor %}
           </td>
           <td class="border border-gray-300 px-2 py-1 text-right tabular-nums">{{ slot.relay.total|mmss }}</td>
         </tr>

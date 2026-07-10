@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS scenarios (
     grouping    TEXT NOT NULL,   -- 'gpsa' | 'per-age' | 'open'
     gender_mode TEXT NOT NULL,   -- 'single' | 'mixed'
     open_leg    INTEGER,         -- leg distance (25|50) for 'open' grouping; else NULL
+    swimups     INTEGER NOT NULL DEFAULT 1,  -- allow younger swimmers up into older medley legs
     created_at  TEXT DEFAULT (datetime('now'))
 );
 
@@ -101,6 +102,10 @@ def init_db() -> None:
     Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
         conn.executescript(_SCHEMA)
+        # Migrate DBs created before the swimups column existed.
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(scenarios)").fetchall()]
+        if "swimups" not in cols:
+            conn.execute("ALTER TABLE scenarios ADD COLUMN swimups INTEGER NOT NULL DEFAULT 1")
 
 
 def reset() -> None:

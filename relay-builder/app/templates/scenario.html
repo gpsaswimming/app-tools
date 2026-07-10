@@ -11,6 +11,7 @@
                 {{ GROUPING_LABELS.get(sc.grouping, sc.grouping) }}
                 &middot; {{ 'Single-gender' if sc.gender_mode == 'single' else 'Mixed' }}
                 {% if sc.grouping == 'open' %}&middot; {{ sc.open_leg }}m legs{% endif %}
+                {% if sc.grouping == 'gpsa' %}&middot; {{ 'swim-ups allowed' if sc.swimups else 'strict age bands' }}{% endif %}
             </p>
         </div>
         <div class="flex gap-2 flex-wrap">
@@ -52,7 +53,7 @@
             <ol class="text-sm space-y-1">
                 {% for leg in relay.legs %}
                 <li class="flex justify-between">
-                    <span class="text-gray-700"><span class="text-gray-400 mr-1">{{ leg.leg_order }}.</span>{{ leg.full_name }} <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ leg.team }}</span></span>
+                    <span class="text-gray-700"><span class="text-gray-400 mr-1">{{ leg.leg_order }}.</span>{{ leg.full_name }} <span class="text-[#0033a0] text-xs font-medium">{{ leg.age_group }}</span> <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ leg.team }}</span></span>
                     <span class="text-gray-500 tabular-nums">{{ leg.seconds|mmss }}</span>
                 </li>
                 {% endfor %}

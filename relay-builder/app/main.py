@@ -164,16 +164,18 @@ def scenario_create(
     grouping: str = Form(...),
     gender_mode: str = Form(...),
     open_leg: int = Form(50),
+    swimups: str = Form("on"),
     name: str = Form(""),
 ):
     name = name.strip() or _default_scenario_name(grouping, gender_mode)
     open_leg_val = open_leg if grouping == "open" else None
+    swim = 1 if swimups == "on" else 0
     with db.connect() as conn:
         sid = conn.execute(
-            "INSERT INTO scenarios (name, grouping, gender_mode, open_leg) VALUES (?,?,?,?)",
-            (name, grouping, gender_mode, open_leg_val),
+            "INSERT INTO scenarios (name, grouping, gender_mode, open_leg, swimups) VALUES (?,?,?,?,?)",
+            (name, grouping, gender_mode, open_leg_val, swim),
         ).lastrowid
-        scenarios.build(conn, sid, grouping, gender_mode, open_leg_val)
+        scenarios.build(conn, sid, grouping, gender_mode, open_leg_val, bool(swim))
         conn.commit()
     return RedirectResponse(url=f"/scenarios/{sid}", status_code=303)
 
@@ -215,7 +217,7 @@ def scenario_rebalance(scenario_id: int):
     with db.connect() as conn:
         sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
         if sc:
-            scenarios.build(conn, scenario_id, sc["grouping"], sc["gender_mode"], sc["open_leg"])
+            scenarios.build(conn, scenario_id, sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]))
             conn.commit()
     return RedirectResponse(url=f"/scenarios/{scenario_id}", status_code=303)
 
@@ -227,10 +229,10 @@ def scenario_clone(scenario_id: int):
         if not sc:
             return RedirectResponse(url="/scenarios", status_code=303)
         sid = conn.execute(
-            "INSERT INTO scenarios (name, grouping, gender_mode, open_leg) VALUES (?,?,?,?)",
-            (f"{sc['name']} (copy)", sc["grouping"], sc["gender_mode"], sc["open_leg"]),
+            "INSERT INTO scenarios (name, grouping, gender_mode, open_leg, swimups) VALUES (?,?,?,?,?)",
+            (f"{sc['name']} (copy)", sc["grouping"], sc["gender_mode"], sc["open_leg"], sc["swimups"]),
         ).lastrowid
-        scenarios.build(conn, sid, sc["grouping"], sc["gender_mode"], sc["open_leg"])
+        scenarios.build(conn, sid, sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]))
         conn.commit()
     return RedirectResponse(url=f"/scenarios/{sid}", status_code=303)
 

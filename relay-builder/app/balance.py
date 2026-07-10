@@ -18,51 +18,55 @@ from __future__ import annotations
 
 # Relay categories per grouping strategy: (label, {age groups}, leg distance).
 # Leg distance follows GPSA practice — 8&U swims a 100 (4×25), older a 200 (4×50).
-GPSA_CATEGORIES = [
-    ("8 & Under", frozenset({"6&U", "7-8"}), 25),
-    ("9-10", frozenset({"9-10"}), 50),
-    ("11-12", frozenset({"11-12"}), 50),
-    ("13-14", frozenset({"13-14"}), 50),
-    ("15-18", frozenset({"15-18"}), 50),
-]
-
-PER_AGE_CATEGORIES = [
-    ("6 & Under", frozenset({"6&U"}), 25),
-    ("7-8", frozenset({"7-8"}), 25),
-    ("9-10", frozenset({"9-10"}), 50),
-    ("11-12", frozenset({"11-12"}), 50),
-    ("13-14", frozenset({"13-14"}), 50),
-    ("15-18", frozenset({"15-18"}), 50),
-]
-
-ALL_AGE_GROUPS = frozenset({"6&U", "7-8", "9-10", "11-12", "13-14", "15-18"})
-
+ALL_AGE_GROUPS = ("6&U", "7-8", "9-10", "11-12", "13-14", "15-18")
+# The GPSA 200m relay is an age-medley: one swimmer from each of these bands,
+# each swimming a 50 free leg (4×50 = 200m).
+MEDLEY_AGES = ["9-10", "11-12", "13-14", "15-18"]
 RELAY_SIZE = 4
+
+
+def _base_categories(grouping: str, open_leg: int | None):
+    """Relay types for a grouping: (label, kind, spec, leg_distance).
+
+    kind 'partition' → spec is the set of eligible age groups; form free relays
+                       of any four from that pool, seeded by the leg-distance free.
+    kind 'medley'    → spec is the ordered list of age-group legs; each relay
+                       takes exactly one swimmer from each band.
+    """
+    if grouping == "gpsa":
+        return [
+            ("8 & Under", "partition", frozenset({"6&U", "7-8"}), 25),
+            ("9-18", "medley", MEDLEY_AGES, 50),
+        ]
+    if grouping == "per-age":
+        return [
+            ("6 & Under", "partition", frozenset({"6&U"}), 25),
+            ("7-8", "partition", frozenset({"7-8"}), 25),
+            ("9-10", "partition", frozenset({"9-10"}), 50),
+            ("11-12", "partition", frozenset({"11-12"}), 50),
+            ("13-14", "partition", frozenset({"13-14"}), 50),
+            ("15-18", "partition", frozenset({"15-18"}), 50),
+        ]
+    if grouping == "open":
+        return [("Open", "partition", frozenset(ALL_AGE_GROUPS), open_leg or 50)]
+    raise ValueError(f"unknown grouping: {grouping}")
 
 
 def resolve_categories(grouping: str, gender_mode: str, open_leg: int | None):
     """Expand a scenario config into concrete categories.
 
-    Each category is a dict: label, age_groups, gender ('M'|'F'|None), leg.
+    Each category is a dict: label, kind ('partition'|'medley'), spec, gender
+    ('M'|'F'|None), leg.
     """
-    if grouping == "gpsa":
-        base = GPSA_CATEGORIES
-    elif grouping == "per-age":
-        base = PER_AGE_CATEGORIES
-    elif grouping == "open":
-        base = [("Open", ALL_AGE_GROUPS, open_leg or 50)]
-    else:
-        raise ValueError(f"unknown grouping: {grouping}")
-
     genders = [("Girls", "F"), ("Boys", "M")] if gender_mode == "single" else [("", None)]
-
     categories = []
-    for label, ages, leg in base:
+    for label, kind, spec, leg in _base_categories(grouping, open_leg):
         for gprefix, gcode in genders:
             categories.append(
                 {
                     "label": f"{gprefix} {label}".strip(),
-                    "age_groups": ages,
+                    "kind": kind,
+                    "spec": spec,
                     "gender": gcode,
                     "leg": leg,
                 }
@@ -125,9 +129,105 @@ def refine(relays, max_passes: int = 500):
 
 
 def balance_category(seeded: list[tuple[str, float]]):
-    """Full pipeline for one category's seeded swimmers → (relays, remainder)."""
+    """Full pipeline for one partition category's seeded swimmers → (relays, remainder)."""
     relays, remainder = snake_draft(sorted(seeded, key=lambda x: x[1]))
     return refine(relays), remainder
+
+
+def _balance_columns(relays, ncol, sweeps: int = 40):
+    """Equalize relay totals by coordinate descent, one leg column at a time.
+
+    Holding the other legs fixed, a column's totals are minimized-variance when
+    its largest time is paired with the relay that has the smallest partial sum
+    (rearrangement inequality). Re-pairing each column that way in turn, swept
+    until stable, converges fast and keeps one swimmer per column (per age band).
+    """
+    n = len(relays)
+    if n < 2:
+        return relays
+    for _ in range(sweeps):
+        changed = False
+        for c in range(ncol):
+            base = [_total(relays[i]) - relays[i][c][1] for i in range(n)]  # totals minus this leg
+            vals = [relays[i][c] for i in range(n)]
+            relays_low_first = sorted(range(n), key=lambda i: base[i])          # smallest partial sum first
+            vals_slow_first = sorted(range(n), key=lambda k: vals[k][1], reverse=True)  # slowest time first
+            for pos in range(n):
+                target = relays_low_first[pos]
+                val = vals[vals_slow_first[pos]]
+                if relays[target][c] is not val:
+                    changed = True
+                relays[target][c] = val
+        if not changed:
+            break
+    return relays
+
+
+def balance_medley(columns: list[list[tuple[str, float]]]):
+    """Age-medley relays: one swimmer per age-group column.
+
+    columns: one (swimmer_id, seconds) list per leg/age band. Returns
+    (relays, leftovers): each relay is a list of (id, seconds) in column/leg
+    order; leftovers is (id, seconds, column_index) for swimmers not placed.
+
+    Relay count is capped by the smallest band; the fastest swimmers of larger
+    bands swim, the slowest are alternates. Totals are equalized by per-column
+    coordinate descent, which keeps exactly one swimmer per band in each relay.
+    """
+    cols = [sorted(c, key=lambda x: x[1]) for c in columns]  # each ascending
+    ncol = len(cols)
+    n = min((len(c) for c in cols), default=0)
+    if n == 0:
+        leftovers = [(sid, sec, ci) for ci, c in enumerate(cols) for (sid, sec) in c]
+        return [], leftovers
+
+    chosen = [c[:n] for c in cols]  # fastest n per band swim
+    leftovers = [(sid, sec, ci) for ci, c in enumerate(cols) for (sid, sec) in c[n:]]
+
+    relays = [[chosen[ci][r] for ci in range(ncol)] for r in range(n)]
+    _balance_columns(relays, ncol)
+    return relays, leftovers
+
+
+def swimup_columns(bands: list[list[tuple[str, float]]]):
+    """Fill age-ordered medley legs allowing swim-ups (younger → older leg).
+
+    bands: one (id, seconds) list per age band, youngest first. Returns
+    (columns, leftovers): four equal-length leg columns (youngest leg first) plus
+    the swimmers who don't fit. Balancing then draws one per column.
+
+    The youngest leg only ever holds its own age (nobody younger exists to swim
+    up); each older leg prefers its own age, then backfills with younger swim-ups.
+    Relay count R is the most that can be filled legally — bounded by the supply
+    of younger swimmers, since only they can cover the constrained young legs. So
+    four 9-10s is a valid relay (one swims 9-10, three swim up).
+    """
+    bands = [sorted(b, key=lambda x: x[1]) for b in bands]  # fastest first
+    sizes = [len(b) for b in bands]
+    ncol = len(bands)
+
+    # Max relays: for legs 0..k (which only younger-or-equal swimmers can fill),
+    # R*(k+1) must not exceed the supply of swimmers in bands 0..k.
+    r = sum(sizes) // ncol
+    cum = 0
+    for k in range(ncol):
+        cum += sizes[k]
+        r = min(r, cum // (k + 1))
+    if r == 0:
+        return [[] for _ in range(ncol)], [(sid, sec, bi) for bi, b in enumerate(bands) for (sid, sec) in b]
+
+    avail = [list(b) for b in bands]
+    columns: list[list] = [[] for _ in range(ncol)]
+    for leg in range(ncol):
+        need = r
+        for b in [leg, *range(leg - 1, -1, -1)]:  # own age first, then younger swim-ups
+            while need > 0 and avail[b]:
+                columns[leg].append(avail[b].pop(0))  # fastest available swims
+                need -= 1
+            if need == 0:
+                break
+    leftovers = [(sid, sec, bi) for bi in range(ncol) for (sid, sec) in avail[bi]]
+    return columns, leftovers
 
 
 def center_out(lanes: int) -> list[int]:
