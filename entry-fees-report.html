@@ -83,14 +83,16 @@
                 </select>
 
                 <div>
-                    <label for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer">
+                    <label id="file-dropzone" for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-44 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                            <p class="mb-1 text-sm text-gray-500"><span class="font-semibold accent-navy">Click to upload</span> the merged meet file</p>
-                            <p class="text-xs text-gray-400">Hy-Tek <code>.hy3</code>, SDIF <code>.sd3</code>, or <code>.zip</code> &mdash; parsed locally, never uploaded</p>
-                            <p id="file-name" class="text-xs text-gray-600 mt-2 font-medium"></p>
+                            <svg id="file-icon-empty" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <svg id="file-icon-selected" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p id="file-prompt" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose a file</span> or drag it here</p>
+                            <p id="file-name" class="text-xs text-gray-500">Accepted: .hy3, .sd3, or .zip</p>
                         </div>
                         <input id="file-upload" type="file" accept=".hy3,.sd3,.txt,.zip" class="hidden" />
                     </label>
+                    <p class="text-xs text-gray-400 mt-2">Parsed locally in your browser &mdash; nothing is uploaded, and no birthdates leave this page.</p>
                     <p id="parse-status" class="text-xs mt-2"></p>
                 </div>
 
@@ -108,6 +110,7 @@
 
     <script type="module">
         import { summarizeByTeam, computeFees, MEETS, formatUsd } from './lib/entry-summary-core.js';
+        import { wireDropzone } from './lib/dropzone.js';
 
         const $ = (id) => document.getElementById(id);
         function escapeHtml(s) {
@@ -272,7 +275,6 @@
         async function handleFile(file) {
             const meetKey = $('meet-select').value;
             if (!meetKey) { showToast('Please select a meet first.', 'warning'); return; }
-            $('file-name').textContent = file.name;
             $('parse-status').textContent = '';
             try {
                 const text = file.name.toLowerCase().endsWith('.zip')
@@ -300,13 +302,15 @@
             }
         }
 
+        wireDropzone({
+            dropzone: $('file-dropzone'), input: $('file-upload'), prompt: $('file-prompt'),
+            nameLabel: $('file-name'), iconEmpty: $('file-icon-empty'), iconSelected: $('file-icon-selected'),
+            accepted: 'Accepted: .hy3, .sd3, or .zip',
+            onFile: handleFile,
+        });
         // If a file is already chosen and the meet changes, re-run the report.
         $('meet-select').addEventListener('change', () => {
             const file = $('file-upload').files?.[0];
-            if (file) handleFile(file);
-        });
-        $('file-upload').addEventListener('change', (e) => {
-            const file = e.target.files?.[0];
             if (file) handleFile(file);
         });
         $('export-btn').addEventListener('click', downloadCsv);
