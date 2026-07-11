@@ -24,9 +24,15 @@
         #summary-doc .doc-total { color: #002366; }
 
         @media print {
-            .no-print { display: none !important; }
+            .no-print, #toast-container { display: none !important; }
             body { background: #fff; }
-            #summary-doc { display: block !important; box-shadow: none !important; margin: 0; }
+            #summary-doc {
+                display: block !important;
+                box-shadow: none !important;
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
             @page { margin: 0.6in; }
         }
     </style>

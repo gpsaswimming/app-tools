@@ -23,9 +23,17 @@
         #report .num { text-align: right; font-variant-numeric: tabular-nums; }
 
         @media print {
-            .no-print { display: none !important; }
+            .no-print, #toast-container { display: none !important; }
             body { background: #fff; }
-            #report { display: block !important; box-shadow: none !important; }
+            #report {
+                display: block !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            #report .overflow-x-auto { overflow: visible !important; }
+            #report tr { break-inside: avoid; }
             @page { margin: 0.5in; size: landscape; }
         }
     </style>
