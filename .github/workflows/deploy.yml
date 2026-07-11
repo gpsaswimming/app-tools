@@ -29,7 +29,7 @@ jobs:
       - name: Stage static site
         run: |
           mkdir -p dist
-          cp index.html publicity.html roster.html entry-summary.html dist/
+          cp index.html publicity.html roster.html entry-summary.html entry-fees-report.html dist/
           cp -r lib dist/
           rm -f dist/lib/*.test.js          # tests aren't part of the public site
           # entry-summary.html imports @gpsa/swimparse in the browser; stage the
