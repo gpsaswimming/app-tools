@@ -29,8 +29,13 @@ jobs:
       - name: Stage static site
         run: |
           mkdir -p dist
-          cp index.html publicity.html roster.html dist/
+          cp index.html publicity.html roster.html entry-summary.html dist/
           cp -r lib dist/
+          rm -f dist/lib/*.test.js          # tests aren't part of the public site
+          # entry-summary.html imports @gpsa/swimparse in the browser; stage the
+          # zero-dependency source only (never the .sd3/.hy3 test fixtures).
+          mkdir -p dist/swimparse
+          cp -r swimparse/src dist/swimparse/
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v4
