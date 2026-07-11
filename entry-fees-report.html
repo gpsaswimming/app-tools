@@ -19,6 +19,7 @@
         #report { display: none; }
         #report.ready { display: block; }
         #report tbody tr:nth-child(even) { background: #f8fafc; }
+        #report tbody tr.total-row { background: #fff !important; }
         #report th, #report td { padding: 8px 10px; }
         #report .num { text-align: right; font-variant-numeric: tabular-nums; }
 
@@ -33,8 +34,13 @@
                 print-color-adjust: exact;
             }
             #report .overflow-x-auto { overflow: visible !important; }
+            #report table { font-size: 11px; }
+            #report th, #report td { padding: 5px 7px; }
+            #report thead { display: table-header-group; } /* repeat header on each page */
+            #report .num { white-space: nowrap; }
             #report tr { break-inside: avoid; }
-            @page { margin: 0.5in; size: landscape; }
+            /* Orientation left to the print dialog (defaults to portrait). */
+            @page { margin: 0.5in; }
         }
     </style>
 </head>
@@ -207,9 +213,8 @@
                             <th class="num">Total</th>
                         </tr>
                     </thead>
-                    <tbody>${body}</tbody>
-                    <tfoot>
-                        <tr class="border-t-2 rule-navy font-bold accent-navy">
+                    <tbody>${body}
+                        <tr class="total-row border-t-2 rule-navy font-bold accent-navy">
                             <td>Total (${rep.rows.length} teams)</td>
                             <td class="num">${t.swimmers}</td>
                             <td class="num">${t.individualEntries}</td>
@@ -219,7 +224,7 @@
                             <td class="num">${formatUsd(t.relay)}</td>
                             <td class="num text-lg">${formatUsd(t.total)}</td>
                         </tr>
-                    </tfoot>
+                    </tbody>
                 </table>
                 </div>`;
             $('report').classList.add('ready');
