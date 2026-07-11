@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPSA Meet Marshal — Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://css.gpsaswimming.org/gpsa-tools-common.css">
+    <style>
+        /* Brand accents (kept local so the tool is self-contained). */
+        .btn-navy  { background-color: #002366; color: #fff; }
+        .btn-navy:hover  { background-color: #0033a0; }
+        .btn-red   { background-color: #d9242b; color: #fff; }
+        .btn-red:hover   { background-color: #b81e24; }
+        .btn-green { background-color: #15803d; color: #fff; }
+        .btn-green:hover { background-color: #166534; }
+        .btn-navy:disabled, .btn-red:disabled, .btn-green:disabled { opacity: .5; cursor: not-allowed; }
+        .accent-navy { color: #002366; }
+
+        /* Number-pad keys: big tap targets for phone use. */
+        .key {
+            font-size: 1.6rem; font-weight: 600; color: #1f2937;
+            background: #fff; border: 1px solid #e5e7eb; border-radius: .75rem;
+            padding: .9rem 0; transition: background .1s;
+            -webkit-user-select: none; user-select: none;
+        }
+        .key:active { background: #eef2ff; }
+        .key-wide { grid-column: span 1; }
+
+        /* Status pills. */
+        .pill { display:inline-block; padding:.15rem .6rem; border-radius:9999px; font-size:.75rem; font-weight:600; }
+        .pill-in   { background:#e0e7ff; color:#3730a3; }
+        .pill-out  { background:#fef3c7; color:#92400e; }
+        .pill-lost { background:#fee2e2; color:#991b1b; }
+
+        /* Toast. */
+        #toast-container { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 60; display:flex; flex-direction:column; gap:.5rem; align-items:center; }
+        .toast { padding:.6rem 1rem; border-radius:.5rem; color:#fff; font-size:.9rem; font-weight:500; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+        .toast-ok   { background:#15803d; }
+        .toast-err  { background:#d9242b; }
+        .toast-info { background:#002366; }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <!-- Access gate -->
+    <div id="gate" class="fixed inset-0 z-[70] items-center justify-center p-4" style="display:none; background:#002366;">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
+            <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png" alt="GPSA" class="h-16 w-16 rounded-full mx-auto mb-3"
+                 onerror="this.onerror=null; this.src='https://placehold.co/100x100/002366/FFFFFF?text=GPSA';">
+            <h1 class="text-xl font-bold accent-navy mb-1">Meet Credentials</h1>
+            <p class="text-sm text-gray-500 mb-4">Enter your access password</p>
+            <input id="gate-pass" type="password" inputmode="text" autocomplete="off"
+                   class="w-full border border-gray-300 rounded-lg p-3 text-center mb-2" placeholder="Password">
+            <button id="gate-go" class="btn-navy rounded-lg px-4 py-3 text-sm font-semibold w-full">Enter</button>
+            <p id="gate-err" class="text-xs text-red-600 mt-2 h-4"></p>
+            <p class="text-[11px] text-gray-400 mt-3 leading-relaxed">Demo passwords — <code>admin123</code> · <code>desk123</code> · <code>marshal123</code>. Real passwords move server-side when the backend lands.</p>
+        </div>
+    </div>
+
+    <main class="container mx-auto p-4 sm:p-6 max-w-2xl">
+        <header class="gpsa-header p-4 shadow-md flex items-center justify-center mb-4 rounded-lg">
+            <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png"
+                 alt="GPSA Logo"
+                 class="h-14 w-14 mr-3 rounded-full"
+                 onerror="this.onerror=null; this.src='https://placehold.co/100x100/002366/FFFFFF?text=GPSA';">
+            <div>
+                <h1 class="text-2xl font-bold">Meet Credentials</h1>
+                <p class="gpsa-header-subtitle">Check credential cards out and in.</p>
+            </div>
+        </header>
+
+        <div id="rolebar" class="flex items-center justify-between text-xs text-gray-500 mb-3 px-1 hidden">
+            <span>Signed in as <span id="role-label" class="font-semibold accent-navy"></span></span>
+            <button id="signout" class="underline">Sign out</button>
+        </div>
+
+        <!-- Live counts -->
+        <div id="counts" class="grid grid-cols-3 gap-2 mb-4">
+            <div class="bg-white rounded-xl shadow p-3 text-center">
+                <div id="count-in" class="text-2xl font-bold accent-navy">–</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wide">At desk</div>
+            </div>
+            <div class="bg-white rounded-xl shadow p-3 text-center">
+                <div id="count-out" class="text-2xl font-bold" style="color:#92400e">–</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wide">Out</div>
+            </div>
+            <div class="bg-white rounded-xl shadow p-3 text-center">
+                <div id="count-lost" class="text-2xl font-bold" style="color:#991b1b">–</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wide">Lost</div>
+            </div>
+        </div>
+
+        <!-- Meet contacts -->
+        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="font-semibold text-sm text-gray-700">Meet contacts</h2>
+                <span class="text-[11px] text-gray-400">Radio first · call for sensitive/urgent</span>
+            </div>
+            <div id="contacts" class="space-y-2"></div>
+        </div>
+
+        <!-- Number pad + display -->
+        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
+            <div id="display" class="text-center text-4xl font-bold accent-navy py-3 mb-3 rounded-lg bg-gray-50 tracking-widest select-none">–</div>
+            <div class="grid grid-cols-3 gap-2">
+                <button class="key" data-k="1">1</button>
+                <button class="key" data-k="2">2</button>
+                <button class="key" data-k="3">3</button>
+                <button class="key" data-k="4">4</button>
+                <button class="key" data-k="5">5</button>
+                <button class="key" data-k="6">6</button>
+                <button class="key" data-k="7">7</button>
+                <button class="key" data-k="8">8</button>
+                <button class="key" data-k="9">9</button>
+                <button class="key" data-k="clear">C</button>
+                <button class="key" data-k="0">0</button>
+                <button class="key btn-navy" style="color:#fff;border:none" data-k="enter">Go</button>
+            </div>
+        </div>
+
+        <!-- Card detail (populated on lookup) -->
+        <div id="card-panel" class="bg-white rounded-xl shadow-lg p-4 mb-4 hidden"></div>
+
+        <!-- Lists -->
+        <div class="bg-white rounded-xl shadow-lg mb-4">
+            <div class="flex border-b border-gray-100">
+                <button id="tab-out" class="flex-1 py-3 font-semibold text-sm accent-navy border-b-2 border-[#002366]">Still Out (<span id="tab-out-n">0</span>)</button>
+                <button id="tab-lost" class="flex-1 py-3 font-semibold text-sm text-gray-500 border-b-2 border-transparent">Lost (<span id="tab-lost-n">0</span>)</button>
+            </div>
+            <ul id="list-body" class="divide-y divide-gray-100 max-h-72 overflow-y-auto"></ul>
+        </div>
+
+        <!-- Setup / admin -->
+        <details id="setup" class="bg-white rounded-xl shadow-lg p-4 mb-8">
+            <summary class="font-semibold text-sm text-gray-700 cursor-pointer">Setup &amp; admin</summary>
+            <div class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Assignments (one per line: <code>number, name, team, role</code>)</label>
+                    <textarea id="assign-input" rows="5" class="w-full border border-gray-300 rounded-lg p-2 text-sm font-mono" placeholder="1, Jane Coach, Glendale, Head Coach&#10;2, Sam Rep, Poquoson, Team Rep"></textarea>
+                    <button id="btn-import" class="btn-navy rounded-lg px-4 py-2 text-sm font-semibold mt-2">Load assignments</button>
+                    <p class="text-xs text-gray-400 mt-1">Numbers not listed here are treated as unassigned spares (you'll be prompted for a name at pickup).</p>
+                </div>
+                <hr>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-2">Meet contacts (shown to everyone)</label>
+                    <div id="dir-fields" class="space-y-3"></div>
+                    <button id="btn-dir" class="btn-navy rounded-lg px-4 py-2 text-sm font-semibold mt-2">Save contacts</button>
+                </div>
+                <hr>
+                <div>
+                    <button id="btn-reset" class="btn-red rounded-lg px-4 py-2 text-sm font-semibold">Reset for new meet</button>
+                    <p class="text-xs text-gray-400 mt-1">Sets every card back to <em>At desk</em> and clears all Out / Lost flags. Assignments are kept.</p>
+                </div>
+            </div>
+        </details>
+    </main>
+
+    <!-- Pickup-holder modal (unassigned-spare fallback) -->
+    <div id="modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl p-5 w-full max-w-sm">
+            <h3 class="font-bold text-lg accent-navy mb-1">Card #<span id="modal-num"></span></h3>
+            <p class="text-sm text-gray-500 mb-4">Unassigned spare — who is picking it up?</p>
+            <input id="modal-name" type="text" placeholder="Name" class="w-full border border-gray-300 rounded-lg p-2 mb-2">
+            <select id="modal-team" class="w-full border border-gray-300 rounded-lg p-2 mb-2 bg-white"></select>
+            <select id="modal-role" class="w-full border border-gray-300 rounded-lg p-2 mb-4 bg-white"></select>
+            <div class="flex gap-2">
+                <button id="modal-cancel" class="flex-1 rounded-lg px-4 py-2 text-sm font-semibold bg-gray-100 text-gray-700">Cancel</button>
+                <button id="modal-ok" class="flex-1 btn-navy rounded-lg px-4 py-2 text-sm font-semibold">Check Out</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ---- Reference data -------------------------------------------------
+        const TEAMS = ["Beaconsdale","Colony","Coventry","Elizabeth Lake","Glendale",
+            "Hidenwood","James River","Kiln Creek","Marlbank","Northampton","Poquoson",
+            "Riverdale","Running Man","Village Green","Warwick Yacht","Wendwood",
+            "Willow Oaks","Windy Point","Wythe"];
+        const ROLES = ["Head Coach","Assistant Coach","Team Rep","Official","Meet Worker","Board","Media","Other"];
+        const CARD_COUNT = 100;
+
+        // ---- Helpers --------------------------------------------------------
+        const $ = (id) => document.getElementById(id);
+        function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function showToast(msg, kind="info"){
+            const t = document.createElement("div");
+            t.className = `toast toast-${kind}`;
+            t.textContent = msg;
+            $("toast-container").appendChild(t);
+            setTimeout(() => t.remove(), 2600);
+        }
+
+        // ---- Data layer (MOCK) ---------------------------------------------
+        // Swappable: replace this object's methods with fetch() calls to the
+        // Cloudflare D1 API and the UI below is unchanged. Every method is async.
+        const store = (() => {
+            const KEY = "gpsa-credentials-v1";
+            function seed(){
+                const cards = {};
+                for (let n = 1; n <= CARD_COUNT; n++) cards[n] = { n, status:"in", name:null, team:null, role:null, out_at:null };
+                // A little sample data so the demo isn't empty.
+                const sample = [
+                    [1,"Jane Coach","Glendale","Head Coach"],
+                    [2,"Sam Rep","Poquoson","Team Rep"],
+                    [3,"Alex Official","Windy Point","Official"],
+                    [4,"Pat Worker","Wythe","Meet Worker"],
+                ];
+                for (const [n,name,team,role] of sample) Object.assign(cards[n], {name,team,role});
+                return cards;
+            }
+            function load(){
+                try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch {}
+                const c = seed(); save(c); return c;
+            }
+            function save(c){ localStorage.setItem(KEY, JSON.stringify(c)); }
+
+            const DIRKEY = "gpsa-credentials-dir-v1";
+            function loadDir(){
+                try { const r = localStorage.getItem(DIRKEY); if (r) return JSON.parse(r); } catch {}
+                return {   // sample directory so the demo isn't empty
+                    safety:   { name:"Dana Reyes",  phone:"757-555-0101", radio:"Ch 2 “Safety”" },
+                    referee:  { name:"Chris Vaughn", phone:"757-555-0102", radio:"Ch 1 “Ref”" },
+                    director: { name:"Morgan Ellis", phone:"757-555-0103", radio:"Ch 1 “Director”" },
+                };
+            }
+            let cards = load();
+            let dir = loadDir();
+
+            return {
+                async get(n){ return cards[n] ? {...cards[n]} : null; },
+                async all(){ return Object.values(cards).map(c => ({...c})); },
+                async checkout(n, holder){
+                    const c = cards[n]; if (!c) return null;
+                    Object.assign(c, { status:"out", out_at: Date.now(), ...(holder||{}) });
+                    save(cards); return {...c};
+                },
+                async checkin(n){
+                    const c = cards[n]; if (!c) return null;
+                    Object.assign(c, { status:"in", out_at:null }); save(cards); return {...c};
+                },
+                async markLost(n){
+                    const c = cards[n]; if (!c) return null;
+                    c.status = "lost"; save(cards); return {...c};
+                },
+                async recover(n){
+                    const c = cards[n]; if (!c) return null;
+                    Object.assign(c, { status:"in", out_at:null }); save(cards); return {...c};
+                },
+                async importAssignments(rows){
+                    for (const r of rows){ const c = cards[r.n]; if (c) Object.assign(c, { name:r.name, team:r.team, role:r.role }); }
+                    save(cards);
+                },
+                async reset(){
+                    for (const c of Object.values(cards)) Object.assign(c, { status:"in", out_at:null });
+                    save(cards);
+                },
+                async getDirectory(){ return { ...dir }; },
+                async setDirectory(d){ dir = d; localStorage.setItem(DIRKEY, JSON.stringify(d)); },
+            };
+        })();
+
+        // ---- Number pad -----------------------------------------------------
+        let entry = "";
+        let role = null;   // "admin" | "checkinout" | "marshal"
+        function renderDisplay(){ $("display").textContent = entry === "" ? "–" : entry; }
+        function pressKey(k){
+            if (k === "clear"){ entry = ""; renderDisplay(); hidePanel(); return; }
+            if (k === "enter"){ lookup(); return; }
+            if (entry.length >= 3) return;
+            const next = (entry + k).replace(/^0+/, "");   // no leading zeros
+            if (next === "" ) { entry = ""; renderDisplay(); return; }
+            if (parseInt(next,10) > CARD_COUNT) { showToast(`Highest card is ${CARD_COUNT}`, "err"); return; }
+            entry = next; renderDisplay();
+        }
+        document.querySelectorAll(".key").forEach(b => b.addEventListener("click", () => pressKey(b.dataset.k)));
+        // Physical keyboard support (handy on a laptop at the desk).
+        window.addEventListener("keydown", e => {
+            if (!role) return;                                              // gate still up
+            const t = e.target;
+            if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;    // typing in a field
+            if (e.key >= "0" && e.key <= "9") pressKey(e.key);
+            else if (e.key === "Enter") pressKey("enter");
+            else if (e.key === "Backspace" || e.key === "Escape") pressKey("clear");
+        });
+
+        // ---- Card lookup + actions -----------------------------------------
+        function hidePanel(){ $("card-panel").classList.add("hidden"); }
+        async function lookup(){
+            const n = parseInt(entry, 10);
+            if (!n || n < 1 || n > CARD_COUNT){ showToast("Enter a number 1–"+CARD_COUNT, "err"); return; }
+            const c = await store.get(n);
+            renderCard(c);
+        }
+
+        function pillFor(status){
+            const map = { in:["pill-in","At desk"], out:["pill-out","Out"], lost:["pill-lost","LOST"] };
+            const [cls, label] = map[status] || map.in;
+            return `<span class="pill ${cls}">${label}</span>`;
+        }
+
+        function renderCard(c){
+            const panel = $("card-panel");
+            const who = c.name
+                ? `<div class="text-lg font-semibold text-gray-900">${escapeHtml(c.name)}</div>
+                   <div class="text-sm text-gray-500">${escapeHtml([c.team, c.role].filter(Boolean).join(" · ") || "—")}</div>`
+                : `<div class="text-lg font-semibold text-gray-400 italic">Unassigned spare</div>`;
+
+            let banner = "";
+            if (c.status === "lost"){
+                banner = `<div class="rounded-lg bg-red-600 text-white text-center font-bold py-3 mb-3 text-lg">⚠ LOST — DENY ENTRY</div>`;
+            }
+
+            let actions = "";
+            if (role === "marshal"){
+                actions = `<p class="text-xs text-gray-400 text-center">Marshal view — lookup only.</p>`;
+            } else if (c.status === "in"){
+                actions = `<button data-act="checkout" class="btn-navy rounded-lg px-4 py-3 text-sm font-semibold w-full">Picked Up</button>`;
+            } else if (c.status === "out"){
+                actions = `<div class="grid grid-cols-2 gap-2">
+                    <button data-act="checkin" class="btn-green rounded-lg px-4 py-3 text-sm font-semibold">Returned</button>
+                    <button data-act="lost" class="btn-red rounded-lg px-4 py-3 text-sm font-semibold">Mark Lost</button></div>`;
+            } else if (c.status === "lost"){
+                actions = `<button data-act="recover" class="btn-navy rounded-lg px-4 py-3 text-sm font-semibold w-full">Recover (back to desk)</button>`;
+            }
+
+            panel.innerHTML = `
+                ${banner}
+                <div class="flex items-center justify-between mb-3">
+                    <div class="text-3xl font-bold accent-navy">#${c.n}</div>
+                    ${pillFor(c.status)}
+                </div>
+                <div class="mb-4">${who}</div>
+                ${actions}`;
+            panel.classList.remove("hidden");
+
+            panel.querySelectorAll("[data-act]").forEach(btn =>
+                btn.addEventListener("click", () => doAction(btn.dataset.act, c)));
+        }
+
+        async function doAction(act, c){
+            if (act === "checkout"){
+                if (!c.name){ openModal(c.n); return; }   // spare → ask who
+                await store.checkout(c.n, {});
+                showToast(`#${c.n} picked up by ${c.name}`, "ok");
+            } else if (act === "checkin"){
+                await store.checkin(c.n); showToast(`#${c.n} returned`, "ok");
+            } else if (act === "lost"){
+                await store.markLost(c.n); showToast(`#${c.n} marked LOST`, "err");
+            } else if (act === "recover"){
+                await store.recover(c.n); showToast(`#${c.n} recovered`, "ok");
+            }
+            renderCard(await store.get(c.n));
+            refresh();
+        }
+
+        // ---- Spare-pickup modal --------------------------------------------
+        let modalNum = null;
+        function fillSelect(el, opts, placeholder){
+            el.innerHTML = `<option value="" disabled selected>${placeholder}</option>` +
+                opts.map(o => `<option>${escapeHtml(o)}</option>`).join("");
+        }
+        fillSelect($("modal-team"), TEAMS, "Team…");
+        fillSelect($("modal-role"), ROLES, "Role…");
+        function openModal(n){
+            modalNum = n; $("modal-num").textContent = n;
+            $("modal-name").value = ""; $("modal-team").selectedIndex = 0; $("modal-role").selectedIndex = 0;
+            $("modal").classList.remove("hidden"); $("modal").classList.add("flex");
+            $("modal-name").focus();
+        }
+        function closeModal(){ $("modal").classList.add("hidden"); $("modal").classList.remove("flex"); modalNum = null; }
+        $("modal-cancel").addEventListener("click", closeModal);
+        $("modal-ok").addEventListener("click", async () => {
+            const name = $("modal-name").value.trim();
+            if (!name){ showToast("Enter a name", "err"); return; }
+            await store.checkout(modalNum, { name, team: $("modal-team").value || null, role: $("modal-role").value || null });
+            showToast(`#${modalNum} picked up by ${name}`, "ok");
+            const n = modalNum; closeModal();
+            renderCard(await store.get(n)); refresh();
+        });
+
+        // ---- Lists + counts -------------------------------------------------
+        let activeTab = "out";
+        $("tab-out").addEventListener("click", () => { activeTab = "out"; styleTabs(); refresh(); });
+        $("tab-lost").addEventListener("click", () => { activeTab = "lost"; styleTabs(); refresh(); });
+        function styleTabs(){
+            const on = "flex-1 py-3 font-semibold text-sm accent-navy border-b-2 border-[#002366]";
+            const off = "flex-1 py-3 font-semibold text-sm text-gray-500 border-b-2 border-transparent";
+            $("tab-out").className = activeTab === "out" ? on : off;
+            $("tab-lost").className = activeTab === "lost" ? on : off;
+        }
+
+        async function refresh(){
+            const cards = await store.all();
+            const out  = cards.filter(c => c.status === "out");
+            const lost = cards.filter(c => c.status === "lost");
+            const inn  = cards.filter(c => c.status === "in");
+            $("count-in").textContent = inn.length;
+            $("count-out").textContent = out.length;
+            $("count-lost").textContent = lost.length;
+            $("tab-out-n").textContent = out.length;
+            $("tab-lost-n").textContent = lost.length;
+
+            const rows = (activeTab === "out" ? out : lost)
+                .sort((a,b) => a.n - b.n);
+            $("list-body").innerHTML = rows.length ? rows.map(c => `
+                <li class="py-3 px-4 flex items-center justify-between gap-3 cursor-pointer hover:bg-gray-50" data-jump="${c.n}">
+                    <div class="flex items-center gap-3">
+                        <span class="text-lg font-bold accent-navy w-10">#${c.n}</span>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">${escapeHtml(c.name || "Unassigned")}</div>
+                            <div class="text-xs text-gray-500">${escapeHtml([c.team, c.role].filter(Boolean).join(" · "))}</div>
+                        </div>
+                    </div>
+                    ${pillFor(c.status)}
+                </li>`).join("")
+                : `<li class="py-8 text-center text-sm text-gray-400">Nothing ${activeTab === "out" ? "out" : "lost"} right now.</li>`;
+
+            $("list-body").querySelectorAll("[data-jump]").forEach(li =>
+                li.addEventListener("click", async () => {
+                    entry = li.dataset.jump; renderDisplay();
+                    renderCard(await store.get(parseInt(entry,10)));
+                }));
+        }
+
+        // ---- Setup / admin --------------------------------------------------
+        $("btn-import").addEventListener("click", async () => {
+            const lines = $("assign-input").value.split("\n").map(l => l.trim()).filter(Boolean);
+            const rows = []; let bad = 0;
+            for (const line of lines){
+                const parts = line.split(",").map(p => p.trim());
+                const n = parseInt(parts[0], 10);
+                if (!n || n < 1 || n > CARD_COUNT || !parts[1]){ bad++; continue; }
+                rows.push({ n, name: parts[1], team: parts[2] || null, role: parts[3] || null });
+            }
+            if (!rows.length){ showToast("No valid rows found", "err"); return; }
+            await store.importAssignments(rows);
+            showToast(`Loaded ${rows.length} assignment${rows.length===1?"":"s"}${bad?` (${bad} skipped)`:""}`, "ok");
+            refresh();
+        });
+        $("btn-reset").addEventListener("click", async () => {
+            if (!confirm("Reset every card to At desk and clear all Out / Lost flags?")) return;
+            await store.reset(); hidePanel(); entry = ""; renderDisplay();
+            showToast("Reset for a new meet", "ok"); refresh();
+        });
+
+        // ---- Meet contacts --------------------------------------------------
+        const CONTACT_ROLES = [
+            { key:"safety",   label:"Safety Officer" },
+            { key:"referee",  label:"Meet Referee" },
+            { key:"director", label:"Meet Director" },
+        ];
+        function telHref(phone){ return "tel:" + String(phone).replace(/[^\d+]/g, ""); }
+        async function renderContacts(){
+            const d = await store.getDirectory();
+            $("contacts").innerHTML = CONTACT_ROLES.map(({key,label}) => {
+                const c = d[key] || {};
+                const sub = [c.name ? escapeHtml(c.name) : "", c.radio ? "📻 " + escapeHtml(c.radio) : ""].filter(Boolean).join(" · ");
+                if (c.phone){
+                    return `<a href="${telHref(c.phone)}" class="flex items-center justify-between gap-3 btn-navy rounded-lg px-4 py-3">
+                        <span class="font-semibold text-sm">📞 Call ${escapeHtml(label)}</span>
+                        <span class="text-xs text-right" style="opacity:.85">${sub || "&nbsp;"}</span></a>`;
+                }
+                return `<div class="flex items-center justify-between gap-3 rounded-lg px-4 py-3 bg-gray-100 text-gray-400">
+                        <span class="font-semibold text-sm">${escapeHtml(label)}</span>
+                        <span class="text-xs">not set</span></div>`;
+            }).join("");
+        }
+        function renderDirFields(d){
+            $("dir-fields").innerHTML = CONTACT_ROLES.map(({key,label}) => {
+                const c = d[key] || {};
+                return `<div class="border border-gray-200 rounded-lg p-2">
+                    <div class="text-xs font-semibold text-gray-600 mb-1">${escapeHtml(label)}</div>
+                    <input data-dir="${key}" data-f="name"  value="${escapeHtml(c.name||"")}"  placeholder="Name" class="w-full border border-gray-300 rounded p-1.5 text-sm mb-1">
+                    <input data-dir="${key}" data-f="phone" value="${escapeHtml(c.phone||"")}" placeholder="Phone (tap-to-call)" inputmode="tel" class="w-full border border-gray-300 rounded p-1.5 text-sm mb-1">
+                    <input data-dir="${key}" data-f="radio" value="${escapeHtml(c.radio||"")}" placeholder="Radio channel / callsign (optional)" class="w-full border border-gray-300 rounded p-1.5 text-sm">
+                </div>`;
+            }).join("");
+        }
+        $("btn-dir").addEventListener("click", async () => {
+            const d = {};
+            $("dir-fields").querySelectorAll("[data-dir]").forEach(inp => {
+                (d[inp.dataset.dir] ||= {})[inp.dataset.f] = inp.value.trim() || null;
+            });
+            await store.setDirectory(d);
+            showToast("Contacts saved", "ok");
+            renderContacts();
+        });
+
+        // ---- Auth (role by password) ---------------------------------------
+        // MOCK passwords. These move SERVER-SIDE with the D1 backend — a static
+        // page cannot truly hide them, and "marshal is read-only" is enforced
+        // by the server, not by this UI.
+        const ROLE_PASSWORDS = { "admin123":"admin", "desk123":"checkinout", "marshal123":"marshal" };
+        const ROLE_LABELS = { admin:"Admin", checkinout:"Check-in/out", marshal:"Marshal" };
+
+        // Persisted session: log in once at the start of the meet and stay in
+        // across tab-close / phone-lock. Expiry clears it after the day.
+        const SESSION_KEY = "gpsa-cred-session";
+        const SESSION_HOURS = 18;
+        function saveSession(r){
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ role:r, exp: Date.now() + SESSION_HOURS*3600*1000 }));
+        }
+        function readSession(){
+            try { const s = JSON.parse(localStorage.getItem(SESSION_KEY));
+                  if (s && ROLE_LABELS[s.role] && s.exp > Date.now()) return s.role; } catch {}
+            localStorage.removeItem(SESSION_KEY);
+            return null;
+        }
+        async function applyRole(r){
+            role = r;
+            saveSession(r);
+            $("role-label").textContent = ROLE_LABELS[r];
+            $("rolebar").classList.remove("hidden");
+            $("setup").style.display = (r === "admin") ? "" : "none";   // admin-only surface
+            $("gate").style.display = "none";
+            // Marshal is lookup-only: hide reconciliation surfaces, keep the
+            // Lost list as a deny-entry watchlist.
+            const marshal = (r === "marshal");
+            $("counts").style.display = marshal ? "none" : "";
+            $("tab-out").style.display = marshal ? "none" : "";
+            activeTab = marshal ? "lost" : "out";
+            styleTabs();
+            hidePanel(); entry = ""; renderDisplay();
+            renderContacts();
+            if (r === "admin") renderDirFields(await store.getDirectory());
+            refresh();
+        }
+        function signOut(){
+            localStorage.removeItem(SESSION_KEY);
+            role = null; entry = ""; renderDisplay(); hidePanel();
+            $("rolebar").classList.add("hidden");
+            $("gate").style.display = "flex"; $("gate-pass").value = ""; $("gate-pass").focus();
+        }
+        function tryLogin(){
+            const r = ROLE_PASSWORDS[$("gate-pass").value.trim()];
+            if (!r){ $("gate-err").textContent = "Password not recognised."; return; }
+            $("gate-err").textContent = ""; applyRole(r);
+        }
+        $("gate-go").addEventListener("click", tryLogin);
+        $("gate-pass").addEventListener("keydown", e => { if (e.key === "Enter") tryLogin(); });
+        $("signout").addEventListener("click", signOut);
+
+        // ---- Boot -----------------------------------------------------------
+        renderDisplay(); styleTabs(); renderContacts();
+        const savedRole = readSession();
+        if (savedRole) applyRole(savedRole);
+        else { $("gate").style.display = "flex"; $("gate-pass").focus(); }
+    </script>
+</body>
+</html>
