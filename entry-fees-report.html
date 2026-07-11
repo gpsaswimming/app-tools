@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPSA Entry Fees Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://css.gpsaswimming.org/gpsa-tools-common.css">
+    <style>
+        .btn-navy { background-color: #002366; color: #fff; }
+        .btn-navy:hover { background-color: #0033a0; }
+        .btn-red { background-color: #d9242b; color: #fff; }
+        .btn-red:hover { background-color: #b81e24; }
+        .btn-navy:disabled, .btn-red:disabled { opacity: .5; cursor: not-allowed; }
+        .accent-navy { color: #002366; }
+        .rule-navy { border-color: #002366; }
+        #report { display: none; }
+        #report.ready { display: block; }
+        #report tbody tr:nth-child(even) { background: #f8fafc; }
+        #report tbody tr.total-row { background: #fff !important; }
+        #report th, #report td { padding: 8px 10px; }
+        #report .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+        @media print {
+            .no-print, #toast-container { display: none !important; }
+            html, body { margin: 0 !important; padding: 0 !important; background: #fff; }
+            /* Collapse the screen layout wrappers so the report fills the page
+               (kills the off-center shift and the dead space at the top). */
+            main { max-width: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            main > div { max-width: none !important; width: 100% !important; margin: 0 !important; }
+            #report {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            #report .overflow-x-auto { overflow: visible !important; }
+            /* Compact enough that all teams + the total fit on one page. */
+            #report table { width: 100% !important; font-size: 9.5px; }
+            #report th, #report td { padding: 3px 6px; }
+            #report thead { display: table-header-group; }
+            #report .num { white-space: nowrap; }
+            #report tr { break-inside: avoid; }
+            #report img { height: 34px !important; width: 34px !important; }
+            @page { margin: 0.4in; }
+        }
+    </style>
+</head>
+<body>
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <header class="gpsa-header p-4 shadow-md flex items-center justify-center no-print mb-6 rounded-lg">
+                <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png"
+                     alt="GPSA Logo"
+                     class="h-16 w-16 md:h-20 md:w-20 mr-4 rounded-full"
+                     onerror="this.onerror=null; this.src='https://placehold.co/100x100/002366/FFFFFF?text=GPSA';">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold">Entry Fees Report</h1>
+                    <p class="gpsa-header-subtitle">Per-team entry fees from the merged meet file.</p>
+                </div>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 no-print">
+                <p class="text-sm text-gray-600 mb-6">
+                    For the treasurer: upload the <strong>merged meet entries file</strong> (Hy-Tek
+                    <code>.hy3</code>, SDIF <code>.sd3</code>, or a <code>.zip</code> of either) to get a
+                    per-team breakdown of entry fees, with a grand total and a CSV export for reconciliation.
+                    The file is parsed <strong>entirely in your browser</strong> &mdash; nothing is uploaded and no
+                    birthdates leave this page.
+                </p>
+
+                <label for="meet-select" class="block text-sm font-semibold text-gray-800 mb-1">Invitational</label>
+                <select id="meet-select" class="w-full sm:w-80 border border-gray-300 rounded-lg p-2.5 mb-6 bg-white">
+                    <option value="" disabled selected>Select a meet&hellip;</option>
+                    <option value="summer-splash">Summer Splash</option>
+                    <option value="city-meet">City Meet</option>
+                </select>
+
+                <div>
+                    <label id="file-dropzone" for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-44 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                            <svg id="file-icon-empty" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <svg id="file-icon-selected" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p id="file-prompt" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose a file</span> or drag it here</p>
+                            <p id="file-name" class="text-xs text-gray-500">Accepted: .hy3, .sd3, or .zip</p>
+                        </div>
+                        <input id="file-upload" type="file" accept=".hy3,.sd3,.txt,.zip" class="hidden" />
+                    </label>
+                    <p class="text-xs text-gray-400 mt-2">Parsed locally in your browser &mdash; nothing is uploaded, and no birthdates leave this page.</p>
+                    <p id="parse-status" class="text-xs mt-2"></p>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mt-6">
+                    <button id="export-btn" class="btn-red font-semibold py-2.5 px-5 rounded-lg hidden">Download CSV</button>
+                    <button id="print-btn" class="border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-2.5 px-5 rounded-lg hidden">Print / Save as PDF</button>
+                </div>
+            </div>
+
+            <div id="report" class="bg-white rounded-xl shadow-lg p-6 sm:p-8 mt-6"></div>
+        </div>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script type="module">
+        import { summarizeByTeam, computeFees, MEETS, formatUsd } from './lib/entry-summary-core.js';
+        import { wireDropzone } from './lib/dropzone.js';
+
+        const $ = (id) => document.getElementById(id);
+        function escapeHtml(s) {
+            return String(s ?? '').replace(/[&<>"']/g, (c) => (
+                { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+            ));
+        }
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = $('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+            toast.innerHTML = `<span class="toast-icon" aria-hidden="true">${icons[type]}</span>`
+                + `<span class="toast-message">${escapeHtml(message)}</span>`
+                + `<button class="toast-close" aria-label="Close notification">×</button>`;
+            container.appendChild(toast);
+            const remove = () => { toast.classList.add('toast-exit'); setTimeout(() => toast.remove(), 300); };
+            toast.querySelector('.toast-close').addEventListener('click', remove);
+            if (duration > 0) setTimeout(remove, duration);
+        }
+
+        // state for the current report (used by CSV export)
+        let report = null; // { meetKey, meetLabel, rows:[{team, counts, fees}], totals }
+
+        async function extractSdifFromZip(file) {
+            const maxSize = 512 * 1024; // merged files are larger than a single team's
+            if (file.size > maxSize) {
+                showToast(`Zip file is too large (${(file.size / 1024).toFixed(0)}KB). Maximum size is 512KB.`, 'error', 6000);
+                return null;
+            }
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const found = [];
+                zip.forEach((path, entry) => {
+                    const n = path.toLowerCase();
+                    if ((n.endsWith('.hy3') || n.endsWith('.sd3') || n.endsWith('.txt')) && !entry.dir) {
+                        found.push({ name: path, entry });
+                    }
+                });
+                if (found.length === 0) {
+                    showToast('No meet file (.hy3 / .sd3 / .txt) found in the zip archive.', 'error', 6000);
+                    return null;
+                }
+                if (found.length > 1) showToast(`Found ${found.length} files in the zip. Using: ${found[0].name}`, 'info', 6000);
+                return await found[0].entry.async('text');
+            } catch (err) {
+                showToast(`Failed to read zip file: ${err.message}`, 'error', 6000);
+                return null;
+            }
+        }
+
+        function buildReport(teams, meetKey) {
+            const meetLabel = MEETS[meetKey].label;
+            const rows = teams.map((t) => {
+                const fees = computeFees(t, meetKey);
+                const by = Object.fromEntries(fees.lines.map((l) => [l.label, l.amount]));
+                return {
+                    team: t,
+                    surcharge: by['Swimmer surcharge'],
+                    individual: by['Individual events'],
+                    relay: by['Relay events'],
+                    total: fees.total,
+                };
+            });
+            const totals = rows.reduce((a, r) => ({
+                swimmers: a.swimmers + r.team.swimmers,
+                individualEntries: a.individualEntries + r.team.individualEntries,
+                relayEntries: a.relayEntries + r.team.relayEntries,
+                surcharge: a.surcharge + r.surcharge,
+                individual: a.individual + r.individual,
+                relay: a.relay + r.relay,
+                total: a.total + r.total,
+            }), { swimmers: 0, individualEntries: 0, relayEntries: 0, surcharge: 0, individual: 0, relay: 0, total: 0 });
+            return { meetKey, meetLabel, rows, totals };
+        }
+
+        function renderReport(rep) {
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const body = rep.rows.map((r) => `
+                <tr>
+                    <td class="font-medium text-gray-900">${escapeHtml(r.team.teamName)}</td>
+                    <td class="num">${r.team.swimmers}</td>
+                    <td class="num">${r.team.individualEntries}</td>
+                    <td class="num">${r.team.relayEntries}</td>
+                    <td class="num">${formatUsd(r.surcharge)}</td>
+                    <td class="num">${formatUsd(r.individual)}</td>
+                    <td class="num">${formatUsd(r.relay)}</td>
+                    <td class="num font-semibold">${formatUsd(r.total)}</td>
+                </tr>`).join('');
+            const t = rep.totals;
+            $('report').innerHTML = `
+                <div class="flex items-center gap-4 border-b-2 rule-navy pb-3 mb-4">
+                    <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png" alt="GPSA" class="h-12 w-12 rounded-full" onerror="this.style.display='none'">
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-gray-500">Greater Peninsula Swimming Association</div>
+                        <div class="text-xl font-bold accent-navy">${escapeHtml(rep.meetLabel)} &mdash; Entry Fees by Team</div>
+                    </div>
+                    <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams</div>
+                </div>
+                <div class="overflow-x-auto">
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="text-left text-xs uppercase text-gray-500 border-b border-gray-200">
+                            <th>Team</th>
+                            <th class="num">Swimmers</th>
+                            <th class="num">Ind. Events</th>
+                            <th class="num">Relays</th>
+                            <th class="num">Surcharge</th>
+                            <th class="num">Ind. Fees</th>
+                            <th class="num">Relay Fees</th>
+                            <th class="num">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>${body}
+                        <tr class="total-row border-t-2 rule-navy font-bold accent-navy">
+                            <td>Total (${rep.rows.length} teams)</td>
+                            <td class="num">${t.swimmers}</td>
+                            <td class="num">${t.individualEntries}</td>
+                            <td class="num">${t.relayEntries}</td>
+                            <td class="num">${formatUsd(t.surcharge)}</td>
+                            <td class="num">${formatUsd(t.individual)}</td>
+                            <td class="num">${formatUsd(t.relay)}</td>
+                            <td class="num text-lg">${formatUsd(t.total)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>`;
+            $('report').classList.add('ready');
+        }
+
+        function toCsv(rep) {
+            const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
+            const header = ['Team', 'Team Code', 'Swimmers', 'Individual Events', 'Relay Events',
+                'Swimmer Surcharge', 'Individual Fees', 'Relay Fees', 'Total'];
+            const lines = [header.map(q).join(',')];
+            for (const r of rep.rows) {
+                lines.push([
+                    q(r.team.teamName), q(r.team.teamCode), r.team.swimmers, r.team.individualEntries,
+                    r.team.relayEntries, r.surcharge.toFixed(2), r.individual.toFixed(2),
+                    r.relay.toFixed(2), r.total.toFixed(2),
+                ].join(','));
+            }
+            const t = rep.totals;
+            lines.push([q('TOTAL'), q(''), t.swimmers, t.individualEntries, t.relayEntries,
+                t.surcharge.toFixed(2), t.individual.toFixed(2), t.relay.toFixed(2), t.total.toFixed(2)].join(','));
+            return lines.join('\r\n');
+        }
+
+        function downloadCsv() {
+            if (!report) return;
+            const blob = new Blob([toCsv(report)], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `gpsa-${report.meetKey}-entry-fees.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        async function handleFile(file) {
+            const meetKey = $('meet-select').value;
+            if (!meetKey) { showToast('Please select a meet first.', 'warning'); return; }
+            $('parse-status').textContent = '';
+            try {
+                const text = file.name.toLowerCase().endsWith('.zip')
+                    ? await extractSdifFromZip(file)
+                    : await file.text();
+                if (text == null) return;
+                const teams = summarizeByTeam(text, { filename: file.name });
+                if (teams.length === 0) {
+                    showToast('No team entries found in that file.', 'error', 6000);
+                    return;
+                }
+                report = buildReport(teams, meetKey);
+                renderReport(report);
+                $('export-btn').classList.remove('hidden');
+                $('print-btn').classList.remove('hidden');
+                $('parse-status').className = 'text-xs mt-2 text-green-700';
+                $('parse-status').textContent =
+                    `Parsed ${teams.length} teams. Grand total: ${formatUsd(report.totals.total)}.`;
+                $('report').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showToast(`Report ready — ${teams.length} teams.`, 'success');
+            } catch (err) {
+                $('parse-status').className = 'text-xs mt-2 text-red-700';
+                $('parse-status').textContent = `Could not parse this file: ${err.message}`;
+                showToast('Could not parse that file. Is it a merged GPSA meet file?', 'error', 6000);
+            }
+        }
+
+        wireDropzone({
+            dropzone: $('file-dropzone'), input: $('file-upload'), prompt: $('file-prompt'),
+            nameLabel: $('file-name'), iconEmpty: $('file-icon-empty'), iconSelected: $('file-icon-selected'),
+            accepted: 'Accepted: .hy3, .sd3, or .zip',
+            onFile: handleFile,
+        });
+        // If a file is already chosen and the meet changes, re-run the report.
+        $('meet-select').addEventListener('change', () => {
+            const file = $('file-upload').files?.[0];
+            if (file) handleFile(file);
+        });
+        $('export-btn').addEventListener('click', downloadCsv);
+        $('print-btn').addEventListener('click', () => window.print());
+    </script>
+</body>
+</html>
