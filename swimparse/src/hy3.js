@@ -26,6 +26,14 @@ const num = (s) => {
     return Number.isNaN(v) || v <= 0 ? null : v;
 };
 
+// "Last, First M" — append the middle initial when present, matching how SDIF
+// packs its D0 name field so the two formats produce identical display names.
+const athleteName = (a) => {
+    if (!a) return '';
+    const base = a.first ? `${a.last}, ${a.first}` : a.last;
+    return a.middle ? `${base} ${a.middle}` : base;
+};
+
 // Event-sex code (W/M/G/B/X) → canonical gender.
 const EVENT_SEX = { M: 'M', B: 'M', W: 'F', G: 'F', F: 'F', X: 'X' };
 
@@ -85,6 +93,7 @@ export function parseHy3(content) {
                         last: slice(line, 8, 28),
                         first: slice(line, 28, 48),
                         preferred: slice(line, 48, 68) || undefined,
+                        middle: slice(line, 68, 69) || undefined,
                         gender: slice(line, 2, 3),
                         birthDate: normalizeDate(slice(line, 88, 96)),
                         usasId: slice(line, 69, 83) || null,
@@ -144,7 +153,7 @@ function parseIndividual(e1, e2, eventMap, athletes, anum, teamMap) {
     const ev = ensureEvent(eventMap, buildEvent(e1, 'individual', { sex: [14, 15], dist: [15, 21], stroke: [21, 22], age: [22, 28] }), eventNum);
 
     const a = athletes.get(anum) || { last: slice(e1, 8, 13), first: '', birthDate: null, team: null };
-    const swimmerName = a.first ? `${a.last}, ${a.first}` : a.last;
+    const swimmerName = athleteName(a);
     const status = STATUS[e2 ? e2[12] : ' '] || 'ok';
     const seconds = e2 ? num(e2.slice(4, 11)) : null;
     const place = e2 ? parseInt(slice(e2, 30, 33), 10) : NaN;
@@ -200,7 +209,7 @@ function parseRelayLegs(f3, relay, athletes) {
         const leg = parseInt(slot.slice(12, 13), 10);
         const a = athletes.get(anum);
         relay.legs.push({
-            name: a ? (a.first ? `${a.last}, ${a.first}` : a.last) : slot.slice(6, 11).trim(),
+            name: a ? athleteName(a) : slot.slice(6, 11).trim(),
             gender: a && (a.gender === 'M' || a.gender === 'F') ? a.gender : undefined,
             legOrder: Number.isNaN(leg) ? relay.legs.length + 1 : leg,
         });

@@ -1,0 +1,66 @@
+name: Build and Publish Relay Builder Docker Image
+
+on:
+  push:
+    # All branches (not tags). main publishes :latest; any other branch publishes :dev.
+    branches:
+      - '**'
+    paths:
+      # The image copies in ../swimparse, so a parser change must rebuild it too.
+      - 'relay-builder/**'
+      - 'swimparse/**'
+  schedule:
+    # Weekly rebuild every Monday at 04:30 UTC — picks up base image security patches
+    - cron: '30 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/relay-builder
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # latest=false disables auto-latest so the tags below are authoritative:
+          #   main  -> :latest   (default branch only)
+          #   other -> :dev      (any non-main branch)
+          #   always -> :sha-<commit> for traceability
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=dev,enable=${{ github.ref != 'refs/heads/main' }}
+            type=sha,prefix=sha-
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          # Build context is the repo root so the Dockerfile can COPY in swimparse/.
+          context: .
+          file: relay-builder/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # No-cache on scheduled runs ensures fresh base image layers
+          no-cache: ${{ github.event_name == 'schedule' }}

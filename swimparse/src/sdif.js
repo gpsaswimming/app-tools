@@ -15,7 +15,7 @@ import { displayTeamCode, improveMeetName, deriveSwimmers } from './model.js';
 
 // Column offsets (0-indexed, [start, end)).
 const OFF = {
-    D0: { name: [11, 39], birth: [55, 63], seed: [95, 103], final: [115, 123], event: [72, 76], place: [135, 138], points: [138, 142] },
+    D0: { name: [11, 39], birth: [55, 63], seed: [88, 96], final: [115, 123], event: [72, 76], place: [135, 138], points: [138, 142] },
     D0evt: { gender: [66, 67], dist: [67, 71], stroke: [71, 72], age: [76, 80] },
     E0: { letter: [11, 12], final: [72, 80], event: [26, 30], place: [92, 95], points: [95, 99] },
     E0evt: { gender: [20, 21], dist: [21, 25], stroke: [25, 26], age: [30, 34] },

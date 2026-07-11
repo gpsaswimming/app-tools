@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Heat Sheet — {{ sc.name }}{% endblock %}
+{% block content %}
+<style>
+  .hs-sheet { font-size: 0.78rem; color: #111; line-height: 1.25; }
+  .hs-banner {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid #111; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.72rem;
+  }
+  .hs-banner .mid { font-weight: 700; }
+  /* Two-column newspaper flow with a divider, like a printed meet program. */
+  .hs-cols { column-count: 2; column-gap: 30px; column-rule: 1px solid #bbb; }
+  .hs-event { margin-bottom: 14px; }
+  .hs-event > h3 {
+    font-weight: 700; font-size: 0.82rem; border-bottom: 1.5px solid #111;
+    padding-bottom: 2px; margin: 0 0 3px;
+    break-after: avoid;  /* keep the event title with its first heat */
+  }
+  /* Keep a heat (title + its lanes) together; events may still flow across columns. */
+  .hs-heat { break-inside: avoid; -webkit-column-break-inside: avoid; }
+  .hs-heat-title { font-weight: 600; border-bottom: 1px solid #444; padding: 3px 0 2px; margin-top: 4px; }
+  .hs-lane { display: grid; grid-template-columns: 16px 1fr; gap: 6px; border-bottom: 1px dashed #ccc; padding: 2px 0; }
+  .hs-lane .no { color: #555; }
+  .hs-head { display: flex; justify-content: space-between; gap: 8px; }
+  .hs-head .team { font-weight: 600; }
+  .hs-head .time { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .hs-swimmers { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; color: #333; }
+  .hs-swimmers .meta { color: #888; }
+  .hs-empty { color: #999; }
+
+  @media print {
+    @page { margin: 0.5in; }
+    body { background: #fff; }
+  }
+</style>
+
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6 print:hidden">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <a href="/scenarios/{{ sc.id }}" class="text-xs text-gray-400 hover:underline">&larr; {{ sc.name }}</a>
+      <h2 class="text-xl font-bold text-gray-800">Heat sheet</h2>
+      <p class="text-sm text-gray-500">Two-column, {{ lanes }}-lane seeding &middot; fastest relays swim last in the centre lanes.</p>
+    </div>
+    <button type="button" data-print class="btn-primary font-semibold py-2 px-4 rounded-lg">Print</button>
+  </div>
+</div>
+
+<div class="hs-sheet">
+  <div class="hs-banner">
+    <span>Relay Heat Sheet</span>
+    <span class="mid">{{ sc.name }}</span>
+    <span>Printed {{ printed }}</span>
+  </div>
+
+  {% if not plan %}
+  <p class="text-gray-400 italic">No relays to seed — build relays for this scenario first.</p>
+  {% else %}
+  <div class="hs-cols">
+    {% for cat in plan %}
+    <div class="hs-event">
+      <h3>{{ cat.label }} {% if cat.leg %}{{ cat.leg * 4 }}m {% endif %}Freestyle Relay</h3>
+      {% for heat in cat.heats %}
+      <div class="hs-heat">
+        <div class="hs-heat-title">Heat {{ heat.heat }} of {{ cat.heats|length }}</div>
+        {% for lane, relay in heat.rows %}
+        <div class="hs-lane">
+          <span class="no">{{ lane }}</span>
+          <div>
+            {% if relay %}
+            <div class="hs-head"><span class="team">Relay {{ relay.idx }}</span><span class="time">{{ relay.total|mmss }}</span></div>
+            <div class="hs-swimmers">
+              {% for leg in relay.legs %}
+              <span>{{ leg.leg_order }}) {{ leg.full_name }} <span class="meta">({{ leg.age_group }}) {{ leg.team }}</span></span>
+              {% endfor %}
+            </div>
+            {% else %}
+            <span class="hs-empty">&mdash;</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

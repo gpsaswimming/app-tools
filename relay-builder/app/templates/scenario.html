@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ sc.name }} — GPSA Relay Builder{% endblock %}
+{% block content %}
+
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+    <div class="flex items-start justify-between flex-wrap gap-3">
+        <div>
+            <a href="/scenarios" class="text-xs text-gray-400 hover:underline">&larr; All scenarios</a>
+            <h2 class="text-xl font-bold text-gray-800">{{ sc.name }}</h2>
+            <p class="text-sm text-gray-500 mt-1">
+                {{ GROUPING_LABELS.get(sc.grouping, sc.grouping) }}
+                &middot; {{ 'Single-gender' if sc.gender_mode == 'single' else 'Mixed' }}
+                {% if sc.grouping == 'open' %}&middot; {{ sc.open_leg }}m legs{% endif %}
+                {% if sc.grouping == 'gpsa' %}&middot; {{ 'swim-ups allowed' if sc.swimups else 'strict age bands' }}{% endif %}
+            </p>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+            <a href="/scenarios/{{ sc.id }}/heatsheet" class="btn-primary text-sm font-semibold py-2 px-4 rounded-lg">Heat sheet</a>
+            <a href="/scenarios/{{ sc.id }}/cards" class="text-sm font-semibold text-[#002366] border border-[#002366] rounded-lg py-2 px-4 hover:bg-[#002366] hover:text-white transition-colors">Relay cards</a>
+            <form action="/scenarios/{{ sc.id }}/rebalance" method="post">
+                <button type="submit" class="text-sm font-semibold text-gray-600 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors">Re-balance</button>
+            </form>
+            <form action="/scenarios/{{ sc.id }}/clone" method="post">
+                <button type="submit" class="text-sm font-semibold text-gray-600 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors">Clone</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if not categories %}
+<div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400 italic">No relays built for this scenario.</div>
+{% endif %}
+
+{% for cat in categories %}
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+    <div class="flex items-center justify-between border-b-2 border-gray-100 pb-2 mb-4 flex-wrap gap-2">
+        <h3 class="text-base font-bold text-[#002366]">{{ cat.label }}
+            {% if cat.leg %}<span class="text-gray-400 font-normal text-sm">&middot; {{ cat.leg * 4 }}m relay ({{ cat.leg }}m legs)</span>{% endif %}
+        </h3>
+        <div class="text-xs text-gray-500">
+            {{ cat.count }} relay{{ 's' if cat.count != 1 }}{% if cat.count > 1 %} &middot; spread {{ cat.spread|mmss }}{% endif %}
+        </div>
+    </div>
+
+    {% if cat.relays %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for relay in cat.relays %}
+        <div class="border border-gray-200 rounded-lg p-3">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-gray-800">Relay {{ relay.idx }}</span>
+                <span class="text-sm font-bold text-[#002366] tabular-nums">{{ relay.total|mmss }}</span>
+            </div>
+            <ol class="text-sm space-y-1">
+                {% for leg in relay.legs %}
+                <li class="flex justify-between">
+                    <span class="text-gray-700"><span class="text-gray-400 mr-1">{{ leg.leg_order }}.</span>{{ leg.full_name }} <span class="text-[#0033a0] text-xs font-medium">{{ leg.age_group }}</span> <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ leg.team }}</span></span>
+                    <span class="text-gray-500 tabular-nums">{{ leg.seconds|mmss }}</span>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm text-gray-400">No complete relays — fewer than 4 swimmers with a {{ cat.leg }}m free time.</p>
+    {% endif %}
+
+    {% if cat.alternates %}
+    <div class="mt-4 pt-3 border-t border-gray-100">
+        <h4 class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Alternates <span class="text-gray-400">({{ cat.alternates|length }})</span></h4>
+        <ul class="text-sm text-gray-600 grid grid-cols-1 sm:grid-cols-2 gap-x-8">
+            {% for a in cat.alternates %}
+            <li class="flex justify-between py-0.5">
+                <span>{{ a.full_name }} <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ a.team }}</span></span>
+                {% if a.reason == 'no-time' %}
+                <span class="text-red-500 text-xs">no {{ a.leg_distance }}m time</span>
+                {% else %}
+                <span class="text-gray-500 text-xs tabular-nums">{{ a.seconds|mmss }}</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% endblock %}

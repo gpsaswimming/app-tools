@@ -8,13 +8,15 @@
     ".": "./src/index.js",
     "./sdif": "./src/sdif.js",
     "./hy3": "./src/hy3.js",
-    "./score": "./src/score.js"
+    "./score": "./src/score.js",
+    "./league": "./src/league.js"
   },
   "bin": {
     "swimparse": "cli.js"
   },
   "files": [
     "src/",
+    "leagues/",
     "cli.js",
     "README.md"
   ],

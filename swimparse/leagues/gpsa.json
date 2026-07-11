@@ -1,0 +1,38 @@
+{
+  "id": "gpsa",
+  "ageUp": { "reference": "06-01" },
+  "ageGroups": [
+    { "label": "6&U", "max": 6 },
+    { "label": "7-8", "min": 7, "max": 8 },
+    { "label": "9-10", "min": 9, "max": 10 },
+    { "label": "11-12", "min": 11, "max": 12 },
+    { "label": "13-14", "min": 13, "max": 14 },
+    { "label": "15-18", "min": 15, "max": 18 }
+  ],
+  "scoring": {
+    "individualPlaces": [5, 3, 1],
+    "relayPlaces": [7],
+    "entriesScoredPerTeam": 2
+  },
+  "teams": [
+    { "code": "BLMAR", "aliases": ["BLMA"] },
+    { "code": "COL" },
+    { "code": "CV" },
+    { "code": "EL" },
+    { "code": "GG" },
+    { "code": "HW" },
+    { "code": "JRCC" },
+    { "code": "KCD" },
+    { "code": "MBKMT", "aliases": ["MBKM"] },
+    { "code": "NHM" },
+    { "code": "POQ" },
+    { "code": "RMMR" },
+    { "code": "RRST" },
+    { "code": "VG" },
+    { "code": "WO" },
+    { "code": "WPPIR", "aliases": ["WPPI"] },
+    { "code": "WW" },
+    { "code": "WYCC" },
+    { "code": "WYTH", "name": "Wythe Wahoos", "aliases": ["GWRA", "WYTHE"] }
+  ]
+}
