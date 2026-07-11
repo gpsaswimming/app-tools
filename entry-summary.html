@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPSA Invitational Entry Summary</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://css.gpsaswimming.org/gpsa-tools-common.css">
     <style>
@@ -66,10 +67,10 @@
                     <label for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
                             <p class="mb-1 text-sm text-gray-500"><span class="font-semibold accent-navy">Click to upload</span> your entry file</p>
-                            <p class="text-xs text-gray-400">SDIF <code>.sd3</code> only &mdash; parsed locally, never uploaded</p>
+                            <p class="text-xs text-gray-400">SDIF <code>.sd3</code> or <code>.zip</code> &mdash; parsed locally, never uploaded</p>
                             <p id="file-name" class="text-xs text-gray-600 mt-2 font-medium"></p>
                         </div>
-                        <input id="file-upload" type="file" accept=".sd3,.txt" class="hidden" />
+                        <input id="file-upload" type="file" accept=".sd3,.txt,.zip" class="hidden" />
                     </label>
                     <p id="parse-status" class="text-xs mt-2"></p>
                 </div>
@@ -191,13 +192,47 @@
         }
 
         // --- file parse -------------------------------------------------------
+        // SwimTopia often hands you the entry export inside a .zip; pull the
+        // SDIF out of it in-browser. Mirrors publicity.html's extractor.
+        async function extractSdifFromZip(file) {
+            const maxSize = 256 * 1024; // 256KB
+            if (file.size > maxSize) {
+                showToast(`Zip file is too large (${(file.size / 1024).toFixed(1)}KB). Maximum size is 256KB.`, 'error', 6000);
+                return null;
+            }
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const sdifFiles = [];
+                zip.forEach((relativePath, zipEntry) => {
+                    const name = relativePath.toLowerCase();
+                    if ((name.endsWith('.sd3') || name.endsWith('.txt')) && !zipEntry.dir) {
+                        sdifFiles.push({ name: relativePath, entry: zipEntry });
+                    }
+                });
+                if (sdifFiles.length === 0) {
+                    showToast('No SDIF file (.sd3 or .txt) found in the zip archive.', 'error', 6000);
+                    return null;
+                }
+                if (sdifFiles.length > 1) {
+                    showToast(`Found ${sdifFiles.length} SDIF files in the zip. Using: ${sdifFiles[0].name}`, 'info', 6000);
+                }
+                return await sdifFiles[0].entry.async('text');
+            } catch (error) {
+                showToast(`Failed to read zip file: ${error.message}`, 'error', 6000);
+                return null;
+            }
+        }
+
         $('file-upload').addEventListener('change', async (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
             $('file-name').textContent = file.name;
             $('parse-status').textContent = '';
             try {
-                const text = await file.text();
+                const text = file.name.toLowerCase().endsWith('.zip')
+                    ? await extractSdifFromZip(file)
+                    : await file.text();
+                if (text == null) return; // zip extraction already reported the problem
                 const s = summarizeEntries(text, { filename: file.name });
                 $('c-swimmers').value = s.swimmers;
                 $('c-individual').value = s.individualEntries;
