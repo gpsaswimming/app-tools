@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPSA Invitational Entry Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://css.gpsaswimming.org/gpsa-tools-common.css">
+    <style>
+        /* Brand accents (kept local so the tool is self-contained). */
+        .btn-navy { background-color: #002366; color: #fff; }
+        .btn-navy:hover { background-color: #0033a0; }
+        .btn-red { background-color: #d9242b; color: #fff; }
+        .btn-red:hover { background-color: #b81e24; }
+        .btn-navy:disabled, .btn-red:disabled { opacity: .5; cursor: not-allowed; }
+        .accent-navy { color: #002366; }
+        .rule-navy { border-color: #002366; }
+
+        /* The printable summary document. */
+        #summary-doc { display: none; }
+        #summary-doc.ready { display: block; }
+        #summary-doc .doc-total { color: #002366; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            #summary-doc { display: block !important; box-shadow: none !important; margin: 0; }
+            @page { margin: 0.6in; }
+        }
+    </style>
+</head>
+<body>
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <header class="gpsa-header p-4 shadow-md flex items-center justify-center no-print mb-6 rounded-lg">
+                <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png"
+                     alt="GPSA Logo"
+                     class="h-16 w-16 md:h-20 md:w-20 mr-4 rounded-full"
+                     onerror="this.onerror=null; this.src='https://placehold.co/100x100/002366/FFFFFF?text=GPSA';">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold">Invitational Entry Summary</h1>
+                    <p class="gpsa-header-subtitle">Calculate entry fees from your team's SDIF entry file.</p>
+                </div>
+            </header>
+
+            <!-- ============================= FORM ============================= -->
+            <div class="bg-white rounded-xl shadow-lg p-6 no-print">
+                <p class="text-sm text-gray-600 mb-6">
+                    Choose the invitational, then upload your team's entry file (<code>.sd3</code>) to
+                    auto-fill the counts &mdash; or enter them by hand. Your file is parsed
+                    <strong>entirely in your browser</strong>; nothing is uploaded and no birthdates leave this page.
+                    Review the numbers, then generate a printable summary to save as PDF or email.
+                </p>
+
+                <!-- Meet selector -->
+                <label for="meet-select" class="block text-sm font-semibold text-gray-800 mb-1">Invitational</label>
+                <select id="meet-select" class="w-full sm:w-80 border border-gray-300 rounded-lg p-2.5 mb-6 bg-white">
+                    <option value="" disabled selected>Select a meet&hellip;</option>
+                    <option value="summer-splash">Summer Splash</option>
+                    <option value="city-meet">City Meet</option>
+                </select>
+
+                <!-- File upload -->
+                <div class="mb-6">
+                    <label for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                            <p class="mb-1 text-sm text-gray-500"><span class="font-semibold accent-navy">Click to upload</span> your entry file</p>
+                            <p class="text-xs text-gray-400">SDIF <code>.sd3</code> or <code>.zip</code> &mdash; parsed locally, never uploaded</p>
+                            <p id="file-name" class="text-xs text-gray-600 mt-2 font-medium"></p>
+                        </div>
+                        <input id="file-upload" type="file" accept=".sd3,.txt,.zip" class="hidden" />
+                    </label>
+                    <p id="parse-status" class="text-xs mt-2"></p>
+                </div>
+
+                <!-- Editable counts + team/contact -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-800 mb-2 border-b rule-navy pb-1">Team &amp; contact</h2>
+                        <label class="block text-xs text-gray-600 mt-2">Team</label>
+                        <input id="f-team" type="text" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Team name">
+                        <label class="block text-xs text-gray-600 mt-2">Submitted by</label>
+                        <input id="f-contact" type="text" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Your name">
+                        <label class="block text-xs text-gray-600 mt-2">Email</label>
+                        <input id="f-email" type="email" class="w-full border border-gray-300 rounded-lg p-2" placeholder="you@example.com">
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-800 mb-2 border-b rule-navy pb-1">Billable counts</h2>
+                        <p class="text-xs text-gray-500 mb-2">Auto-filled from your file. Adjust if needed &mdash; the total follows these numbers.</p>
+                        <div class="flex items-center justify-between gap-3 mt-1">
+                            <label for="c-swimmers" class="text-sm text-gray-700">Swimmers</label>
+                            <input id="c-swimmers" type="number" min="0" value="0" class="w-28 text-right border border-gray-300 rounded-lg p-2">
+                        </div>
+                        <div class="flex items-center justify-between gap-3 mt-2">
+                            <label for="c-individual" class="text-sm text-gray-700">Individual events</label>
+                            <input id="c-individual" type="number" min="0" value="0" class="w-28 text-right border border-gray-300 rounded-lg p-2">
+                        </div>
+                        <div class="flex items-center justify-between gap-3 mt-2">
+                            <label for="c-relays" class="text-sm text-gray-700">Relay events</label>
+                            <input id="c-relays" type="number" min="0" value="0" class="w-28 text-right border border-gray-300 rounded-lg p-2">
+                        </div>
+                        <p id="relay-note" class="text-xs text-gray-500 mt-2"></p>
+                    </div>
+                </div>
+
+                <!-- Live fee preview -->
+                <div id="fee-preview" class="mt-6 hidden">
+                    <h2 class="text-sm font-semibold text-gray-800 mb-2 border-b rule-navy pb-1">Fee preview</h2>
+                    <div id="fee-lines" class="text-sm"></div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mt-8">
+                    <button id="generate-btn" class="btn-navy font-semibold py-2.5 px-5 rounded-lg" disabled>Generate Summary</button>
+                    <button id="print-btn" class="btn-red font-semibold py-2.5 px-5 rounded-lg hidden">Print / Save as PDF</button>
+                    <button id="email-btn" class="border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-2.5 px-5 rounded-lg hidden">Email Summary&hellip;</button>
+                </div>
+            </div>
+
+            <!-- ===================== PRINTABLE DOCUMENT ===================== -->
+            <div id="summary-doc" class="bg-white rounded-xl shadow-lg p-8 mt-6"></div>
+        </div>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script type="module">
+        import { summarizeEntries, computeFees, MEETS, formatUsd } from './lib/entry-summary-core.js';
+
+        // Recipients for the mailto helper: the summary goes TO the treasurer,
+        // CC the meet director.
+        const MAIL_TO = 'treasurer@gpsaswimming.org';
+        const MAIL_CC = 'meetdirector@gpsaswimming.org';
+
+        // --- tiny helpers -----------------------------------------------------
+        const $ = (id) => document.getElementById(id);
+        function escapeHtml(s) {
+            return String(s ?? '').replace(/[&<>"']/g, (c) => (
+                { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+            ));
+        }
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = $('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+            toast.innerHTML = `<span class="toast-icon" aria-hidden="true">${icons[type]}</span>`
+                + `<span class="toast-message">${escapeHtml(message)}</span>`
+                + `<button class="toast-close" aria-label="Close notification">×</button>`;
+            container.appendChild(toast);
+            const remove = () => { toast.classList.add('toast-exit'); setTimeout(() => toast.remove(), 300); };
+            toast.querySelector('.toast-close').addEventListener('click', remove);
+            if (duration > 0) setTimeout(remove, duration);
+        }
+
+        // --- state ------------------------------------------------------------
+        let lastFees = null; // most recent computeFees() result, for email/print
+
+        function currentCounts() {
+            return {
+                swimmers: parseInt($('c-swimmers').value, 10) || 0,
+                individualEntries: parseInt($('c-individual').value, 10) || 0,
+                relayEntries: parseInt($('c-relays').value, 10) || 0,
+            };
+        }
+
+        function refreshPreview() {
+            const meetKey = $('meet-select').value;
+            const canGenerate = !!meetKey;
+            $('generate-btn').disabled = !canGenerate;
+
+            if (!meetKey) { $('fee-preview').classList.add('hidden'); $('relay-note').textContent = ''; return; }
+
+            const m = MEETS[meetKey];
+            $('relay-note').textContent = m.relayEntry === 0
+                ? 'Relays are free for this meet (built from the swimmer pool by the meet director).'
+                : `Relays are billed at ${formatUsd(m.relayEntry)} each for this meet.`;
+
+            const fees = computeFees(currentCounts(), meetKey);
+            const rows = fees.lines.map((l) => `
+                <div class="flex justify-between py-0.5">
+                    <span class="text-gray-600">${escapeHtml(l.label)} &times; ${l.qty} @ ${formatUsd(l.rate)}</span>
+                    <span class="font-medium text-gray-900">${formatUsd(l.amount)}</span>
+                </div>`).join('');
+            $('fee-lines').innerHTML = rows
+                + `<div class="flex justify-between border-t rule-navy mt-1 pt-1">
+                       <span class="font-semibold accent-navy">${escapeHtml(fees.meet)} total</span>
+                       <span class="font-bold accent-navy">${formatUsd(fees.total)}</span>
+                   </div>`;
+            $('fee-preview').classList.remove('hidden');
+        }
+
+        // --- file parse -------------------------------------------------------
+        // SwimTopia often hands you the entry export inside a .zip; pull the
+        // SDIF out of it in-browser. Mirrors publicity.html's extractor.
+        async function extractSdifFromZip(file) {
+            const maxSize = 256 * 1024; // 256KB
+            if (file.size > maxSize) {
+                showToast(`Zip file is too large (${(file.size / 1024).toFixed(1)}KB). Maximum size is 256KB.`, 'error', 6000);
+                return null;
+            }
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const sdifFiles = [];
+                zip.forEach((relativePath, zipEntry) => {
+                    const name = relativePath.toLowerCase();
+                    if ((name.endsWith('.sd3') || name.endsWith('.txt')) && !zipEntry.dir) {
+                        sdifFiles.push({ name: relativePath, entry: zipEntry });
+                    }
+                });
+                if (sdifFiles.length === 0) {
+                    showToast('No SDIF file (.sd3 or .txt) found in the zip archive.', 'error', 6000);
+                    return null;
+                }
+                if (sdifFiles.length > 1) {
+                    showToast(`Found ${sdifFiles.length} SDIF files in the zip. Using: ${sdifFiles[0].name}`, 'info', 6000);
+                }
+                return await sdifFiles[0].entry.async('text');
+            } catch (error) {
+                showToast(`Failed to read zip file: ${error.message}`, 'error', 6000);
+                return null;
+            }
+        }
+
+        $('file-upload').addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            $('file-name').textContent = file.name;
+            $('parse-status').textContent = '';
+            try {
+                const text = file.name.toLowerCase().endsWith('.zip')
+                    ? await extractSdifFromZip(file)
+                    : await file.text();
+                if (text == null) return; // zip extraction already reported the problem
+                const s = summarizeEntries(text, { filename: file.name });
+                $('c-swimmers').value = s.swimmers;
+                $('c-individual').value = s.individualEntries;
+                $('c-relays').value = s.relayEntries;
+                if (s.teams.length && !$('f-team').value) {
+                    $('f-team').value = s.teams.map((t) => t.name).join(', ');
+                }
+                const relayNote = s.relayOnlySwimmers
+                    ? ` (${s.relayOnlySwimmers} relay-only swimmer${s.relayOnlySwimmers > 1 ? 's' : ''} included in the surcharge)`
+                    : '';
+                $('parse-status').className = 'text-xs mt-2 text-green-700';
+                $('parse-status').textContent =
+                    `Parsed: ${s.swimmers} swimmers, ${s.individualEntries} individual entries, ${s.relayEntries} relays${relayNote}. Review below.`;
+                refreshPreview();
+                showToast('Entry file parsed. Review the counts before generating.', 'success');
+            } catch (err) {
+                $('parse-status').className = 'text-xs mt-2 text-red-700';
+                $('parse-status').textContent = `Could not parse this file: ${err.message}`;
+                showToast('Could not parse that file. Is it a GPSA SDIF (.sd3) entry export?', 'error', 6000);
+            }
+        });
+
+        // --- generate the printable document ----------------------------------
+        function buildDoc(fees) {
+            const team = $('f-team').value.trim() || '—';
+            const contact = $('f-contact').value.trim();
+            const email = $('f-email').value.trim();
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const feeRows = fees.lines.map((l) => `
+                <tr>
+                    <td style="padding:6px 0;">${escapeHtml(l.label)}</td>
+                    <td style="padding:6px 12px; text-align:right;">${l.qty}</td>
+                    <td style="padding:6px 12px; text-align:right;">${formatUsd(l.rate)}</td>
+                    <td style="padding:6px 0; text-align:right; font-weight:600;">${formatUsd(l.amount)}</td>
+                </tr>`).join('');
+
+            const notes = fees.notes.map((n) => `<li style="margin:4px 0;">${escapeHtml(n)}</li>`).join('');
+
+            const contactLine = [contact, email].filter(Boolean).map(escapeHtml).join(' &middot; ');
+
+            return `
+                <div style="display:flex; align-items:center; gap:16px; border-bottom:3px solid #002366; padding-bottom:12px;">
+                    <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png" alt="GPSA" style="height:60px; width:60px; border-radius:9999px;"
+                         onerror="this.style.display='none'">
+                    <div>
+                        <div style="font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:#6b7280;">Greater Peninsula Swimming Association</div>
+                        <div style="font-size:24px; font-weight:700; color:#002366;">${escapeHtml(fees.meet)} &mdash; Entry Summary</div>
+                    </div>
+                </div>
+
+                <table style="width:100%; margin-top:16px; font-size:14px;">
+                    <tr><td style="color:#6b7280; padding:2px 0; width:120px;">Team</td><td style="font-weight:600;">${escapeHtml(team)}</td></tr>
+                    ${contactLine ? `<tr><td style="color:#6b7280; padding:2px 0;">Submitted by</td><td>${contactLine}</td></tr>` : ''}
+                    <tr><td style="color:#6b7280; padding:2px 0;">Date</td><td>${escapeHtml(today)}</td></tr>
+                </table>
+
+                <table style="width:100%; margin-top:20px; font-size:14px; border-collapse:collapse;">
+                    <thead>
+                        <tr style="border-bottom:1px solid #e5e7eb; color:#6b7280; font-size:12px; text-transform:uppercase;">
+                            <th style="text-align:left; padding:6px 0;">Item</th>
+                            <th style="text-align:right; padding:6px 12px;">Qty</th>
+                            <th style="text-align:right; padding:6px 12px;">Rate</th>
+                            <th style="text-align:right; padding:6px 0;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>${feeRows}</tbody>
+                    <tfoot>
+                        <tr style="border-top:2px solid #002366;">
+                            <td colspan="3" style="padding:10px 0; font-weight:700; color:#002366;">Total due</td>
+                            <td class="doc-total" style="padding:10px 0; text-align:right; font-weight:700; font-size:20px;">${formatUsd(fees.total)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div style="margin-top:20px; font-size:12px; color:#374151;">
+                    <div style="font-weight:600; color:#002366; margin-bottom:4px;">Notes</div>
+                    <ul style="padding-left:18px; margin:0;">${notes}</ul>
+                </div>
+
+                <div style="margin-top:24px; font-size:11px; color:#9ca3af; border-top:1px solid #e5e7eb; padding-top:8px;">
+                    Generated ${escapeHtml(today)} from the team's SDIF entry file. Counts were reviewed by the submitting team.
+                </div>`;
+        }
+
+        function generate() {
+            const meetKey = $('meet-select').value;
+            if (!meetKey) { showToast('Please select a meet first.', 'warning'); return; }
+            const fees = computeFees(currentCounts(), meetKey);
+            lastFees = fees;
+            $('summary-doc').innerHTML = buildDoc(fees);
+            $('summary-doc').classList.add('ready');
+            $('print-btn').classList.remove('hidden');
+            $('email-btn').classList.remove('hidden');
+            $('summary-doc').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            showToast('Summary generated. Print to PDF or email it below.', 'success');
+        }
+
+        function emailSummary() {
+            if (!lastFees) return;
+            const team = $('f-team').value.trim() || 'Team';
+            const subject = `GPSA ${lastFees.meet} Entry Summary — ${team} — ${formatUsd(lastFees.total)}`;
+            const lines = lastFees.lines.map((l) => `  ${l.label}: ${l.qty} x ${formatUsd(l.rate)} = ${formatUsd(l.amount)}`);
+            const body = [
+                `${lastFees.meet} — Entry Summary`,
+                `Team: ${team}`,
+                '',
+                ...lines,
+                `  TOTAL DUE: ${formatUsd(lastFees.total)}`,
+                '',
+                'Notes:',
+                ...lastFees.notes.map((n) => `  - ${n}`),
+                '',
+                'Please find the printable summary (PDF) attached.',
+            ].join('\n');
+            const href = `mailto:${encodeURIComponent(MAIL_TO)}`
+                + `?cc=${encodeURIComponent(MAIL_CC)}`
+                + `&subject=${encodeURIComponent(subject)}`
+                + `&body=${encodeURIComponent(body)}`;
+            window.location.href = href;
+        }
+
+        // --- wire up ----------------------------------------------------------
+        $('meet-select').addEventListener('change', refreshPreview);
+        ['c-swimmers', 'c-individual', 'c-relays'].forEach((id) => $(id).addEventListener('input', refreshPreview));
+        $('generate-btn').addEventListener('click', generate);
+        $('print-btn').addEventListener('click', () => window.print());
+        $('email-btn').addEventListener('click', emailSummary);
+    </script>
+</body>
+</html>
