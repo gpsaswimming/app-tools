@@ -35,6 +35,20 @@ function bearer(request) {
   return h.startsWith("Bearer ") ? h.slice(7) : "";
 }
 
+// Verify a Cloudflare Turnstile token against the siteverify API.
+async function verifyTurnstile(token, secret, request) {
+  if (!token) return false;
+  const form = new FormData();
+  form.append("secret", secret);
+  form.append("response", token);
+  const ip = request.headers.get("cf-connecting-ip");
+  if (ip) form.append("remoteip", ip);
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body: form });
+    return !!(await res.json()).success;
+  } catch { return false; }
+}
+
 export async function onRequest(context) {
   const { request, env, params } = context;
   const seg = Array.isArray(params.path) ? params.path : [params.path].filter(Boolean);
@@ -44,7 +58,14 @@ export async function onRequest(context) {
   try {
     // ---- Public: login (confirms a password and returns its role) ----------
     if (seg[0] === "login" && method === "POST") {
-      const role = roleFor((await body()).password, env);
+      const b = await body();
+      // Turnstile gate — only enforced when a secret is configured, so the
+      // app keeps working before the widget is provisioned.
+      if (env.TURNSTILE_SECRET) {
+        const ok = await verifyTurnstile(b.turnstileToken, env.TURNSTILE_SECRET, request);
+        if (!ok) return json({ error: "captcha" }, 403);
+      }
+      const role = roleFor(b.password, env);
       return role ? json({ role }) : json({ error: "bad-password" }, 401);
     }
 
