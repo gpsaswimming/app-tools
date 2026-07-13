@@ -66,7 +66,12 @@ export async function onRequest(context) {
         if (!ok) return json({ error: "captcha" }, 403);
       }
       const role = roleFor(b.password, env);
-      return role ? json({ role }) : json({ error: "bad-password" }, 401);
+      if (!role) return json({ error: "bad-password" }, 401);
+      const res = json({ role });
+      // Mark the session so the WAF can skip Bot Fight Mode for this device's
+      // /api polling (scoped to /api; presence-checked by a WAF custom rule).
+      res.headers.append("Set-Cookie", "ct_sess=1; Path=/api; Max-Age=64800; Secure; HttpOnly; SameSite=Lax");
+      return res;
     }
 
     // ---- Everything else requires a valid role -----------------------------
