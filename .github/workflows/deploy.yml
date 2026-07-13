@@ -30,7 +30,7 @@ jobs:
         run: |
           mkdir -p dist
           cp index.html publicity.html roster.html entry-summary.html entry-fees-report.html dist/
-          cp meet-marshal-test.html dist/     # unlinked prototype for stakeholder review
+          cp credential-tracker.html dist/    # gated meet-day credential tracker (unlinked)
           cp -r lib dist/
           rm -f dist/lib/*.test.js          # tests aren't part of the public site
           # entry-summary.html imports @gpsa/swimparse in the browser; stage the
