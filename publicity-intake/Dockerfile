@@ -11,6 +11,11 @@ RUN npm ci --omit=dev
 COPY publicity-intake/server.mjs ./
 COPY publicity-intake/public/ ./public/
 
+# Shared swimparse parser, served read-only to the browser for the results
+# preview. Mounted at /vendor/swimparse (see server.mjs). Sibling of /app so the
+# same '../swimparse/src' path resolves here and in local dev.
+COPY swimparse/src/ /swimparse/src/
+
 # Drop to the built-in unprivileged user.
 USER node
 

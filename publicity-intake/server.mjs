@@ -86,7 +86,9 @@ app.use((req, res, next) => {
             "img-src 'self' https://assets.gpsaswimming.org",
             "style-src 'self' 'unsafe-inline' https://css.gpsaswimming.org https://fonts.googleapis.com",
             "font-src https://fonts.gstatic.com",
-            "script-src 'self' 'unsafe-eval' https://cdn.tailwindcss.com",
+            // JSZip (cdnjs) reads the .sd3 out of a Meet Maestro .zip for the
+            // client-side preview; swimparse is served same-origin ('self').
+            "script-src 'self' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
             "connect-src 'self'",
             "form-action 'self'",
             "base-uri 'none'",
@@ -113,6 +115,16 @@ app.use(express.static(path.join(__dirname, 'public'), {
     extensions: ['html'],
     dotfiles: 'ignore',
     index: 'index.html'
+}));
+
+// Serve the shared swimparse parser (single source — no committed copy) so the
+// browser can preview the meet date, teams, and score before the user confirms.
+// The sibling `swimparse/src` resolves both locally (../swimparse/src) and in
+// the image (Dockerfile copies it to /swimparse/src). Read-only, JS only.
+app.use('/vendor/swimparse', express.static(path.join(__dirname, '..', 'swimparse', 'src'), {
+    extensions: ['js'],
+    dotfiles: 'ignore',
+    index: false
 }));
 
 // =============================================================================
