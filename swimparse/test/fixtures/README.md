@@ -19,6 +19,17 @@ Everything else — times, places, DQs and reasons, event structure, relay legs 
 preserved exactly, so the files remain a faithful parser test. The generator
 verifies that no real surname survives in any name field.
 
+## One deliberate edit: a cleared time
+
+Presley, Elvis's **Boys 15-18 50m Butterfly** win (place 1) has its **final time
+blanked in both files** — SDIF `D0` cols `[115,123)` and HY3 `E2` cols `[4,11)`,
+place preserved. This mirrors a real *cleared time*: when a timing issue leaves a
+placed swim with no usable time and no backup, the scorekeeper clears the time in
+Meet Maestro. Both parsers render it as `finalTime: null, status: "ok"` (a no-time,
+**not** a DQ), and the publicity processor publishes it as `NT`. Do not "restore"
+this time — `lib/publicity-core.test.js` relies on it being the meet's single
+cleared time.
+
 ## Golden snapshots
 
 `*.golden.json` are the expected `NormalizedMeet` outputs. Regenerate them only
