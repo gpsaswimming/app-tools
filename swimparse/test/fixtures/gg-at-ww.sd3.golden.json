@@ -1647,10 +1647,7 @@
             "text": "30.06",
             "seconds": 30.06
           },
-          "finalTime": {
-            "text": "31.18",
-            "seconds": 31.18
-          },
+          "finalTime": null,
           "status": "ok",
           "disqualified": false,
           "place": 1,
