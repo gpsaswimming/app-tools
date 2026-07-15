@@ -1,5 +1,9 @@
 /* GPSA Publicity Intake — client-side form logic.
+   ES module: parses the file in the browser (swimparse + JSZip) so the submitter
+   can review the meet date, teams, and score before anything is sent to n8n.
    No inline handlers (keeps script-src 'self'). */
+
+import { parse, score } from '/vendor/swimparse/index.js';
 
 const ALLOWED_EXTENSIONS = ['.sd3', '.zip'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,7 +18,12 @@ const fileIconEmpty = document.getElementById('file-icon-empty');
 const fileIconSelected = document.getElementById('file-icon-selected');
 const emailError = document.getElementById('email-error');
 const fileError = document.getElementById('file-error');
-const submitButton = document.getElementById('submit-button');
+const editStage = document.getElementById('edit-stage');
+const previewStage = document.getElementById('preview-stage');
+const previewBody = document.getElementById('preview-body');
+const reviewButton = document.getElementById('review-button');
+const confirmButton = document.getElementById('confirm-button');
+const backButton = document.getElementById('back-button');
 const result = document.getElementById('result');
 
 // Dropzone styling for each state, so we can cleanly toggle between them.
@@ -117,19 +126,135 @@ function validate() {
     return ok;
 }
 
+// =============================================================================
+// Preview: read the SDIF text (unzipping if needed) and summarise the meet.
+// =============================================================================
+
+// Return the SDIF text from a .sd3, or from the first .sd3/.txt inside a .zip.
+async function readSdifText(file) {
+    if (extOf(file.name) !== '.zip') return file.text();
+
+    const zip = await JSZip.loadAsync(file);
+    const entry = Object.values(zip.files).find(
+        (e) => !e.dir && /\.(sd3|txt)$/i.test(e.name)
+    );
+    if (!entry) throw new Error('No .sd3 file was found inside the .zip.');
+    return entry.async('string');
+}
+
+function formatMeetDate(iso) {
+    // iso is "YYYY-MM-DD"; build a local date to avoid UTC day-shift.
+    const [y, m, d] = (iso || '').split('-').map(Number);
+    if (!y || !m || !d) return { text: iso || 'Unknown date', year: null };
+    const date = new Date(y, m - 1, d);
+    const text = date.toLocaleDateString(undefined, {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    return { text, year: y };
+}
+
+// Build the preview card from a parsed + scored meet.
+function renderMeetPreview(meet) {
+    const totals = score(meet);
+    const { text: dateText, year } = formatMeetDate(meet.meet.startDate);
+
+    // The bug we're guarding against: a team re-submitting last year's results.
+    const isStale = year !== null && year < new Date().getFullYear();
+    const staleWarning = isStale
+        ? `<div class="mb-3 p-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm">
+             <span class="font-semibold">Heads up:</span> this meet is dated <span class="font-semibold">${year}</span>,
+             not the current season. Make sure you're submitting the right file.
+           </div>`
+        : '';
+
+    const teamRows = [...meet.teams]
+        .map((t) => ({ name: t.name || t.code, points: totals[t.code] || 0 }))
+        .sort((a, b) => b.points - a.points)
+        .map((t) => `
+            <div class="flex items-baseline justify-between py-1">
+                <span class="text-gray-800">${escapeHtml(t.name)}</span>
+                <span class="font-bold text-gray-900 tabular-nums">${t.points}</span>
+            </div>`)
+        .join('');
+
+    previewBody.innerHTML = `
+        ${staleWarning}
+        <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">Meet date</div>
+        <div class="text-lg font-bold text-gray-900 mb-3">${escapeHtml(dateText)}</div>
+        ${meet.meet.name ? `<div class="text-sm text-gray-600 mb-3">${escapeHtml(meet.meet.name)}</div>` : ''}
+        <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">Teams &amp; score</div>
+        <div class="divide-y divide-gray-200">${teamRows || '<div class="text-sm text-gray-500 py-1">No teams found.</div>'}</div>
+    `;
+}
+
+// Shown when the file can't be parsed — don't block a legitimate submission.
+function renderUnparsedPreview(file, reason) {
+    previewBody.innerHTML = `
+        <div class="mb-2 p-3 rounded-md bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+            We couldn't read this file to preview it (${escapeHtml(reason)}).
+            Double-check it's the correct results file before submitting.
+        </div>
+        <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">File</div>
+        <div class="text-sm font-medium text-gray-900">${escapeHtml(file.name)} (${formatBytes(file.size)})</div>
+    `;
+}
+
+function showEditStage() {
+    previewStage.classList.add('hidden');
+    editStage.classList.remove('hidden');
+}
+
+function showPreviewStage() {
+    editStage.classList.add('hidden');
+    previewStage.classList.remove('hidden');
+}
+
+// =============================================================================
+// Stage transitions
+// =============================================================================
+
+// "Review results →" — validate, parse, and show the preview stage.
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
     result.classList.add('hidden');
 
     if (!validate()) return;
 
+    const file = fileInput.files[0];
+    reviewButton.disabled = true;
+    const originalLabel = reviewButton.textContent;
+    reviewButton.textContent = 'Reading file…';
+
+    try {
+        const text = await readSdifText(file);
+        renderMeetPreview(parse(text));
+    } catch (err) {
+        // Parsing is a courtesy check, not a gate — let them proceed with a warning.
+        renderUnparsedPreview(file, err.message || 'unrecognised format');
+    } finally {
+        reviewButton.disabled = false;
+        reviewButton.textContent = originalLabel;
+    }
+
+    showPreviewStage();
+});
+
+backButton.addEventListener('click', () => {
+    result.classList.add('hidden');
+    showEditStage();
+});
+
+// "Confirm & submit" — forward email + file to the server (which proxies to n8n).
+confirmButton.addEventListener('click', async () => {
+    result.classList.add('hidden');
+
     const data = new FormData();
     data.append('email', emailInput.value.trim());
     data.append('file', fileInput.files[0]);
 
-    submitButton.disabled = true;
-    const originalLabel = submitButton.textContent;
-    submitButton.textContent = 'Submitting…';
+    confirmButton.disabled = true;
+    const originalLabel = confirmButton.textContent;
+    confirmButton.textContent = 'Submitting…';
 
     try {
         const res = await fetch('/submit', { method: 'POST', body: data });
@@ -140,13 +265,14 @@ form.addEventListener('submit', async (event) => {
             showResult('success', payload.message || 'Results submitted successfully. Thank you!');
             form.reset();
             setFileEmpty();
+            showEditStage();
         } else {
             showResult('error', payload.error || `Submission failed (status ${res.status}). Please try again.`);
         }
     } catch {
         showResult('error', 'Network error — could not reach the server. Check your connection and try again.');
     } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = originalLabel;
+        confirmButton.disabled = false;
+        confirmButton.textContent = originalLabel;
     }
 });

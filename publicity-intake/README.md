@@ -15,13 +15,22 @@ Submitter → Pangolin (auth) → publicity-intake (this) → n8n webhook → pu
 This is the human/manual front door into the same workflow that
 [`publicity-server`](../publicity-server) serves as an API for.
 
+Before submitting, the form shows a **review stage** — it parses the chosen file
+**in the browser** (shared [`swimparse`](../swimparse) + JSZip for `.zip`) and
+displays the meet date, teams, and final score, flagging any file dated to a
+previous year. This catches wrong-file / prior-season resubmissions. The parse
+is a client-side courtesy check only; the server still forwards the file
+**untouched** (it never parses), and a file that won't parse can still be
+submitted with a warning.
+
 ## Endpoints
 
-| Method | Path      | Purpose                                              |
-|--------|-----------|------------------------------------------------------|
-| GET    | `/`       | The branded submission form                          |
-| GET    | `/health` | Health check (also reports whether the webhook is set) |
-| POST   | `/submit` | Accepts `email` + `file`, forwards to n8n            |
+| Method | Path                 | Purpose                                              |
+|--------|----------------------|------------------------------------------------------|
+| GET    | `/`                  | The branded submission form                          |
+| GET    | `/health`            | Health check (also reports whether the webhook is set) |
+| GET    | `/vendor/swimparse/` | Read-only static mount of `../swimparse/src` for the browser preview |
+| POST   | `/submit`            | Accepts `email` + `file`, forwards to n8n            |
 
 ## Configuration
 
