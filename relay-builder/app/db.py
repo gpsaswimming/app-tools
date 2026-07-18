@@ -88,6 +88,17 @@ CREATE TABLE IF NOT EXISTS relay_alternates (
     seconds      REAL,               -- leg time if they have one, else NULL
     reason       TEXT NOT NULL       -- 'remainder' | 'no-time'
 );
+
+-- Deck scratches: swimmers marked absent for a scenario. This is the source of
+-- truth for who is out — scratched swimmers are excluded from (re)builds and
+-- from substitute selection. Scratching also patches the swimmer's relay in
+-- place (see scenarios.scratch); this table lets a full re-balance honour it too.
+CREATE TABLE IF NOT EXISTS relay_scratches (
+    scenario_id  INTEGER NOT NULL REFERENCES scenarios(id) ON DELETE CASCADE,
+    swimmer_id   TEXT NOT NULL REFERENCES swimmers(id),
+    scratched_at TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (scenario_id, swimmer_id)
+);
 """
 
 

@@ -80,3 +80,15 @@ From a scenario, print-optimized views (site chrome hidden on print):
   (`4-5-3-6-2-7-1-8`), the first heat is the small/slow one.
 - **Relay cards** (`/scenarios/{id}/cards`) — one card per relay with swimmers,
   per-leg times, projected total, and its heat + lane.
+
+### Deck scratches
+
+On meet day, the **Deck** view (`/scenarios/{id}/deck`) handles no-shows live.
+Scratching a swimmer records them as out and **patches their relay in place**:
+the closest-time eligible **alternate** (one with an entry time; for a medley,
+one legal for that leg's age band — its own band or a younger swim-up) is subbed
+into the empty leg. Only that one relay changes, so every other already-printed
+card stays valid. If no eligible alternate is available the relay is left short
+(flagged). The scratch set is the source of truth for who's out, so the
+**Re-run balancing** button re-forms all relays around the swimmers still in.
+Reprint the heat sheet / cards afterward.

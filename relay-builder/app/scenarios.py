@@ -12,8 +12,12 @@ import sqlite3
 from .balance import assign_heats, balance_category, balance_medley, resolve_categories, swimup_columns
 
 
-def _eligible(conn: sqlite3.Connection, age_groups, gender, leg):
-    """Swimmers in the category's age groups (+ gender), with their leg time."""
+def _eligible(conn: sqlite3.Connection, scenario_id, age_groups, gender, leg):
+    """Swimmers in the category's age groups (+ gender), with their leg time.
+
+    Deck-scratched swimmers are excluded, so a re-balance re-forms relays around
+    who is actually present.
+    """
     placeholders = ",".join("?" * len(age_groups))
     sql = f"""
         SELECT s.id AS id, s.full_name AS name, s.team AS team, s.age_group AS age_group,
@@ -21,8 +25,9 @@ def _eligible(conn: sqlite3.Connection, age_groups, gender, leg):
                   WHERE t.swimmer_id = s.id AND t.distance = ? AND t.stroke = 'Freestyle') AS secs
         FROM swimmers s
         WHERE s.age_group IN ({placeholders})
+          AND s.id NOT IN (SELECT swimmer_id FROM relay_scratches WHERE scenario_id = ?)
     """
-    args: list = [leg, *age_groups]
+    args: list = [leg, *age_groups, scenario_id]
     if gender:
         sql += " AND s.gender = ?"
         args.append(gender)
@@ -68,7 +73,7 @@ def build(
             # One eligible pool per age-group leg (youngest first).
             pools, no_time = [], []
             for age in cat["spec"]:
-                rows = _eligible(conn, {age}, cat["gender"], cat["leg"])
+                rows = _eligible(conn, scenario_id, {age}, cat["gender"], cat["leg"])
                 pools.append([(r["id"], r["secs"]) for r in rows if r["secs"] is not None])
                 no_time += [r["id"] for r in rows if r["secs"] is None]
             if swimups:
@@ -83,7 +88,7 @@ def build(
             for sid in no_time:
                 _alt(conn, scenario_id, cat, sid, None, "no-time")
         else:
-            rows = _eligible(conn, cat["spec"], cat["gender"], cat["leg"])
+            rows = _eligible(conn, scenario_id, cat["spec"], cat["gender"], cat["leg"])
             seeded = [(r["id"], r["secs"]) for r in rows if r["secs"] is not None]
             no_time = [r["id"] for r in rows if r["secs"] is None]
             relays, remainder = balance_category(seeded)
@@ -114,7 +119,7 @@ def detail(conn: sqlite3.Connection, scenario_id: int) -> list[dict]:
     ).fetchall()
     legs = conn.execute(
         """
-        SELECT l.relay_id, l.leg_order, l.seconds, s.full_name, s.team, s.age_group
+        SELECT l.relay_id, l.leg_order, l.seconds, l.swimmer_id, s.full_name, s.team, s.age_group
         FROM relay_legs l JOIN relays r ON r.id = l.relay_id JOIN swimmers s ON s.id = l.swimmer_id
         WHERE r.scenario_id = ? ORDER BY l.relay_id, l.leg_order
         """,
@@ -154,6 +159,111 @@ def detail(conn: sqlite3.Connection, scenario_id: int) -> list[dict]:
         cat["count"] = len(cat["relays"])
         out.append(cat)
     return out
+
+
+def list_scratches(conn: sqlite3.Connection, scenario_id: int) -> list:
+    """Swimmers currently scratched for the scenario, for the deck view."""
+    return conn.execute(
+        """
+        SELECT s.id AS swimmer_id, s.full_name, s.team, s.age_group, s.gender
+        FROM relay_scratches x JOIN swimmers s ON s.id = x.swimmer_id
+        WHERE x.scenario_id = ? ORDER BY s.full_name
+        """,
+        (scenario_id,),
+    ).fetchall()
+
+
+def _pick_alternate(conn, scenario_id, category, leg_order, target_secs, cat, swimups):
+    """Best available substitute for a scratched leg, or None.
+
+    A candidate must be an alternate in the same category with an entry time (so
+    'no-time' alternates are skipped) and not itself scratched. For a partition
+    (free) relay any such alternate qualifies; for a medley the sub must be legal
+    for that leg's age band — its own band, or a younger swim-up when swim-ups are
+    on (never older). Among the legal candidates we take the one whose time is
+    closest to the swimmer being replaced, so the relay total — and thus its heat
+    seed — barely moves.
+    """
+    rows = conn.execute(
+        """
+        SELECT a.swimmer_id, a.seconds, s.age_group
+        FROM relay_alternates a JOIN swimmers s ON s.id = a.swimmer_id
+        WHERE a.scenario_id = ? AND a.category = ? AND a.seconds IS NOT NULL
+          AND a.swimmer_id NOT IN (SELECT swimmer_id FROM relay_scratches WHERE scenario_id = ?)
+        """,
+        (scenario_id, category, scenario_id),
+    ).fetchall()
+    if cat["kind"] == "medley":
+        bands = list(cat["spec"])  # youngest-first; leg_order 1..4 maps to index 0..3
+        need_idx = leg_order - 1
+
+        def legal(age_group):
+            if age_group not in bands:
+                return False
+            i = bands.index(age_group)
+            return i == need_idx or (swimups and i < need_idx)
+
+        rows = [r for r in rows if legal(r["age_group"])]
+    if not rows:
+        return None
+    return min(rows, key=lambda r: abs(r["seconds"] - target_secs))
+
+
+def scratch(conn, scenario_id, swimmer_id, grouping, gender_mode, open_leg, swimups) -> dict:
+    """Mark a swimmer out and patch their relay in place — a surgical deck edit.
+
+    Records the scratch (source of truth for a later re-balance), then, if the
+    swimmer was placed, fills their leg with the best available alternate
+    (`_pick_alternate`). If no legal sub with a time exists, the leg is left open
+    and the relay swims short. Only this one relay changes; every other printed
+    card stays valid. Returns a small status dict for the caller/UI.
+    """
+    conn.execute(
+        "INSERT OR IGNORE INTO relay_scratches (scenario_id, swimmer_id) VALUES (?,?)",
+        (scenario_id, swimmer_id),
+    )
+    row = conn.execute(
+        """
+        SELECT rl.relay_id, rl.leg_order, rl.seconds AS scr_secs, r.category
+        FROM relay_legs rl JOIN relays r ON r.id = rl.relay_id
+        WHERE r.scenario_id = ? AND rl.swimmer_id = ?
+        """,
+        (scenario_id, swimmer_id),
+    ).fetchone()
+    if row is None:
+        return {"placed": False, "subbed": False, "short": False}
+
+    relay_id, leg_order = row["relay_id"], row["leg_order"]
+    cats = {c["label"]: c for c in resolve_categories(grouping, gender_mode, open_leg)}
+    cat = cats.get(row["category"])
+    sub = _pick_alternate(conn, scenario_id, row["category"], leg_order, row["scr_secs"], cat, swimups) if cat else None
+
+    if sub is not None:
+        conn.execute(
+            "UPDATE relay_legs SET swimmer_id = ?, seconds = ? WHERE relay_id = ? AND leg_order = ?",
+            (sub["swimmer_id"], sub["seconds"], relay_id, leg_order),
+        )
+        conn.execute(
+            "DELETE FROM relay_alternates WHERE scenario_id = ? AND swimmer_id = ?",
+            (scenario_id, sub["swimmer_id"]),
+        )
+    else:
+        conn.execute("DELETE FROM relay_legs WHERE relay_id = ? AND leg_order = ?", (relay_id, leg_order))
+
+    total = conn.execute(
+        "SELECT COALESCE(SUM(seconds), 0) FROM relay_legs WHERE relay_id = ?", (relay_id,)
+    ).fetchone()[0]
+    conn.execute("UPDATE relays SET total_seconds = ? WHERE id = ?", (total, relay_id))
+    return {"placed": True, "subbed": sub is not None, "short": sub is None}
+
+
+def unscratch(conn, scenario_id, swimmer_id) -> None:
+    """Clear a scratch. The in-place sub is not auto-reversed — re-balance to fold
+    the swimmer back into fresh relays."""
+    conn.execute(
+        "DELETE FROM relay_scratches WHERE scenario_id = ? AND swimmer_id = ?",
+        (scenario_id, swimmer_id),
+    )
 
 
 def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8):
