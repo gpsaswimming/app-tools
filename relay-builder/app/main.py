@@ -226,14 +226,51 @@ def scenario_cards(request: Request, scenario_id: int):
     return templates.TemplateResponse(request=request, name="cards.html", context={"sc": sc, "cards": cards})
 
 
+@app.get("/scenarios/{scenario_id}/deck")
+def scenario_deck(request: Request, scenario_id: int):
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if not sc:
+            return RedirectResponse(url="/scenarios", status_code=303)
+        categories = scenarios.detail(conn, scenario_id)
+        scratched = scenarios.list_scratches(conn, scenario_id)
+    return templates.TemplateResponse(
+        request=request,
+        name="deck.html",
+        context={"sc": sc, "categories": categories, "scratched": scratched},
+    )
+
+
+@app.post("/scenarios/{scenario_id}/scratch")
+def scenario_scratch(scenario_id: int, swimmer_id: str = Form(...)):
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if sc:
+            scenarios.scratch(
+                conn, scenario_id, swimmer_id,
+                sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]),
+            )
+            conn.commit()
+    return RedirectResponse(url=f"/scenarios/{scenario_id}/deck", status_code=303)
+
+
+@app.post("/scenarios/{scenario_id}/unscratch")
+def scenario_unscratch(scenario_id: int, swimmer_id: str = Form(...)):
+    with db.connect() as conn:
+        scenarios.unscratch(conn, scenario_id, swimmer_id)
+        conn.commit()
+    return RedirectResponse(url=f"/scenarios/{scenario_id}/deck", status_code=303)
+
+
 @app.post("/scenarios/{scenario_id}/rebalance")
-def scenario_rebalance(scenario_id: int):
+def scenario_rebalance(scenario_id: int, redirect: str = Form("detail")):
     with db.connect() as conn:
         sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
         if sc:
             scenarios.build(conn, scenario_id, sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]))
             conn.commit()
-    return RedirectResponse(url=f"/scenarios/{scenario_id}", status_code=303)
+    dest = f"/scenarios/{scenario_id}/deck" if redirect == "deck" else f"/scenarios/{scenario_id}"
+    return RedirectResponse(url=f"{dest}", status_code=303)
 
 
 @app.post("/scenarios/{scenario_id}/clone")
