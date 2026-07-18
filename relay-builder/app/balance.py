@@ -244,6 +244,9 @@ def center_out(lanes: int) -> list[int]:
     return order
 
 
+MIN_HEAT = 3  # never seed a heat with a lone relay; borrow up to this floor
+
+
 def assign_heats(relays: list, lanes: int = 8) -> list[dict]:
     """Seed built relays into heats, standard-meet style.
 
@@ -251,6 +254,13 @@ def assign_heats(relays: list, lanes: int = 8) -> list[dict]:
     slow one. Each relay dict must carry 'total'. Returns heats numbered from 1
     (slowest) with lane assignments, e.g.
         [{"heat": 1, "lanes": [{"lane": 4, "relay": {...}}, ...]}, ...]
+
+    A heat is never left with a single relay: when the remainder would seed the
+    slow heat with fewer than MIN_HEAT relays, we borrow from the next-slowest
+    heat so the slow heat reaches the floor. Faster heats stay full, so sizes
+    (slowest first) read e.g. 3, 6, 8, 8, ... instead of 1, 8, 8, ... . The lone
+    exception is a category with a single heat (1-2 relays total), where there
+    is nothing to borrow from.
     """
     seeds = sorted(relays, key=lambda r: r["total"])  # fastest first
     k = len(seeds)
@@ -258,14 +268,20 @@ def assign_heats(relays: list, lanes: int = 8) -> list[dict]:
         return []
     order = center_out(lanes)
     num_heats = (k + lanes - 1) // lanes
-    first_size = k - lanes * (num_heats - 1)  # the slow heat 1 takes the remainder
+
+    # Slow heat 1 takes the remainder; faster heats are full.
+    sizes = [lanes] * num_heats
+    sizes[0] = k - lanes * (num_heats - 1)
+    if num_heats >= 2 and sizes[0] < MIN_HEAT:
+        deficit = MIN_HEAT - sizes[0]
+        sizes[1] -= deficit  # pull relays down from the next-slowest heat
+        sizes[0] = MIN_HEAT
 
     heats: list[dict] = [None] * num_heats  # type: ignore[list-item]
     pos = 0
     for h in range(num_heats - 1, -1, -1):  # fill the last (fastest) heat first
-        size = first_size if h == 0 else lanes
-        chunk = seeds[pos : pos + size]
-        pos += size
+        chunk = seeds[pos : pos + sizes[h]]
+        pos += sizes[h]
         laned = [{"lane": order[i], "relay": chunk[i]} for i in range(len(chunk))]
         laned.sort(key=lambda slot: slot["lane"])
         heats[h] = {"heat": h + 1, "lanes": laned}
