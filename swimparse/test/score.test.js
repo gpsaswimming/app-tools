@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { parse, score } from '../src/index.js';
+import { parse, score, auditPlacePoints } from '../src/index.js';
 
 const dir = new URL('./fixtures/', import.meta.url);
 const load = (name) => parse(readFileSync(new URL(name, dir), 'latin1'), { filename: name });
@@ -61,4 +61,39 @@ test('DQ and no-show swims score 0', () => {
             if (r.status === 'dq' || r.status === 'ns') assert.equal(r.points, 0);
         }
     }
+});
+
+test('auditPlacePoints finds no false positives on a clean meet', () => {
+    assert.deepStrictEqual(auditPlacePoints(load('gg-at-ww.sd3')), []);
+});
+
+test('auditPlacePoints flags a place/points mismatch (DQ not reconciled)', () => {
+    // Synthetic SDIF meet: the swimmer ahead DQ'd but the place order was left
+    // stale, so the winner kept a "2nd place" label while earning 1st-place pts.
+    const meet = {
+        format: 'sdif-v3',
+        events: [
+            {
+                number: '35',
+                type: 'individual',
+                gender: 'M',
+                description: 'Boys 9-10 50m Backstroke',
+                results: [
+                    { kind: 'individual', swimmerName: 'Sell, Charlie', teamCode: 'JRCC', status: 'dq', place: null, points: 0 },
+                    { kind: 'individual', swimmerName: 'Myers, Xavier', teamCode: 'RRST', status: 'ok', place: 2, points: 5 },
+                    { kind: 'individual', swimmerName: 'Grabowski, Grayson', teamCode: 'JRCC', status: 'ok', place: 3, points: 3 },
+                ],
+            },
+        ],
+    };
+    const issues = auditPlacePoints(meet);
+    assert.equal(issues.length, 2);
+    assert.equal(issues[0].swimmerName, 'Myers, Xavier');
+    assert.equal(issues[0].place, 2);
+    assert.equal(issues[0].points, 5);
+    assert.equal(issues[0].expectedPoints, 3); // what "2nd place" should score
+});
+
+test('auditPlacePoints is a no-op for HY3 (no stored points)', () => {
+    assert.deepStrictEqual(auditPlacePoints(load('gg-at-ww.hy3')), []);
 });

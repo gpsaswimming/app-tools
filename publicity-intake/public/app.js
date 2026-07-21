@@ -3,7 +3,7 @@
    can review the meet date, teams, and score before anything is sent to n8n.
    No inline handlers (keeps script-src 'self'). */
 
-import { parse, score } from '/vendor/swimparse/index.js';
+import { parse, score, auditPlacePoints } from '/vendor/swimparse/index.js';
 
 const ALLOWED_EXTENSIONS = ['.sd3', '.zip'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -177,8 +177,22 @@ function renderMeetPreview(meet) {
             </div>`)
         .join('');
 
+    // Swims whose recorded place disagrees with their points — usually a DQ or
+    // exhibition that wasn't reconciled in the place order. Flag for the rep;
+    // the totals above already use the recorded (official) points.
+    const placeIssues = auditPlacePoints(meet);
+    const placeWarning = placeIssues.length === 0 ? '' : `
+        <div class="mb-3 p-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm">
+            <div class="font-semibold mb-1">⚠ Please review: place vs. points mismatch</div>
+            <div class="mb-2">These swims scored differently than their recorded place implies (often a DQ/exhibition not corrected in the placing). Check them before submitting.</div>
+            <ul class="list-disc list-inside space-y-1">
+                ${placeIssues.map((i) => `<li>Event ${escapeHtml(i.eventNumber)} ${escapeHtml(i.eventDescription)} — <span class="font-semibold">${escapeHtml(i.swimmerName)}</span> (${escapeHtml(i.teamCode || '')}): place ${i.place} but ${i.points} pt${i.points === 1 ? '' : 's'} (place ${i.place} normally scores ${i.expectedPoints}).</li>`).join('')}
+            </ul>
+        </div>`;
+
     previewBody.innerHTML = `
         ${staleWarning}
+        ${placeWarning}
         <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">Meet date</div>
         <div class="text-lg font-bold text-gray-900 mb-3">${escapeHtml(dateText)}</div>
         ${meet.meet.name ? `<div class="text-sm text-gray-600 mb-3">${escapeHtml(meet.meet.name)}</div>` : ''}
