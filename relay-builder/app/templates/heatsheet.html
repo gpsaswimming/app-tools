@@ -58,7 +58,7 @@
   <div class="hs-cols">
     {% for cat in plan %}
     <div class="hs-event">
-      <h3>{{ cat.label }} {% if cat.leg %}{{ cat.leg * 4 }}m {% endif %}Freestyle Relay</h3>
+      <h3>Event {{ cat.event }} &middot; {{ cat.label }} {% if cat.leg %}{{ cat.leg * 4 }}m {% endif %}Freestyle Relay</h3>
       {% for heat in cat.heats %}
       <div class="hs-heat">
         <div class="hs-heat-title">Heat {{ heat.heat }} of {{ cat.heats|length }}</div>
