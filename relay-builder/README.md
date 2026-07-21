@@ -79,7 +79,14 @@ From a scenario, print-optimized views (site chrome hidden on print):
   into 8-lane heats: fastest relays swim last in the centre lanes
   (`4-5-3-6-2-7-1-8`), the first heat is the small/slow one.
 - **Relay cards** (`/scenarios/{id}/cards`) — one card per relay with swimmers,
-  per-leg times, projected total, and its heat + lane.
+  per-leg times, projected total, and its event + heat + lane. Printed **four to
+  a page in landscape** (2×2 grid, page-breaks every four).
+- **Team reports** (`/scenarios/{id}/team-reports`) — one page per team listing
+  that team's relay swimmers with the event, heat, and lane they swim in, so a
+  pooled relay's swimmers can be handed back to their home teams.
+
+Categories are numbered as **events** in program order; the same event numbers
+appear on the heat sheet, cards, and team reports so they cross-reference.
 
 ### Deck scratches
 

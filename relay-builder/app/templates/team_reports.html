@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Team Reports — {{ sc.name }}{% endblock %}
+{% block content %}
+<style>
+  /* One page per team: every team starts on a fresh page, first one included. */
+  .tr-team { break-before: page; }
+  .tr-team:first-child { break-before: auto; }
+  .tr-banner {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid #111; padding-bottom: 4px; margin-bottom: 10px;
+  }
+  .tr-banner .team { font-size: 1.4rem; font-weight: 700; color: #002366; }
+  .tr-banner .meta { font-size: 0.72rem; color: #555; }
+  table.tr-tbl { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .tr-tbl th, .tr-tbl td { text-align: left; padding: 4px 6px; border-bottom: 1px solid #ddd; }
+  .tr-tbl th { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.03em; color: #666; border-bottom: 1.5px solid #111; }
+  .tr-tbl td.num { font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
+  .tr-tbl tr { break-inside: avoid; }
+  .tr-age { color: #0033a0; font-size: 0.72rem; font-weight: 500; }
+  /* Scratch tick-box — a crisp square that prints reliably (not a native check). */
+  .tr-check {
+    appearance: none; -webkit-appearance: none;
+    width: 15px; height: 15px; border: 1.5px solid #333; border-radius: 2px;
+    vertical-align: middle; cursor: pointer; margin: 0;
+  }
+  .tr-check:checked { background: #d9242b; border-color: #d9242b; }
+
+  @media print {
+    @page { margin: 0.5in; }
+    body { background: #fff; }
+    .tr-check { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6 print:hidden">
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <a href="/scenarios/{{ sc.id }}" class="text-xs text-gray-400 hover:underline">&larr; {{ sc.name }}</a>
+      <h2 class="text-xl font-bold text-gray-800">Team reports</h2>
+      <p class="text-sm text-gray-500">One page per team &middot; each team's relay swimmers with event, heat &amp; lane.</p>
+    </div>
+    <button type="button" data-print class="btn-primary font-semibold py-2 px-4 rounded-lg">Print</button>
+  </div>
+</div>
+
+{% if not teams %}
+<div class="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400 italic">No relays — build relays for this scenario first.</div>
+{% else %}
+{% for t in teams %}
+<div class="tr-team bg-white rounded-xl shadow-lg p-6 mb-6 print:shadow-none print:p-0 print:mb-0 print:rounded-none">
+  <div class="tr-banner">
+    <span class="team">{{ t.team }}</span>
+    <span class="meta">{{ sc.name }} &middot; {{ t.entries|length }} swimmer{{ 's' if t.entries|length != 1 }} &middot; printed {{ printed }}</span>
+  </div>
+  <table class="tr-tbl">
+    <thead>
+      <tr>
+        <th class="num">Scr</th>
+        <th>Swimmer</th>
+        <th>Event</th>
+        <th class="num">Heat</th>
+        <th class="num">Lane</th>
+        <th class="num">Relay</th>
+        <th class="num">Leg</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in t.entries %}
+      <tr>
+        <td class="num"><input type="checkbox" class="tr-check" aria-label="Scratch {{ e.swimmer }}"></td>
+        <td>{{ e.swimmer }} <span class="tr-age">{{ e.age_group }}</span></td>
+        <td>{{ e.event }} &middot; {{ e.event_label }}{% if e.leg %} {{ e.leg * 4 }}m Relay{% endif %}</td>
+        <td class="num">{{ e.heat }}</td>
+        <td class="num">{{ e.lane }}</td>
+        <td class="num">{{ e.relay_idx }}</td>
+        <td class="num">{{ e.leg_order }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+{% endif %}
+
+{% endblock %}

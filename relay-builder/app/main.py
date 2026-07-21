@@ -226,6 +226,19 @@ def scenario_cards(request: Request, scenario_id: int):
     return templates.TemplateResponse(request=request, name="cards.html", context={"sc": sc, "cards": cards})
 
 
+@app.get("/scenarios/{scenario_id}/team-reports")
+def scenario_team_reports(request: Request, scenario_id: int):
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if not sc:
+            return RedirectResponse(url="/scenarios", status_code=303)
+        teams = scenarios.team_reports(conn, scenario_id, lanes=POOL_LANES)
+    printed = datetime.now().strftime("%m/%d/%y %I:%M %p")
+    return templates.TemplateResponse(
+        request=request, name="team_reports.html", context={"sc": sc, "teams": teams, "printed": printed}
+    )
+
+
 @app.get("/scenarios/{scenario_id}/deck")
 def scenario_deck(request: Request, scenario_id: int):
     with db.connect() as conn:

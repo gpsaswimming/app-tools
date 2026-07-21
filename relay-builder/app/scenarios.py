@@ -274,13 +274,43 @@ def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8):
     for the relay cards.
     """
     plan, cards = [], []
-    for cat in detail(conn, scenario_id):
+    for event, cat in enumerate(detail(conn, scenario_id), start=1):
         heats = assign_heats(cat["relays"], lanes)
         for heat in heats:
             for slot in heat["lanes"]:
                 relay = slot["relay"]
                 relay["heat"] = heat["heat"]
                 relay["lane"] = slot["lane"]
-                cards.append({"category": cat["label"], "leg": cat["leg"], **relay})
-        plan.append({"label": cat["label"], "leg": cat["leg"], "heats": heats})
+                cards.append({"category": cat["label"], "event": event, "leg": cat["leg"], **relay})
+        plan.append({"label": cat["label"], "event": event, "leg": cat["leg"], "heats": heats})
     return plan, cards
+
+
+def team_reports(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8) -> list[dict]:
+    """Per-team participant lists for the deck. Each relay swimmer becomes a row
+    on their own team's report with the event, heat, and lane they swim in — so a
+    pooled relay's swimmers can be handed back to their home teams. Returns a list
+    of {team, entries[]} sorted by team, entries sorted by event/heat/lane.
+    """
+    _, cards = heat_plan(conn, scenario_id, lanes)
+    teams: dict[str, list] = {}
+    for c in cards:
+        for leg in c["legs"]:
+            teams.setdefault(leg["team"] or "?", []).append(
+                {
+                    "swimmer": leg["full_name"],
+                    "age_group": leg["age_group"],
+                    "event": c["event"],
+                    "event_label": c["category"],
+                    "leg": c["leg"],
+                    "heat": c["heat"],
+                    "lane": c["lane"],
+                    "relay_idx": c["idx"],
+                    "leg_order": leg["leg_order"],
+                }
+            )
+    out = []
+    for team in sorted(teams):
+        entries = sorted(teams[team], key=lambda e: (e["swimmer"].lower(), e["event"]))
+        out.append({"team": team, "entries": entries})
+    return out
