@@ -115,6 +115,7 @@
             parseAgeCode,
             parseSdif,
             validateDualMeet,
+            auditPlacePoints,
             applyForfeitScores,
             generateExportableHtml,
             generateFilename,
@@ -439,6 +440,20 @@
                     </div>
                 `;
                 meetTitleDiv.innerHTML += bannerHtml;
+            }
+
+            // Render place/points review warnings (DQ not reconciled in placing)
+            const placeIssues = auditPlacePoints(data);
+            if (placeIssues.length > 0) {
+                const rows = placeIssues.map(i =>
+                    `<li>Event ${escapeHtml(i.eventNumber)} — ${escapeHtml(i.eventDescription)}: <strong>${escapeHtml(i.swimmer)}</strong> (${escapeHtml(i.teamCode || '')}) recorded <strong>place ${i.place}</strong> but scored <strong>${i.points} pt${i.points === 1 ? '' : 's'}</strong> (place ${i.place} normally scores ${i.expectedPoints}).</li>`
+                ).join('');
+                meetTitleDiv.innerHTML += `
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
+                        <p class="text-sm text-red-800 font-bold mb-1">⚠️ Please review: place vs. points mismatch</p>
+                        <p class="text-sm text-red-700 mb-2">These swims scored differently than their recorded place implies — usually a DQ or exhibition that wasn't corrected in the place order. Team totals use the recorded points. Confirm the results are right before publishing.</p>
+                        <ul class="text-sm text-red-700 list-disc list-inside space-y-1">${rows}</ul>
+                    </div>`;
             }
 
             // Render Team Scores

@@ -17,7 +17,7 @@ import { applyLeague } from './league.js';
 export { parseSdif } from './sdif.js';
 export { parseHy3 } from './hy3.js';
 export { detectFormat } from './detect.js';
-export { score, GPSA_DUAL, rulesetFromScoring } from './score.js';
+export { score, auditPlacePoints, GPSA_DUAL, rulesetFromScoring } from './score.js';
 export {
     GPSA,
     BUILTIN_LEAGUES,
