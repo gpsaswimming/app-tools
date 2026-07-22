@@ -13,6 +13,7 @@ import tempfile
 import zipfile
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import FastAPI, Form, Request, UploadFile
 from fastapi.responses import RedirectResponse
@@ -31,6 +32,14 @@ templates = Jinja2Templates(directory=BASE / "templates")
 # GPSA age-group order for the pool view.
 AGE_ORDER = ["6&U", "7-8", "9-10", "11-12", "13-14", "15-18"]
 
+# Canonical GPSA team codes, for the manual-add datalist (free text still allowed
+# so a pooled invitational relay with a guest team isn't blocked).
+TEAM_CODES = [
+    "BLMAR", "COL", "CV", "EL", "GG", "HW", "JRCC", "KCD", "MBKMT", "NHM",
+    "POQ", "RMMR", "RRST", "VG", "WO", "WPPIR", "WW", "WYCC", "WYTH",
+]
+GENDERS = {"F", "M"}
+
 GROUPING_LABELS = {"gpsa": "GPSA standard", "per-age": "Per age group", "open": "Open pool"}
 GENDER_LABELS = {"single": "single-gender", "mixed": "mixed"}
 
@@ -44,8 +53,48 @@ def _mmss(seconds):
     return f"{minutes}:{rem:05.2f}" if minutes else f"{rem:.2f}"
 
 
+def _clock(seconds):
+    """Seconds since midnight → 'h:mm AM/PM' for the session timeline."""
+    if seconds is None:
+        return "—"
+    total = int(round(seconds))
+    hour24 = (total // 3600) % 24
+    minute = (total % 3600) // 60
+    period = "AM" if hour24 < 12 else "PM"
+    hour12 = hour24 % 12 or 12
+    return f"{hour12}:{minute:02d} {period}"
+
+
 templates.env.filters["mmss"] = _mmss
+templates.env.filters["clock"] = _clock
 templates.env.globals["GROUPING_LABELS"] = GROUPING_LABELS
+
+
+def _parse_seconds(raw: str):
+    """Parse an entry time — 'ss.ss', 'ss', or 'm:ss.ss' — to float seconds.
+
+    Blank → None (swimmer added without that time). Raises ValueError on garbage.
+    """
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    if ":" in raw:
+        mins, secs = raw.split(":", 1)
+        value = int(mins) * 60 + float(secs)
+    else:
+        value = float(raw)
+    if value <= 0:
+        raise ValueError("time must be positive")
+    return value
+
+
+def _parse_clock(raw: str, default: int = 9 * 3600) -> int:
+    """'HH:MM' (24h, from an <input type=time>) → seconds since midnight."""
+    try:
+        hours, minutes = raw.split(":")
+        return int(hours) * 3600 + int(minutes) * 60
+    except (ValueError, AttributeError):
+        return default
 
 
 def _default_scenario_name(grouping: str, gender_mode: str) -> str:
@@ -63,7 +112,7 @@ def health() -> dict:
 
 
 @app.get("/")
-def pool(request: Request):
+def pool(request: Request, added: str = "", err: str = ""):
     with db.connect() as conn:
         swimmers = conn.execute(
             """
@@ -91,6 +140,10 @@ def pool(request: Request):
             "groups": ordered,
             "imports": imports,
             "total": len(swimmers),
+            "team_codes": TEAM_CODES,
+            "age_groups": AGE_ORDER,
+            "added": added,
+            "err": err,
         },
     )
 
@@ -147,6 +200,64 @@ async def import_files(files: list[UploadFile]):
 def reset():
     db.reset()
     return {"success": True}
+
+
+@app.post("/swimmers")
+def add_swimmer(
+    first_name: str = Form(...),
+    last_name: str = Form(...),
+    gender: str = Form(...),
+    age_group: str = Form(...),
+    team: str = Form(...),
+    free25: str = Form(""),
+    free50: str = Form(""),
+):
+    """Manually add one swimmer to the pool — for opt-ins missing from an entry
+    file. Builds the same DOB-free ``last|first|agegroup`` id swimparse uses, so a
+    later import of the same swimmer updates this row in place rather than duplicating.
+    """
+    first, last = first_name.strip(), last_name.strip()
+    team, gender = team.strip().upper(), gender.strip().upper()
+    if not first or not last or gender not in GENDERS or age_group not in AGE_ORDER or not team:
+        return RedirectResponse(url="/?err=" + quote("Missing or invalid swimmer details."), status_code=303)
+    try:
+        times = {25: _parse_seconds(free25), 50: _parse_seconds(free50)}
+    except ValueError:
+        return RedirectResponse(
+            url="/?err=" + quote("Enter times as seconds (e.g. 31.45) or m:ss.ss."), status_code=303
+        )
+
+    sid = f"{last}|{first}|{age_group}".lower()
+    full_name = f"{last}, {first}"
+    with db.connect() as conn:
+        conn.execute(
+            """
+            INSERT INTO swimmers (id, full_name, last_name, first_name, gender, age_group, team, source)
+            VALUES (?,?,?,?,?,?,?,'manual')
+            ON CONFLICT(id) DO UPDATE SET
+                full_name = excluded.full_name, last_name = excluded.last_name,
+                first_name = excluded.first_name, gender = excluded.gender,
+                age_group = excluded.age_group, team = excluded.team
+            """,
+            (sid, full_name, last, first, gender, age_group, team),
+        )
+        for distance, secs in times.items():
+            if secs is not None:
+                conn.execute(
+                    "INSERT INTO times (swimmer_id, distance, stroke, seconds) VALUES (?,?,'Freestyle',?)"
+                    " ON CONFLICT(swimmer_id, distance, stroke) DO UPDATE SET seconds = excluded.seconds",
+                    (sid, distance, secs),
+                )
+        conn.commit()
+    return RedirectResponse(url="/?added=" + quote(full_name), status_code=303)
+
+
+@app.post("/swimmers/delete")
+def delete_swimmer(swimmer_id: str = Form(...)):
+    with db.connect() as conn:
+        db.remove_swimmer(conn, swimmer_id)
+        conn.commit()
+    return RedirectResponse(url="/", status_code=303)
 
 
 @app.get("/scenarios")
@@ -236,6 +347,37 @@ def scenario_team_reports(request: Request, scenario_id: int):
     printed = datetime.now().strftime("%m/%d/%y %I:%M %p")
     return templates.TemplateResponse(
         request=request, name="team_reports.html", context={"sc": sc, "teams": teams, "printed": printed}
+    )
+
+
+# Session-timeline defaults (seconds): rough per-heat swim estimates by leg
+# distance, plus a between-heats gap to let the next heat get set. All adjustable
+# per render via query params from the timeline page's form.
+TL_DEFAULTS = {"h25": 75, "h50": 135, "gap": 40, "start": "09:00"}
+
+
+@app.get("/scenarios/{scenario_id}/timeline")
+def scenario_timeline(
+    request: Request,
+    scenario_id: int,
+    start: str = TL_DEFAULTS["start"],
+    h25: int = TL_DEFAULTS["h25"],
+    h50: int = TL_DEFAULTS["h50"],
+    gap: int = TL_DEFAULTS["gap"],
+):
+    h25, h50, gap = max(0, h25), max(0, h50), max(0, gap)
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if not sc:
+            return RedirectResponse(url="/scenarios", status_code=303)
+        tl = scenarios.timeline(
+            conn, scenario_id, start_seconds=_parse_clock(start), h25=h25, h50=h50, gap=gap, lanes=POOL_LANES
+        )
+    printed = datetime.now().strftime("%m/%d/%y %I:%M %p")
+    return templates.TemplateResponse(
+        request=request,
+        name="timeline.html",
+        context={"sc": sc, "tl": tl, "printed": printed, "params": {"start": start, "h25": h25, "h50": h50, "gap": gap}},
     )
 
 

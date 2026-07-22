@@ -286,6 +286,45 @@ def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8):
     return plan, cards
 
 
+def timeline(
+    conn: sqlite3.Connection,
+    scenario_id: int,
+    *,
+    start_seconds: int,
+    h25: int,
+    h50: int,
+    gap: int,
+    lanes: int = 8,
+) -> dict:
+    """Estimated running order for a session: each event's clock start time.
+
+    Events run in program order (same order as the heat sheet). An event's block
+    is ``heats × (per-heat swim estimate + gap)``, where the per-heat estimate is
+    ``h25`` or ``h50`` by leg distance and ``gap`` is the seconds between heats to
+    let the next heat get set. The clock advances event to event; the trailing gap
+    on the last heat of an event doubles as the setup time before the next event.
+    """
+    plan, _ = heat_plan(conn, scenario_id, lanes)
+    running = start_seconds
+    rows = []
+    for cat in plan:
+        n = len(cat["heats"])
+        per = h25 if cat["leg"] == 25 else h50
+        duration = n * (per + gap)
+        rows.append(
+            {
+                "event": cat["event"],
+                "label": cat["label"],
+                "leg": cat["leg"],
+                "heats": n,
+                "start": running,
+                "duration": duration,
+            }
+        )
+        running += duration
+    return {"rows": rows, "start": start_seconds, "end": running, "total": running - start_seconds}
+
+
 def team_reports(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8) -> list[dict]:
     """Per-team participant lists for the deck. Each relay swimmer becomes a row
     on their own team's report with the event, heat, and lane they swim in — so a

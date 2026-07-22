@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Session Timeline — {{ sc.name }}{% endblock %}
+{% block content %}
+<style>
+  .tl-sheet { color: #111; }
+  .tl-banner {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid #111; padding-bottom: 4px; margin-bottom: 12px; font-size: 0.8rem;
+  }
+  .tl-banner .mid { font-weight: 700; }
+  .tl-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .tl-table th { text-align: left; border-bottom: 1.5px solid #111; padding: 5px 8px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #444; }
+  .tl-table td { padding: 5px 8px; border-bottom: 1px solid #ddd; }
+  .tl-table .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tl-table .start { font-weight: 700; }
+  .tl-foot { margin-top: 10px; font-size: 0.85rem; color: #333; display: flex; gap: 24px; flex-wrap: wrap; }
+  .tl-foot .num { font-variant-numeric: tabular-nums; font-weight: 600; }
+  @media print {
+    @page { margin: 0.5in; }
+    body { background: #fff; }
+  }
+</style>
+
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6 print:hidden">
+  <div class="flex items-start justify-between flex-wrap gap-3 mb-5">
+    <div>
+      <a href="/scenarios/{{ sc.id }}" class="text-xs text-gray-400 hover:underline">&larr; {{ sc.name }}</a>
+      <h2 class="text-xl font-bold text-gray-800">Session timeline</h2>
+      <p class="text-sm text-gray-500">Estimated start time for each event, in program order. Adjust the estimates below and the clock recomputes.</p>
+    </div>
+    <button type="button" data-print class="btn-primary font-semibold py-2 px-4 rounded-lg">Print</button>
+  </div>
+
+  <form method="get" action="/scenarios/{{ sc.id }}/timeline" class="grid grid-cols-2 sm:grid-cols-4 gap-4 items-end">
+    <div>
+      <label for="start" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Start time</label>
+      <input id="start" name="start" type="time" value="{{ params.start }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+      <label for="h25" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">25 Free heat (sec)</label>
+      <input id="h25" name="h25" type="number" min="0" value="{{ params.h25 }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+      <label for="h50" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">50 Free heat (sec)</label>
+      <input id="h50" name="h50" type="number" min="0" value="{{ params.h50 }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+      <label for="gap" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Between heats (sec)</label>
+      <input id="gap" name="gap" type="number" min="0" value="{{ params.gap }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div class="col-span-2 sm:col-span-4">
+      <button type="submit" class="text-sm font-semibold text-[#002366] border border-[#002366] rounded-lg py-2 px-4 hover:bg-[#002366] hover:text-white transition-colors">Recompute</button>
+    </div>
+  </form>
+</div>
+
+<div class="tl-sheet">
+  <div class="tl-banner">
+    <span>Session Timeline</span>
+    <span class="mid">{{ sc.name }}</span>
+    <span>Printed {{ printed }}</span>
+  </div>
+
+  {% if not tl.rows %}
+  <p class="text-gray-400 italic">No relays to schedule — build relays for this scenario first.</p>
+  {% else %}
+  <table class="tl-table">
+    <thead>
+      <tr>
+        <th class="num">Start</th>
+        <th>Event</th>
+        <th>Category</th>
+        <th class="num">Heats</th>
+        <th class="num">Est. length</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in tl.rows %}
+      <tr>
+        <td class="num start">{{ row.start|clock }}</td>
+        <td class="num">{{ row.event }}</td>
+        <td>{{ row.label }}{% if row.leg %} &middot; {{ row.leg * 4 }}m Free Relay{% endif %}</td>
+        <td class="num">{{ row.heats }}</td>
+        <td class="num">{{ row.duration|mmss }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="tl-foot">
+    <span>Estimated finish <span class="num">{{ tl.end|clock }}</span></span>
+    <span>Total session <span class="num">{{ tl.total|mmss }}</span></span>
+    <span class="text-gray-400 print:hidden">Estimates only — actual pace varies with age group and deck efficiency.</span>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

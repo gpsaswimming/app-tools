@@ -24,7 +24,8 @@ Parsing is delegated entirely to the shared **swimparse** package (`../swimparse
 the single source of truth for SDIF/HY3. We always pass `--league gpsa`, so the
 JSON is **DOB-free** (age groups computed, birthdates stripped) — no minors' PII
 is ever stored. Accepts both `.sd3` and `.hy3`; swimparse normalizes them
-identically.
+identically. Swimmers can also be **added by hand** for opt-ins who aren't in any
+entry file (see [Swimmer pool](#swimmer-pool)).
 
 ## Stack
 
@@ -57,6 +58,24 @@ docker compose up -d
 - [x] Phase 2 — scenarios (grouping / gender switches) + snake-draft balancing
 - [x] Phase 3 — printable relay cards + 8-lane heat sheet
 
+### Swimmer pool
+
+The pool (`/`) is the stable base every scenario is built from. Two ways in:
+
+- **Import** — drop each team's `.sd3`/`.hy3` (or a `.zip` of several); re-importing
+  a team updates it in place. Bulk or one team at a time.
+- **Add manually** — for a relay opt-in missing from every entry file. Enter name,
+  gender, age group, team, and optional **25 / 50 Free** times (`ss.ss`, `ss`, or
+  `m:ss.ss`). A manual add builds the same DOB-free `last|first|agegroup` id
+  swimparse uses, so a later import of that swimmer merges onto the same row rather
+  than duplicating. Leave both times blank and the swimmer still pools — they just
+  land in the alternates until given a time.
+
+Manually-added swimmers carry a **`manual`** badge and a remove (`×`) button;
+removing one deletes them everywhere and re-totals any relay they'd been seeded
+into (re-balance afterward to re-form clean relays). Imported swimmers have no
+remove button — clear them with **Reset pool** or a corrected re-import.
+
 ### Scenarios
 
 A **scenario** is one way to slice the pool into relays: a grouping strategy ×
@@ -84,9 +103,18 @@ From a scenario, print-optimized views (site chrome hidden on print):
 - **Team reports** (`/scenarios/{id}/team-reports`) — one page per team listing
   that team's relay swimmers with the event, heat, and lane they swim in, so a
   pooled relay's swimmers can be handed back to their home teams.
+- **Session timeline** (`/scenarios/{id}/timeline`) — estimated clock start time
+  for each event, in program order, for posting on deck. Each event's block is
+  `heats × (per-heat swim estimate + gap)`, with **separate 25 / 50 Free heat
+  estimates** (so a 4×25 event is scheduled shorter than a 4×50) and a
+  **between-heats gap** that also serves as setup time before the next event. All
+  four inputs — start time, 25-Free heat, 50-Free heat, gap (defaults 9:00 AM /
+  75s / 135s / 40s) — are adjustable on the page and live in the URL, so a tuned
+  timeline is bookmarkable and printable. Footer shows estimated finish and total
+  session length. Estimates only — actual pace varies with age group and deck.
 
 Categories are numbered as **events** in program order; the same event numbers
-appear on the heat sheet, cards, and team reports so they cross-reference.
+appear on the heat sheet, cards, team reports, and timeline so they cross-reference.
 
 ### Deck scratches
 
