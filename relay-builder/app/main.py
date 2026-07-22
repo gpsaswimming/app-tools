@@ -32,13 +32,35 @@ templates = Jinja2Templates(directory=BASE / "templates")
 # GPSA age-group order for the pool view.
 AGE_ORDER = ["6&U", "7-8", "9-10", "11-12", "13-14", "15-18"]
 
-# Canonical GPSA team codes, for the manual-add datalist (free text still allowed
-# so a pooled invitational relay with a guest team isn't blocked).
-TEAM_CODES = [
-    "BLMAR", "COL", "CV", "EL", "GG", "HW", "JRCC", "KCD", "MBKMT", "NHM",
-    "POQ", "RMMR", "RRST", "VG", "WO", "WPPIR", "WW", "WYCC", "WYTH",
-]
+# Canonical GPSA team code → display name. Drives the manual-add datalist (free
+# text still allowed so a pooled invitational relay with a guest team isn't
+# blocked) and the "Name (CODE)" heading on team reports.
+TEAM_NAMES = {
+    "BLMAR": "Beaconsdale",
+    "COL": "Colony",
+    "CV": "Coventry",
+    "EL": "Elizabeth Lake",
+    "GG": "Glendale",
+    "HW": "Hidenwood",
+    "JRCC": "James River",
+    "KCD": "Kiln Creek",
+    "MBKMT": "Marlbank",
+    "NHM": "Northampton",
+    "POQ": "Poquoson",
+    "RMMR": "Running Man",
+    "RRST": "Riverdale",
+    "VG": "Village Green",
+    "WO": "Willow Oaks",
+    "WPPIR": "Windy Point",
+    "WW": "Wendwood",
+    "WYCC": "Warwick Yacht",
+    "WYTH": "Wythe",
+}
+TEAM_CODES = sorted(TEAM_NAMES)
 GENDERS = {"F", "M"}
+
+# The meet these relays belong to — shown in the app header and on printed reports.
+MEET_TITLE = "Summer Splash Invitational Relays"
 
 GROUPING_LABELS = {"gpsa": "GPSA standard", "per-age": "Per age group", "open": "Open pool"}
 GENDER_LABELS = {"single": "single-gender", "mixed": "mixed"}
@@ -78,6 +100,8 @@ templates.env.filters["mmss"] = _mmss
 templates.env.filters["mss"] = _mss
 templates.env.filters["clock"] = _clock
 templates.env.globals["GROUPING_LABELS"] = GROUPING_LABELS
+templates.env.globals["TEAM_NAMES"] = TEAM_NAMES
+templates.env.globals["MEET_TITLE"] = MEET_TITLE
 
 
 def _parse_seconds(raw: str):
