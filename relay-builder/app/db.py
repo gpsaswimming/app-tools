@@ -100,6 +100,17 @@ CREATE TABLE IF NOT EXISTS relay_scratches (
     scratched_at TEXT DEFAULT (datetime('now')),
     PRIMARY KEY (scenario_id, swimmer_id)
 );
+
+-- Swimmers the user wants seeded into their category's fastest (lowest-total)
+-- relay. Applied after balancing on each (re)build: even relays are formed as
+-- usual, then each pinned swimmer is swapped into the fastest one. Scenario-
+-- scoped like scratches, so a re-balance keeps honouring the pin.
+CREATE TABLE IF NOT EXISTS relay_pins (
+    scenario_id INTEGER NOT NULL REFERENCES scenarios(id) ON DELETE CASCADE,
+    swimmer_id  TEXT NOT NULL REFERENCES swimmers(id),
+    pinned_at   TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (scenario_id, swimmer_id)
+);
 """
 
 
@@ -137,6 +148,7 @@ def remove_swimmer(conn: sqlite3.Connection, swimmer_id: str) -> None:
     conn.execute("DELETE FROM relay_legs WHERE swimmer_id = ?", (swimmer_id,))
     conn.execute("DELETE FROM relay_alternates WHERE swimmer_id = ?", (swimmer_id,))
     conn.execute("DELETE FROM relay_scratches WHERE swimmer_id = ?", (swimmer_id,))
+    conn.execute("DELETE FROM relay_pins WHERE swimmer_id = ?", (swimmer_id,))
     conn.execute("DELETE FROM times WHERE swimmer_id = ?", (swimmer_id,))
     conn.execute("DELETE FROM swimmers WHERE id = ?", (swimmer_id,))
     for rid in affected:

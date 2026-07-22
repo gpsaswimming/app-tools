@@ -419,11 +419,41 @@ def scenario_deck(request: Request, scenario_id: int):
             return RedirectResponse(url="/scenarios", status_code=303)
         categories = scenarios.detail(conn, scenario_id)
         scratched = scenarios.list_scratches(conn, scenario_id)
+        pinned = scenarios.list_pins(conn, scenario_id)
     return templates.TemplateResponse(
         request=request,
         name="deck.html",
-        context={"sc": sc, "categories": categories, "scratched": scratched},
+        context={"sc": sc, "categories": categories, "scratched": scratched, "pinned": pinned},
     )
+
+
+@app.post("/scenarios/{scenario_id}/pin")
+def scenario_pin(scenario_id: int, swimmer_id: str = Form(...)):
+    """Pin a swimmer to their category's fastest relay and rebuild so it takes
+    effect now. Balancing is unchanged; the pin is applied as a post-balance swap."""
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if sc:
+            conn.execute(
+                "INSERT OR IGNORE INTO relay_pins (scenario_id, swimmer_id) VALUES (?,?)",
+                (scenario_id, swimmer_id),
+            )
+            scenarios.build(conn, scenario_id, sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]))
+            conn.commit()
+    return RedirectResponse(url=f"/scenarios/{scenario_id}/deck", status_code=303)
+
+
+@app.post("/scenarios/{scenario_id}/unpin")
+def scenario_unpin(scenario_id: int, swimmer_id: str = Form(...)):
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if sc:
+            conn.execute(
+                "DELETE FROM relay_pins WHERE scenario_id = ? AND swimmer_id = ?", (scenario_id, swimmer_id)
+            )
+            scenarios.build(conn, scenario_id, sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]))
+            conn.commit()
+    return RedirectResponse(url=f"/scenarios/{scenario_id}/deck", status_code=303)
 
 
 @app.post("/scenarios/{scenario_id}/scratch")

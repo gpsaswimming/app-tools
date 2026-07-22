@@ -87,6 +87,10 @@ gender mode. Build several and compare relay counts, alternates, and time spread
 - **Balancing** — serpentine (snake) draft to equalize 4-swimmer totals, then a
   greedy swap-refinement polish. Seed time matches the leg distance (25 free for
   100m relays, 50 free for 200m).
+- **Leg order** — a free relay's four legs are ordered by seed time for a strong
+  finish: lead off the 2nd fastest, 3rd fastest second, slowest third, fastest
+  anchors. Order-only (the total is a sum), so heats and balance are unaffected.
+  Medley relays keep their fixed youngest→oldest age-band order.
 - **Alternates** — swimmers eligible but unplaced: the remainder past a multiple
   of four, or missing a time at the leg distance (flagged in red).
 
@@ -131,3 +135,14 @@ card stays valid. If no eligible alternate is available the relay is left short
 (flagged). The scratch set is the source of truth for who's out, so the
 **Re-run balancing** button re-forms all relays around the swimmers still in.
 Reprint the heat sheet / cards afterward.
+
+### Pin to fastest relay
+
+**Pin** (on the Deck view) forces a swimmer into their category's **fastest**
+(lowest-total) relay while everyone else stays evenly balanced. On each (re)build
+the balancer forms even relays as usual, then swaps each pinned swimmer into the
+fastest one — for a free relay trading the closest-time member (so that relay's
+total, and its fast seed, barely move); for a medley trading within the same age
+band so leg legality holds. It's a general per-swimmer control (no names in code),
+scenario-scoped, and honoured on every re-balance. Pinning rebuilds immediately so
+the move shows at once; the fastest relay is flagged on the deck.
