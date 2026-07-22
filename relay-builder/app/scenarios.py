@@ -291,32 +291,35 @@ def timeline(
     scenario_id: int,
     *,
     start_seconds: int,
-    h25: int,
-    h50: int,
     gap: int,
     lanes: int = 8,
 ) -> dict:
     """Estimated running order for a session: each event's clock start time.
 
-    Events run in program order (same order as the heat sheet). An event's block
-    is ``heats × (per-heat swim estimate + gap)``, where the per-heat estimate is
-    ``h25`` or ``h50`` by leg distance and ``gap`` is the seconds between heats to
-    let the next heat get set. The clock advances event to event; the trailing gap
-    on the last heat of an event doubles as the setup time before the next event.
+    Events run in program order (same order as the heat sheet). A heat runs all
+    lanes at once, so its wall-clock cost is the **slowest relay in the heat** —
+    its seeded total — plus ``gap``, the seconds to clear the pool and get the
+    next heat set. An event's block is the sum of its heats; the clock advances
+    event to event, the trailing gap doubling as setup before the next event.
+
+    Seeded totals are the sum of four flat-start free seed times, so they run a
+    touch long versus actual relay splits (flying exchanges) — a conservative,
+    ready-early estimate, which is the safe direction for a posted timeline.
     """
     plan, _ = heat_plan(conn, scenario_id, lanes)
     running = start_seconds
     rows = []
     for cat in plan:
-        n = len(cat["heats"])
-        per = h25 if cat["leg"] == 25 else h50
-        duration = n * (per + gap)
+        duration = 0.0
+        for heat in cat["heats"]:
+            slowest = max((slot["relay"]["total"] for slot in heat["lanes"]), default=0.0)
+            duration += slowest + gap
         rows.append(
             {
                 "event": cat["event"],
                 "label": cat["label"],
                 "leg": cat["leg"],
-                "heats": n,
+                "heats": len(cat["heats"]),
                 "start": running,
                 "duration": duration,
             }

@@ -104,14 +104,16 @@ From a scenario, print-optimized views (site chrome hidden on print):
   that team's relay swimmers with the event, heat, and lane they swim in, so a
   pooled relay's swimmers can be handed back to their home teams.
 - **Session timeline** (`/scenarios/{id}/timeline`) — estimated clock start time
-  for each event, in program order, for posting on deck. Each event's block is
-  `heats × (per-heat swim estimate + gap)`, with **separate 25 / 50 Free heat
-  estimates** (so a 4×25 event is scheduled shorter than a 4×50) and a
-  **between-heats gap** that also serves as setup time before the next event. All
-  four inputs — start time, 25-Free heat, 50-Free heat, gap (defaults 9:00 AM /
-  75s / 135s / 40s) — are adjustable on the page and live in the URL, so a tuned
-  timeline is bookmarkable and printable. Footer shows estimated finish and total
-  session length. Estimates only — actual pace varies with age group and deck.
+  for each event, in program order, for posting on deck. A heat runs all lanes at
+  once, so it's timed from the **slowest seeded relay in that heat** plus a
+  **between-heats gap** (clear the pool + get the next heat set); an event's block
+  is the sum of its heats. Timing the heats off real seed times captures what a
+  fixed per-race estimate can't — a slow 9-10 heat vs a fast 13-14 heat, and the
+  slow early heats vs the fast late ones. Seeded totals are flat-start free times
+  summed, so they run a touch long versus actual relay splits — conservative
+  (ready early), which is the safe direction. Start time and gap (defaults 9:00 AM
+  / 40s) are adjustable on the page and live in the URL, so a tuned timeline is
+  bookmarkable and printable. Footer shows estimated finish and total session length.
 
 Categories are numbered as **events** in program order; the same event numbers
 appear on the heat sheet, cards, team reports, and timeline so they cross-reference.

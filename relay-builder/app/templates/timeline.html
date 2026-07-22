@@ -26,29 +26,21 @@
     <div>
       <a href="/scenarios/{{ sc.id }}" class="text-xs text-gray-400 hover:underline">&larr; {{ sc.name }}</a>
       <h2 class="text-xl font-bold text-gray-800">Session timeline</h2>
-      <p class="text-sm text-gray-500">Estimated start time for each event, in program order. Adjust the estimates below and the clock recomputes.</p>
+      <p class="text-sm text-gray-500">Estimated start time for each event, in program order. Each heat is timed from its slowest seeded relay plus the between-heats gap.</p>
     </div>
     <button type="button" data-print class="btn-primary font-semibold py-2 px-4 rounded-lg">Print</button>
   </div>
 
-  <form method="get" action="/scenarios/{{ sc.id }}/timeline" class="grid grid-cols-2 sm:grid-cols-4 gap-4 items-end">
+  <form method="get" action="/scenarios/{{ sc.id }}/timeline" class="grid grid-cols-2 gap-4 items-end sm:max-w-md">
     <div>
       <label for="start" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Start time</label>
       <input id="start" name="start" type="time" value="{{ params.start }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
     <div>
-      <label for="h25" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">25 Free heat (sec)</label>
-      <input id="h25" name="h25" type="number" min="0" value="{{ params.h25 }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
-      <label for="h50" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">50 Free heat (sec)</label>
-      <input id="h50" name="h50" type="number" min="0" value="{{ params.h50 }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
       <label for="gap" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Between heats (sec)</label>
       <input id="gap" name="gap" type="number" min="0" value="{{ params.gap }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
-    <div class="col-span-2 sm:col-span-4">
+    <div class="col-span-2">
       <button type="submit" class="text-sm font-semibold text-[#002366] border border-[#002366] rounded-lg py-2 px-4 hover:bg-[#002366] hover:text-white transition-colors">Recompute</button>
     </div>
   </form>

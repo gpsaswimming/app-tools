@@ -350,10 +350,10 @@ def scenario_team_reports(request: Request, scenario_id: int):
     )
 
 
-# Session-timeline defaults (seconds): rough per-heat swim estimates by leg
-# distance, plus a between-heats gap to let the next heat get set. All adjustable
-# per render via query params from the timeline page's form.
-TL_DEFAULTS = {"h25": 75, "h50": 135, "gap": 40, "start": "09:00"}
+# Session-timeline defaults: the meet start clock and the between-heats gap
+# (seconds) to clear the pool and get the next heat set. Heat length itself comes
+# from each heat's slowest seeded relay, so there's nothing to estimate per race.
+TL_DEFAULTS = {"gap": 40, "start": "09:00"}
 
 
 @app.get("/scenarios/{scenario_id}/timeline")
@@ -361,23 +361,19 @@ def scenario_timeline(
     request: Request,
     scenario_id: int,
     start: str = TL_DEFAULTS["start"],
-    h25: int = TL_DEFAULTS["h25"],
-    h50: int = TL_DEFAULTS["h50"],
     gap: int = TL_DEFAULTS["gap"],
 ):
-    h25, h50, gap = max(0, h25), max(0, h50), max(0, gap)
+    gap = max(0, gap)
     with db.connect() as conn:
         sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
         if not sc:
             return RedirectResponse(url="/scenarios", status_code=303)
-        tl = scenarios.timeline(
-            conn, scenario_id, start_seconds=_parse_clock(start), h25=h25, h50=h50, gap=gap, lanes=POOL_LANES
-        )
+        tl = scenarios.timeline(conn, scenario_id, start_seconds=_parse_clock(start), gap=gap, lanes=POOL_LANES)
     printed = datetime.now().strftime("%m/%d/%y %I:%M %p")
     return templates.TemplateResponse(
         request=request,
         name="timeline.html",
-        context={"sc": sc, "tl": tl, "printed": printed, "params": {"start": start, "h25": h25, "h50": h50, "gap": gap}},
+        context={"sc": sc, "tl": tl, "printed": printed, "params": {"start": start, "gap": gap}},
     )
 
 
