@@ -15,6 +15,8 @@
     font-weight: 700; font-size: 0.82rem; border-bottom: 1.5px solid #111;
     padding-bottom: 2px; margin: 0 0 3px;
     break-after: avoid;  /* keep the event title with its first heat */
+    /* never split the heading itself across the column gap */
+    break-inside: avoid; -webkit-column-break-inside: avoid;
   }
   /* Keep a heat (title + its lanes) together; events may still flow across columns. */
   .hs-heat { break-inside: avoid; -webkit-column-break-inside: avoid; }
@@ -29,8 +31,12 @@
   .hs-empty { color: #999; }
 
   @media print {
-    @page { margin: 0.5in; }
+    @page { margin: 0.3in; }
     body { background: #fff; }
+    /* Use the full page — the app container/max-width otherwise pins the sheet
+       to a narrow centred strip when printing. */
+    main { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+    main > div { max-width: none !important; }
   }
 </style>
 
@@ -48,7 +54,7 @@
 <div class="hs-sheet">
   <div class="hs-banner">
     <span>Relay Heat Sheet</span>
-    <span class="mid">{{ sc.name }}</span>
+    <span class="mid">{{ MEET_TITLE }}</span>
     <span>Printed {{ printed }}</span>
   </div>
 
