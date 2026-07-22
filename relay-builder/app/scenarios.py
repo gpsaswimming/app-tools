@@ -267,15 +267,21 @@ def unscratch(conn, scenario_id, swimmer_id) -> None:
     )
 
 
-def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8):
+# The pooled relays run at the tail of the Summer Splash program, after the 52
+# individual events — so relay event numbering starts here (events 53+).
+FIRST_RELAY_EVENT = 53
+
+
+def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8, event_start: int = FIRST_RELAY_EVENT):
     """Seed each category's relays into heats/lanes for the deck output.
 
     Returns (plan, cards): `plan` is per-category heats for the heat sheet;
     `cards` is a flat, program-order list of relays annotated with heat + lane
-    for the relay cards.
+    for the relay cards. Events are numbered from `event_start` (the relays'
+    position in the overall meet program).
     """
     plan, cards = [], []
-    for event, cat in enumerate(detail(conn, scenario_id), start=1):
+    for event, cat in enumerate(detail(conn, scenario_id), start=event_start):
         heats = assign_heats(cat["relays"], lanes)
         for heat in heats:
             for slot in heat["lanes"]:

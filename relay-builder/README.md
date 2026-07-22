@@ -115,8 +115,10 @@ From a scenario, print-optimized views (site chrome hidden on print):
   / 40s) are adjustable on the page and live in the URL, so a tuned timeline is
   bookmarkable and printable. Footer shows estimated finish and total session length.
 
-Categories are numbered as **events** in program order; the same event numbers
-appear on the heat sheet, cards, team reports, and timeline so they cross-reference.
+Categories are numbered as **events** in program order, starting at **event 53**
+(the relays' slot at the tail of the Summer Splash program — see `FIRST_RELAY_EVENT`
+in `scenarios.py`). The same event numbers appear on the heat sheet, cards, team
+reports, and timeline so they cross-reference.
 
 ### Deck scratches
 
