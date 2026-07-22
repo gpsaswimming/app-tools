@@ -35,6 +35,18 @@ def _eligible(conn: sqlite3.Connection, scenario_id, age_groups, gender, leg):
     return conn.execute(sql, args).fetchall()
 
 
+def _order_legs(relay):
+    """Swim order for a free (partition) relay's four legs: lead off the 2nd
+    fastest, then the 3rd, the slowest swims third, and the fastest anchors.
+    Order-only — the total is a sum, so heats/balance are unaffected. Relays that
+    aren't a full four (shouldn't happen at build time) are left as-is.
+    """
+    if len(relay) != 4:
+        return list(relay)
+    fastest, second, third, slowest = sorted(relay, key=lambda leg: leg[1])  # ascending secs
+    return [second, third, slowest, fastest]
+
+
 def _persist_relays(conn, scenario_id, cat, relays):
     for i, relay in enumerate(relays, start=1):
         total = sum(sec for _, sec in relay)
@@ -42,7 +54,10 @@ def _persist_relays(conn, scenario_id, cat, relays):
             "INSERT INTO relays (scenario_id, category, leg_distance, idx, total_seconds) VALUES (?,?,?,?,?)",
             (scenario_id, cat["label"], cat["leg"], i, total),
         ).lastrowid
-        for leg_order, (sid, sec) in enumerate(relay, start=1):
+        # Medley legs are fixed youngest→oldest by age band; only free relays get
+        # the fast-order swim sequence.
+        legs = _order_legs(relay) if cat["kind"] != "medley" else relay
+        for leg_order, (sid, sec) in enumerate(legs, start=1):
             conn.execute(
                 "INSERT INTO relay_legs (relay_id, leg_order, swimmer_id, seconds) VALUES (?,?,?,?)",
                 (rid, leg_order, sid, sec),
