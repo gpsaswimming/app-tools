@@ -7,6 +7,7 @@ category, and persist relays + alternates.
 
 from __future__ import annotations
 
+import math
 import sqlite3
 
 from .balance import assign_heats, balance_category, balance_medley, resolve_categories, swimup_columns
@@ -310,10 +311,13 @@ def timeline(
     running = start_seconds
     rows = []
     for cat in plan:
-        duration = 0.0
+        duration = 0
         for heat in cat["heats"]:
             slowest = max((slot["relay"]["total"] for slot in heat["lanes"]), default=0.0)
-            duration += slowest + gap
+            # Round each heat up to the whole second — hundredths are false
+            # precision on an estimate, and integer blocks keep every displayed
+            # start/length/total mutually consistent.
+            duration += math.ceil(slowest) + gap
         rows.append(
             {
                 "event": cat["event"],

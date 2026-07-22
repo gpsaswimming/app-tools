@@ -53,6 +53,15 @@ def _mmss(seconds):
     return f"{minutes}:{rem:05.2f}" if minutes else f"{rem:.2f}"
 
 
+def _mss(seconds):
+    """Seconds → m:ss (whole seconds) for coarse durations like the timeline,
+    where hundredths are noise. Values arrive already rounded up in timeline()."""
+    if seconds is None:
+        return "—"
+    total = int(round(seconds))
+    return f"{total // 60}:{total % 60:02d}"
+
+
 def _clock(seconds):
     """Seconds since midnight → 'h:mm AM/PM' for the session timeline."""
     if seconds is None:
@@ -66,6 +75,7 @@ def _clock(seconds):
 
 
 templates.env.filters["mmss"] = _mmss
+templates.env.filters["mss"] = _mss
 templates.env.filters["clock"] = _clock
 templates.env.globals["GROUPING_LABELS"] = GROUPING_LABELS
 

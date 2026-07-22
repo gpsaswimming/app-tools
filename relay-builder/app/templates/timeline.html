@@ -73,14 +73,14 @@
         <td class="num">{{ row.event }}</td>
         <td>{{ row.label }}{% if row.leg %} &middot; {{ row.leg * 4 }}m Free Relay{% endif %}</td>
         <td class="num">{{ row.heats }}</td>
-        <td class="num">{{ row.duration|mmss }}</td>
+        <td class="num">{{ row.duration|mss }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   <div class="tl-foot">
     <span>Estimated finish <span class="num">{{ tl.end|clock }}</span></span>
-    <span>Total session <span class="num">{{ tl.total|mmss }}</span></span>
+    <span>Total session <span class="num">{{ tl.total|mss }}</span></span>
     <span class="text-gray-400 print:hidden">Estimates only — actual pace varies with age group and deck efficiency.</span>
   </div>
   {% endif %}
