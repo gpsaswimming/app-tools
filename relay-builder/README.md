@@ -63,7 +63,10 @@ docker compose up -d
 The pool (`/`) is the stable base every scenario is built from. Two ways in:
 
 - **Import** — drop each team's `.sd3`/`.hy3` (or a `.zip` of several); re-importing
-  a team updates it in place. Bulk or one team at a time.
+  a team updates it in place. Bulk or one team at a time. Only **relay opt-ins** are
+  pooled: a swimmer must be entered in one of the placeholder relay sign-up events
+  (**53A-D, 54A-H**) in the entry file, otherwise they're dropped entirely. The
+  import summary reports how many were skipped for lacking an opt-in entry.
 - **Add manually** — for a relay opt-in missing from every entry file. Enter name,
   gender, age group, team, and optional **25 / 50 Free** times (`ss.ss`, `ss`, or
   `m:ss.ss`). A manual add builds the same DOB-free `last|first|agegroup` id

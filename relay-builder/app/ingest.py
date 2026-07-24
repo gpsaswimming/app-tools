@@ -4,20 +4,47 @@ Idempotent: importing the same file again (or a corrected one) updates the
 affected swimmers and times in place instead of duplicating them. This is what
 makes both bulk import (many files at once) and incremental import (one team's
 file arriving later) work with the same code path.
+
+Only relay opt-ins are pooled. A swimmer signals opt-in by being entered in one
+of the placeholder relay sign-up events (53A-D, 54A-H) in the team entry file; a
+swimmer with no entry in any of those events is dropped entirely, times and all,
+so the pool is exactly the swimmers who asked to swim a relay.
 """
 
 from __future__ import annotations
 
 import sqlite3
 
+# Placeholder events a swimmer is entered in to opt into a pooled relay. Only
+# swimmers with an entry in one of these are pooled (see module docstring).
+RELAY_OPT_IN_EVENTS = frozenset(
+    {f"53{c}" for c in "ABCD"} | {f"54{c}" for c in "ABCDEFGH"}
+)
+
+
+def _opted_in_swimmer_ids(meet: dict) -> set[str]:
+    """Ids of swimmers entered in a relay opt-in event (53A-D, 54A-H)."""
+    opted_in: set[str] = set()
+    for ev in meet.get("events") or []:
+        if str(ev.get("number") or "").strip().upper() not in RELAY_OPT_IN_EVENTS:
+            continue
+        for r in ev.get("results") or []:
+            sid = r.get("swimmerId")
+            if sid is not None:
+                opted_in.add(sid)
+    return opted_in
+
 
 def ingest_meet(conn: sqlite3.Connection, meet: dict, *, filename: str) -> dict:
-    """Insert/update swimmers and free times from one parsed meet.
+    """Insert/update relay opt-in swimmers and their free times from one meet.
 
-    Returns a small summary for the import log.
+    Swimmers without an entry in a relay opt-in event (53A-D, 54A-H) are skipped
+    entirely. Returns a small summary for the import log.
     """
-    swimmers = meet.get("swimmers") or []
-    team = swimmers[0]["teamCode"] if swimmers else None
+    all_swimmers = meet.get("swimmers") or []
+    team = all_swimmers[0]["teamCode"] if all_swimmers else None
+    opted_in = _opted_in_swimmer_ids(meet)
+    swimmers = [s for s in all_swimmers if s["id"] in opted_in]
 
     for s in swimmers:
         conn.execute(
@@ -54,9 +81,10 @@ def ingest_meet(conn: sqlite3.Connection, meet: dict, *, filename: str) -> dict:
             seed = r.get("seedTime")
             sid = r.get("swimmerId")
             secs = seed.get("seconds") if seed else None
-            # Skip "no time" entries — swimparse reports NT/blank seeds as 0, which
-            # would otherwise sort as impossibly fast and poison a relay.
-            if sid is None or not secs or secs <= 0:
+            # Skip swimmers who didn't opt in (not pooled) and "no time" entries —
+            # swimparse reports NT/blank seeds as 0, which would otherwise sort as
+            # impossibly fast and poison a relay.
+            if sid is None or sid not in opted_in or not secs or secs <= 0:
                 continue
             conn.execute(
                 """
@@ -72,4 +100,9 @@ def ingest_meet(conn: sqlite3.Connection, meet: dict, *, filename: str) -> dict:
         "INSERT INTO imports (filename, fmt, team, swimmers) VALUES (?, ?, ?, ?)",
         (filename, meet.get("format"), team, len(swimmers)),
     )
-    return {"team": team, "swimmers": len(swimmers), "times": time_count}
+    return {
+        "team": team,
+        "swimmers": len(swimmers),
+        "times": time_count,
+        "skipped": len(all_swimmers) - len(swimmers),
+    }
