@@ -13,6 +13,7 @@ import tempfile
 import zipfile
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import FastAPI, Form, Request, UploadFile
 from fastapi.responses import RedirectResponse
@@ -31,6 +32,36 @@ templates = Jinja2Templates(directory=BASE / "templates")
 # GPSA age-group order for the pool view.
 AGE_ORDER = ["6&U", "7-8", "9-10", "11-12", "13-14", "15-18"]
 
+# Canonical GPSA team code → display name. Drives the manual-add datalist (free
+# text still allowed so a pooled invitational relay with a guest team isn't
+# blocked) and the "Name (CODE)" heading on team reports.
+TEAM_NAMES = {
+    "BLMAR": "Beaconsdale",
+    "COL": "Colony",
+    "CV": "Coventry",
+    "EL": "Elizabeth Lake",
+    "GG": "Glendale",
+    "HW": "Hidenwood",
+    "JRCC": "James River",
+    "KCD": "Kiln Creek",
+    "MBKMT": "Marlbank",
+    "NHM": "Northampton",
+    "POQ": "Poquoson",
+    "RMMR": "Running Man",
+    "RRST": "Riverdale",
+    "VG": "Village Green",
+    "WO": "Willow Oaks",
+    "WPPIR": "Windy Point",
+    "WW": "Wendwood",
+    "WYCC": "Warwick Yacht",
+    "WYTH": "Wythe",
+}
+TEAM_CODES = sorted(TEAM_NAMES)
+GENDERS = {"F", "M"}
+
+# The meet these relays belong to — shown in the app header and on printed reports.
+MEET_TITLE = "Summer Splash Invitational Relays"
+
 GROUPING_LABELS = {"gpsa": "GPSA standard", "per-age": "Per age group", "open": "Open pool"}
 GENDER_LABELS = {"single": "single-gender", "mixed": "mixed"}
 
@@ -44,8 +75,60 @@ def _mmss(seconds):
     return f"{minutes}:{rem:05.2f}" if minutes else f"{rem:.2f}"
 
 
+def _mss(seconds):
+    """Seconds → m:ss (whole seconds) for coarse durations like the timeline,
+    where hundredths are noise. Values arrive already rounded up in timeline()."""
+    if seconds is None:
+        return "—"
+    total = int(round(seconds))
+    return f"{total // 60}:{total % 60:02d}"
+
+
+def _clock(seconds):
+    """Seconds since midnight → 'h:mm AM/PM' for the session timeline."""
+    if seconds is None:
+        return "—"
+    total = int(round(seconds))
+    hour24 = (total // 3600) % 24
+    minute = (total % 3600) // 60
+    period = "AM" if hour24 < 12 else "PM"
+    hour12 = hour24 % 12 or 12
+    return f"{hour12}:{minute:02d} {period}"
+
+
 templates.env.filters["mmss"] = _mmss
+templates.env.filters["mss"] = _mss
+templates.env.filters["clock"] = _clock
 templates.env.globals["GROUPING_LABELS"] = GROUPING_LABELS
+templates.env.globals["TEAM_NAMES"] = TEAM_NAMES
+templates.env.globals["MEET_TITLE"] = MEET_TITLE
+
+
+def _parse_seconds(raw: str):
+    """Parse an entry time — 'ss.ss', 'ss', or 'm:ss.ss' — to float seconds.
+
+    Blank → None (swimmer added without that time). Raises ValueError on garbage.
+    """
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    if ":" in raw:
+        mins, secs = raw.split(":", 1)
+        value = int(mins) * 60 + float(secs)
+    else:
+        value = float(raw)
+    if value <= 0:
+        raise ValueError("time must be positive")
+    return value
+
+
+def _parse_clock(raw: str, default: int = 9 * 3600) -> int:
+    """'HH:MM' (24h, from an <input type=time>) → seconds since midnight."""
+    try:
+        hours, minutes = raw.split(":")
+        return int(hours) * 3600 + int(minutes) * 60
+    except (ValueError, AttributeError):
+        return default
 
 
 def _default_scenario_name(grouping: str, gender_mode: str) -> str:
@@ -63,7 +146,7 @@ def health() -> dict:
 
 
 @app.get("/")
-def pool(request: Request):
+def pool(request: Request, added: str = "", err: str = ""):
     with db.connect() as conn:
         swimmers = conn.execute(
             """
@@ -91,6 +174,10 @@ def pool(request: Request):
             "groups": ordered,
             "imports": imports,
             "total": len(swimmers),
+            "team_codes": TEAM_CODES,
+            "age_groups": AGE_ORDER,
+            "added": added,
+            "err": err,
         },
     )
 
@@ -147,6 +234,64 @@ async def import_files(files: list[UploadFile]):
 def reset():
     db.reset()
     return {"success": True}
+
+
+@app.post("/swimmers")
+def add_swimmer(
+    first_name: str = Form(...),
+    last_name: str = Form(...),
+    gender: str = Form(...),
+    age_group: str = Form(...),
+    team: str = Form(...),
+    free25: str = Form(""),
+    free50: str = Form(""),
+):
+    """Manually add one swimmer to the pool — for opt-ins missing from an entry
+    file. Builds the same DOB-free ``last|first|agegroup`` id swimparse uses, so a
+    later import of the same swimmer updates this row in place rather than duplicating.
+    """
+    first, last = first_name.strip(), last_name.strip()
+    team, gender = team.strip().upper(), gender.strip().upper()
+    if not first or not last or gender not in GENDERS or age_group not in AGE_ORDER or not team:
+        return RedirectResponse(url="/?err=" + quote("Missing or invalid swimmer details."), status_code=303)
+    try:
+        times = {25: _parse_seconds(free25), 50: _parse_seconds(free50)}
+    except ValueError:
+        return RedirectResponse(
+            url="/?err=" + quote("Enter times as seconds (e.g. 31.45) or m:ss.ss."), status_code=303
+        )
+
+    sid = f"{last}|{first}|{age_group}".lower()
+    full_name = f"{last}, {first}"
+    with db.connect() as conn:
+        conn.execute(
+            """
+            INSERT INTO swimmers (id, full_name, last_name, first_name, gender, age_group, team, source)
+            VALUES (?,?,?,?,?,?,?,'manual')
+            ON CONFLICT(id) DO UPDATE SET
+                full_name = excluded.full_name, last_name = excluded.last_name,
+                first_name = excluded.first_name, gender = excluded.gender,
+                age_group = excluded.age_group, team = excluded.team
+            """,
+            (sid, full_name, last, first, gender, age_group, team),
+        )
+        for distance, secs in times.items():
+            if secs is not None:
+                conn.execute(
+                    "INSERT INTO times (swimmer_id, distance, stroke, seconds) VALUES (?,?,'Freestyle',?)"
+                    " ON CONFLICT(swimmer_id, distance, stroke) DO UPDATE SET seconds = excluded.seconds",
+                    (sid, distance, secs),
+                )
+        conn.commit()
+    return RedirectResponse(url="/?added=" + quote(full_name), status_code=303)
+
+
+@app.post("/swimmers/delete")
+def delete_swimmer(swimmer_id: str = Form(...)):
+    with db.connect() as conn:
+        db.remove_swimmer(conn, swimmer_id)
+        conn.commit()
+    return RedirectResponse(url="/", status_code=303)
 
 
 @app.get("/scenarios")
@@ -239,6 +384,33 @@ def scenario_team_reports(request: Request, scenario_id: int):
     )
 
 
+# Session-timeline defaults: the meet start clock and the between-heats gap
+# (seconds) to clear the pool and get the next heat set. Heat length itself comes
+# from each heat's slowest seeded relay, so there's nothing to estimate per race.
+TL_DEFAULTS = {"gap": 40, "start": "09:00"}
+
+
+@app.get("/scenarios/{scenario_id}/timeline")
+def scenario_timeline(
+    request: Request,
+    scenario_id: int,
+    start: str = TL_DEFAULTS["start"],
+    gap: int = TL_DEFAULTS["gap"],
+):
+    gap = max(0, gap)
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if not sc:
+            return RedirectResponse(url="/scenarios", status_code=303)
+        tl = scenarios.timeline(conn, scenario_id, start_seconds=_parse_clock(start), gap=gap, lanes=POOL_LANES)
+    printed = datetime.now().strftime("%m/%d/%y %I:%M %p")
+    return templates.TemplateResponse(
+        request=request,
+        name="timeline.html",
+        context={"sc": sc, "tl": tl, "printed": printed, "params": {"start": start, "gap": gap}},
+    )
+
+
 @app.get("/scenarios/{scenario_id}/deck")
 def scenario_deck(request: Request, scenario_id: int):
     with db.connect() as conn:
@@ -247,11 +419,41 @@ def scenario_deck(request: Request, scenario_id: int):
             return RedirectResponse(url="/scenarios", status_code=303)
         categories = scenarios.detail(conn, scenario_id)
         scratched = scenarios.list_scratches(conn, scenario_id)
+        pinned = scenarios.list_pins(conn, scenario_id)
     return templates.TemplateResponse(
         request=request,
         name="deck.html",
-        context={"sc": sc, "categories": categories, "scratched": scratched},
+        context={"sc": sc, "categories": categories, "scratched": scratched, "pinned": pinned},
     )
+
+
+@app.post("/scenarios/{scenario_id}/pin")
+def scenario_pin(scenario_id: int, swimmer_id: str = Form(...)):
+    """Pin a swimmer to their category's fastest relay and rebuild so it takes
+    effect now. Balancing is unchanged; the pin is applied as a post-balance swap."""
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if sc:
+            conn.execute(
+                "INSERT OR IGNORE INTO relay_pins (scenario_id, swimmer_id) VALUES (?,?)",
+                (scenario_id, swimmer_id),
+            )
+            scenarios.build(conn, scenario_id, sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]))
+            conn.commit()
+    return RedirectResponse(url=f"/scenarios/{scenario_id}/deck", status_code=303)
+
+
+@app.post("/scenarios/{scenario_id}/unpin")
+def scenario_unpin(scenario_id: int, swimmer_id: str = Form(...)):
+    with db.connect() as conn:
+        sc = conn.execute("SELECT * FROM scenarios WHERE id = ?", (scenario_id,)).fetchone()
+        if sc:
+            conn.execute(
+                "DELETE FROM relay_pins WHERE scenario_id = ? AND swimmer_id = ?", (scenario_id, swimmer_id)
+            )
+            scenarios.build(conn, scenario_id, sc["grouping"], sc["gender_mode"], sc["open_leg"], bool(sc["swimups"]))
+            conn.commit()
+    return RedirectResponse(url=f"/scenarios/{scenario_id}/deck", status_code=303)
 
 
 @app.post("/scenarios/{scenario_id}/scratch")

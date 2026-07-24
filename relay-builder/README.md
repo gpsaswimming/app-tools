@@ -24,7 +24,8 @@ Parsing is delegated entirely to the shared **swimparse** package (`../swimparse
 the single source of truth for SDIF/HY3. We always pass `--league gpsa`, so the
 JSON is **DOB-free** (age groups computed, birthdates stripped) — no minors' PII
 is ever stored. Accepts both `.sd3` and `.hy3`; swimparse normalizes them
-identically.
+identically. Swimmers can also be **added by hand** for opt-ins who aren't in any
+entry file (see [Swimmer pool](#swimmer-pool)).
 
 ## Stack
 
@@ -57,6 +58,27 @@ docker compose up -d
 - [x] Phase 2 — scenarios (grouping / gender switches) + snake-draft balancing
 - [x] Phase 3 — printable relay cards + 8-lane heat sheet
 
+### Swimmer pool
+
+The pool (`/`) is the stable base every scenario is built from. Two ways in:
+
+- **Import** — drop each team's `.sd3`/`.hy3` (or a `.zip` of several); re-importing
+  a team updates it in place. Bulk or one team at a time. Only **relay opt-ins** are
+  pooled: a swimmer must be entered in one of the placeholder relay sign-up events
+  (**53A-D, 54A-H**) in the entry file, otherwise they're dropped entirely. The
+  import summary reports how many were skipped for lacking an opt-in entry.
+- **Add manually** — for a relay opt-in missing from every entry file. Enter name,
+  gender, age group, team, and optional **25 / 50 Free** times (`ss.ss`, `ss`, or
+  `m:ss.ss`). A manual add builds the same DOB-free `last|first|agegroup` id
+  swimparse uses, so a later import of that swimmer merges onto the same row rather
+  than duplicating. Leave both times blank and the swimmer still pools — they just
+  land in the alternates until given a time.
+
+Manually-added swimmers carry a **`manual`** badge and a remove (`×`) button;
+removing one deletes them everywhere and re-totals any relay they'd been seeded
+into (re-balance afterward to re-form clean relays). Imported swimmers have no
+remove button — clear them with **Reset pool** or a corrected re-import.
+
 ### Scenarios
 
 A **scenario** is one way to slice the pool into relays: a grouping strategy ×
@@ -68,6 +90,10 @@ gender mode. Build several and compare relay counts, alternates, and time spread
 - **Balancing** — serpentine (snake) draft to equalize 4-swimmer totals, then a
   greedy swap-refinement polish. Seed time matches the leg distance (25 free for
   100m relays, 50 free for 200m).
+- **Leg order** — a free relay's four legs are ordered by seed time for a strong
+  finish: lead off the 2nd fastest, 3rd fastest second, slowest third, fastest
+  anchors. Order-only (the total is a sum), so heats and balance are unaffected.
+  Medley relays keep their fixed youngest→oldest age-band order.
 - **Alternates** — swimmers eligible but unplaced: the remainder past a multiple
   of four, or missing a time at the leg distance (flagged in red).
 
@@ -84,9 +110,22 @@ From a scenario, print-optimized views (site chrome hidden on print):
 - **Team reports** (`/scenarios/{id}/team-reports`) — one page per team listing
   that team's relay swimmers with the event, heat, and lane they swim in, so a
   pooled relay's swimmers can be handed back to their home teams.
+- **Session timeline** (`/scenarios/{id}/timeline`) — estimated clock start time
+  for each event, in program order, for posting on deck. A heat runs all lanes at
+  once, so it's timed from the **slowest seeded relay in that heat** plus a
+  **between-heats gap** (clear the pool + get the next heat set); an event's block
+  is the sum of its heats. Timing the heats off real seed times captures what a
+  fixed per-race estimate can't — a slow 9-10 heat vs a fast 13-14 heat, and the
+  slow early heats vs the fast late ones. Seeded totals are flat-start free times
+  summed, so they run a touch long versus actual relay splits — conservative
+  (ready early), which is the safe direction. Start time and gap (defaults 9:00 AM
+  / 40s) are adjustable on the page and live in the URL, so a tuned timeline is
+  bookmarkable and printable. Footer shows estimated finish and total session length.
 
-Categories are numbered as **events** in program order; the same event numbers
-appear on the heat sheet, cards, and team reports so they cross-reference.
+Categories are numbered as **events** in program order, starting at **event 53**
+(the relays' slot at the tail of the Summer Splash program — see `FIRST_RELAY_EVENT`
+in `scenarios.py`). The same event numbers appear on the heat sheet, cards, team
+reports, and timeline so they cross-reference.
 
 ### Deck scratches
 
@@ -99,3 +138,14 @@ card stays valid. If no eligible alternate is available the relay is left short
 (flagged). The scratch set is the source of truth for who's out, so the
 **Re-run balancing** button re-forms all relays around the swimmers still in.
 Reprint the heat sheet / cards afterward.
+
+### Pin to fastest relay
+
+**Pin** (on the Deck view) forces a swimmer into their category's **fastest**
+(lowest-total) relay while everyone else stays evenly balanced. On each (re)build
+the balancer forms even relays as usual, then swaps each pinned swimmer into the
+fastest one — for a free relay trading the closest-time member (so that relay's
+total, and its fast seed, barely move); for a medley trading within the same age
+band so leg legality holds. It's a general per-swimmer control (no names in code),
+scenario-scoped, and honoured on every re-balance. Pinning rebuilds immediately so
+the move shows at once; the fastest relay is flagged on the deck.

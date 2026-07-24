@@ -25,6 +25,9 @@
         only that one relay changes, so the rest of your printed cards stay valid. If no eligible alternate is
         available the relay is left short. Use <span class="font-semibold">Re-run balancing</span> to re-form all
         relays from scratch around who is still in.
+        <br><span class="font-semibold">Pin</span> a swimmer to drop them into their category's
+        <span class="font-semibold">fastest</span> relay — relays still balance for everyone else, and the pin
+        sticks across re-balances.
     </p>
 </div>
 
@@ -61,21 +64,35 @@
     </div>
 
     {% if cat.relays %}
+    {% set fastest = cat.relays|min(attribute='total') %}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for relay in cat.relays %}
-        <div class="border {{ 'border-red-300 bg-red-50/40' if relay.legs|length < 4 else 'border-gray-200' }} rounded-lg p-3">
+        <div class="border {{ 'border-red-300 bg-red-50/40' if relay.legs|length < 4 else ('border-[#002366]' if relay.idx == fastest.idx else 'border-gray-200') }} rounded-lg p-3">
             <div class="flex items-center justify-between mb-2">
                 <span class="font-bold text-gray-800">Relay {{ relay.idx }}
+                    {% if relay.idx == fastest.idx %}<span class="ml-1 text-[0.6rem] font-semibold text-white bg-[#002366] uppercase tracking-wide rounded px-1.5 py-0.5 align-middle">fastest</span>{% endif %}
                     {% if relay.legs|length < 4 %}<span class="ml-1 text-xs font-semibold text-red-600 uppercase tracking-wide">short — needs a swimmer</span>{% endif %}
                 </span>
                 <span class="text-sm font-bold text-[#002366] tabular-nums">{{ relay.total|mmss }}</span>
             </div>
             <ol class="text-sm space-y-1">
                 {% for leg in relay.legs %}
+                {% set is_pinned = leg.swimmer_id in pinned %}
                 <li class="flex items-center justify-between gap-2">
-                    <span class="text-gray-700"><span class="text-gray-400 mr-1">{{ leg.leg_order }}.</span>{{ leg.full_name }} <span class="text-[#0033a0] text-xs font-medium">{{ leg.age_group }}</span> <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ leg.team }}</span></span>
+                    <span class="text-gray-700"><span class="text-gray-400 mr-1">{{ leg.leg_order }}.</span>{{ leg.full_name }} <span class="text-[#0033a0] text-xs font-medium">{{ leg.age_group }}</span> <span class="text-gray-400 text-xs" style="font-variant: small-caps;">{{ leg.team }}</span>{% if is_pinned %} <span class="text-[0.6rem] font-semibold uppercase tracking-wide text-[#002366] bg-blue-50 rounded px-1">pinned</span>{% endif %}</span>
                     <span class="flex items-center gap-2 shrink-0">
                         <span class="text-gray-500 tabular-nums">{{ leg.seconds|mmss }}</span>
+                        {% if is_pinned %}
+                        <form action="/scenarios/{{ sc.id }}/unpin" method="post">
+                            <input type="hidden" name="swimmer_id" value="{{ leg.swimmer_id }}">
+                            <button type="submit" title="Unpin from the fastest relay" class="text-xs font-semibold text-[#002366] hover:underline">Unpin</button>
+                        </form>
+                        {% else %}
+                        <form action="/scenarios/{{ sc.id }}/pin" method="post">
+                            <input type="hidden" name="swimmer_id" value="{{ leg.swimmer_id }}">
+                            <button type="submit" title="Pin to the fastest relay" class="text-xs font-semibold text-gray-400 hover:text-[#002366]">Pin</button>
+                        </form>
+                        {% endif %}
                         <form action="/scenarios/{{ sc.id }}/scratch" method="post"
                               data-confirm="Scratch {{ leg.full_name }}? An eligible alternate will be subbed into this leg if one is available.">
                             <input type="hidden" name="swimmer_id" value="{{ leg.swimmer_id }}">

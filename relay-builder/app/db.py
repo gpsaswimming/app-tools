@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS swimmers (
     first_name TEXT,
     gender     TEXT,          -- 'M' | 'F'
     age_group  TEXT,          -- '6&U', '7-8', ...
-    team       TEXT
+    team       TEXT,
+    source     TEXT NOT NULL DEFAULT 'import'  -- 'import' | 'manual'
 );
 
 -- A swimmer's individual free times, used to seed relay legs. Keyed by
@@ -99,6 +100,17 @@ CREATE TABLE IF NOT EXISTS relay_scratches (
     scratched_at TEXT DEFAULT (datetime('now')),
     PRIMARY KEY (scenario_id, swimmer_id)
 );
+
+-- Swimmers the user wants seeded into their category's fastest (lowest-total)
+-- relay. Applied after balancing on each (re)build: even relays are formed as
+-- usual, then each pinned swimmer is swapped into the fastest one. Scenario-
+-- scoped like scratches, so a re-balance keeps honouring the pin.
+CREATE TABLE IF NOT EXISTS relay_pins (
+    scenario_id INTEGER NOT NULL REFERENCES scenarios(id) ON DELETE CASCADE,
+    swimmer_id  TEXT NOT NULL REFERENCES swimmers(id),
+    pinned_at   TEXT DEFAULT (datetime('now')),
+    PRIMARY KEY (scenario_id, swimmer_id)
+);
 """
 
 
@@ -117,6 +129,33 @@ def init_db() -> None:
         cols = [r[1] for r in conn.execute("PRAGMA table_info(scenarios)").fetchall()]
         if "swimups" not in cols:
             conn.execute("ALTER TABLE scenarios ADD COLUMN swimups INTEGER NOT NULL DEFAULT 1")
+        # Migrate DBs created before manually-added swimmers were tracked.
+        sw_cols = [r[1] for r in conn.execute("PRAGMA table_info(swimmers)").fetchall()]
+        if "source" not in sw_cols:
+            conn.execute("ALTER TABLE swimmers ADD COLUMN source TEXT NOT NULL DEFAULT 'import'")
+
+
+def remove_swimmer(conn: sqlite3.Connection, swimmer_id: str) -> None:
+    """Delete a swimmer and every reference to them, recomputing any relay they
+    were seeded into. Used for manual pool edits (removing an opt-out or a mistaken
+    add). Scenarios are disposable, so a re-balance afterwards re-forms clean relays;
+    this just keeps the stored totals honest in the meantime."""
+    affected = [
+        r[0] for r in conn.execute(
+            "SELECT DISTINCT relay_id FROM relay_legs WHERE swimmer_id = ?", (swimmer_id,)
+        ).fetchall()
+    ]
+    conn.execute("DELETE FROM relay_legs WHERE swimmer_id = ?", (swimmer_id,))
+    conn.execute("DELETE FROM relay_alternates WHERE swimmer_id = ?", (swimmer_id,))
+    conn.execute("DELETE FROM relay_scratches WHERE swimmer_id = ?", (swimmer_id,))
+    conn.execute("DELETE FROM relay_pins WHERE swimmer_id = ?", (swimmer_id,))
+    conn.execute("DELETE FROM times WHERE swimmer_id = ?", (swimmer_id,))
+    conn.execute("DELETE FROM swimmers WHERE id = ?", (swimmer_id,))
+    for rid in affected:
+        total = conn.execute(
+            "SELECT COALESCE(SUM(seconds), 0) FROM relay_legs WHERE relay_id = ?", (rid,)
+        ).fetchone()[0]
+        conn.execute("UPDATE relays SET total_seconds = ? WHERE id = ?", (total, rid))
 
 
 def reset() -> None:

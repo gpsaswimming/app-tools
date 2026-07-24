@@ -7,6 +7,7 @@ category, and persist relays + alternates.
 
 from __future__ import annotations
 
+import math
 import sqlite3
 
 from .balance import assign_heats, balance_category, balance_medley, resolve_categories, swimup_columns
@@ -34,6 +35,56 @@ def _eligible(conn: sqlite3.Connection, scenario_id, age_groups, gender, leg):
     return conn.execute(sql, args).fetchall()
 
 
+def _fastest_index(relays):
+    """Index of the lowest-total (fastest) relay."""
+    return min(range(len(relays)), key=lambda i: sum(sec for _, sec in relays[i]))
+
+
+def _pin_into_fastest(relays, pinned, *, medley):
+    """Swap each pinned swimmer into the fastest (lowest-total) relay, in place.
+
+    The fastest relay is chosen from the balanced output, then pinned swimmers are
+    swapped in — so relays stay even for everyone else and the pin is the only
+    hand placement. For a free relay the legs are interchangeable, so we swap for
+    the closest-time non-pinned member (keeps that relay's total, and thus its
+    fast seed, barely moved). For a medley the swap must stay in the same age
+    band, so we trade the same leg index. Pinned swimmers who aren't placed
+    (alternates/remainder) are left alone.
+    """
+    if not relays or not pinned:
+        return
+    fast = _fastest_index(relays)
+    for i, relay in enumerate(relays):
+        if i == fast:
+            continue  # already in the fastest relay
+        for j, (sid, sec) in enumerate(relay):
+            if sid not in pinned:
+                continue
+            if medley:
+                fid = relays[fast][j][0]
+                if fid in pinned:
+                    continue
+                relays[fast][j], relay[j] = relay[j], relays[fast][j]
+            else:
+                targets = [(k, fsec) for k, (fid, fsec) in enumerate(relays[fast]) if fid not in pinned]
+                if not targets:
+                    continue
+                k = min(targets, key=lambda t: abs(t[1] - sec))[0]
+                relays[fast][k], relay[j] = relay[j], relays[fast][k]
+
+
+def _order_legs(relay):
+    """Swim order for a free (partition) relay's four legs: lead off the 2nd
+    fastest, then the 3rd, the slowest swims third, and the fastest anchors.
+    Order-only — the total is a sum, so heats/balance are unaffected. Relays that
+    aren't a full four (shouldn't happen at build time) are left as-is.
+    """
+    if len(relay) != 4:
+        return list(relay)
+    fastest, second, third, slowest = sorted(relay, key=lambda leg: leg[1])  # ascending secs
+    return [second, third, slowest, fastest]
+
+
 def _persist_relays(conn, scenario_id, cat, relays):
     for i, relay in enumerate(relays, start=1):
         total = sum(sec for _, sec in relay)
@@ -41,7 +92,10 @@ def _persist_relays(conn, scenario_id, cat, relays):
             "INSERT INTO relays (scenario_id, category, leg_distance, idx, total_seconds) VALUES (?,?,?,?,?)",
             (scenario_id, cat["label"], cat["leg"], i, total),
         ).lastrowid
-        for leg_order, (sid, sec) in enumerate(relay, start=1):
+        # Medley legs are fixed youngest→oldest by age band; only free relays get
+        # the fast-order swim sequence.
+        legs = _order_legs(relay) if cat["kind"] != "medley" else relay
+        for leg_order, (sid, sec) in enumerate(legs, start=1):
             conn.execute(
                 "INSERT INTO relay_legs (relay_id, leg_order, swimmer_id, seconds) VALUES (?,?,?,?)",
                 (rid, leg_order, sid, sec),
@@ -68,6 +122,10 @@ def build(
     conn.execute("DELETE FROM relays WHERE scenario_id = ?", (scenario_id,))
     conn.execute("DELETE FROM relay_alternates WHERE scenario_id = ?", (scenario_id,))
 
+    pinned = {r[0] for r in conn.execute(
+        "SELECT swimmer_id FROM relay_pins WHERE scenario_id = ?", (scenario_id,)
+    ).fetchall()}
+
     for cat in resolve_categories(grouping, gender_mode, open_leg):
         if cat["kind"] == "medley":
             # One eligible pool per age-group leg (youngest first).
@@ -82,6 +140,7 @@ def build(
                 relays, _ = balance_medley(columns)  # columns are equal length → no extra leftovers
             else:
                 relays, leftovers = balance_medley(pools)  # strict one-per-band
+            _pin_into_fastest(relays, pinned, medley=True)
             _persist_relays(conn, scenario_id, cat, relays)
             for sid, sec, _col in leftovers:
                 _alt(conn, scenario_id, cat, sid, sec, "remainder")
@@ -92,6 +151,7 @@ def build(
             seeded = [(r["id"], r["secs"]) for r in rows if r["secs"] is not None]
             no_time = [r["id"] for r in rows if r["secs"] is None]
             relays, remainder = balance_category(seeded)
+            _pin_into_fastest(relays, pinned, medley=False)
             _persist_relays(conn, scenario_id, cat, relays)
             for sid, sec in remainder:
                 _alt(conn, scenario_id, cat, sid, sec, "remainder")
@@ -159,6 +219,13 @@ def detail(conn: sqlite3.Connection, scenario_id: int) -> list[dict]:
         cat["count"] = len(cat["relays"])
         out.append(cat)
     return out
+
+
+def list_pins(conn: sqlite3.Connection, scenario_id: int) -> set:
+    """Swimmer ids pinned to the fastest relay for this scenario."""
+    return {r[0] for r in conn.execute(
+        "SELECT swimmer_id FROM relay_pins WHERE scenario_id = ?", (scenario_id,)
+    ).fetchall()}
 
 
 def list_scratches(conn: sqlite3.Connection, scenario_id: int) -> list:
@@ -266,15 +333,21 @@ def unscratch(conn, scenario_id, swimmer_id) -> None:
     )
 
 
-def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8):
+# The pooled relays run at the tail of the Summer Splash program, after the 52
+# individual events — so relay event numbering starts here (events 53+).
+FIRST_RELAY_EVENT = 53
+
+
+def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8, event_start: int = FIRST_RELAY_EVENT):
     """Seed each category's relays into heats/lanes for the deck output.
 
     Returns (plan, cards): `plan` is per-category heats for the heat sheet;
     `cards` is a flat, program-order list of relays annotated with heat + lane
-    for the relay cards.
+    for the relay cards. Events are numbered from `event_start` (the relays'
+    position in the overall meet program).
     """
     plan, cards = [], []
-    for event, cat in enumerate(detail(conn, scenario_id), start=1):
+    for event, cat in enumerate(detail(conn, scenario_id), start=event_start):
         heats = assign_heats(cat["relays"], lanes)
         for heat in heats:
             for slot in heat["lanes"]:
@@ -284,6 +357,51 @@ def heat_plan(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8):
                 cards.append({"category": cat["label"], "event": event, "leg": cat["leg"], **relay})
         plan.append({"label": cat["label"], "event": event, "leg": cat["leg"], "heats": heats})
     return plan, cards
+
+
+def timeline(
+    conn: sqlite3.Connection,
+    scenario_id: int,
+    *,
+    start_seconds: int,
+    gap: int,
+    lanes: int = 8,
+) -> dict:
+    """Estimated running order for a session: each event's clock start time.
+
+    Events run in program order (same order as the heat sheet). A heat runs all
+    lanes at once, so its wall-clock cost is the **slowest relay in the heat** —
+    its seeded total — plus ``gap``, the seconds to clear the pool and get the
+    next heat set. An event's block is the sum of its heats; the clock advances
+    event to event, the trailing gap doubling as setup before the next event.
+
+    Seeded totals are the sum of four flat-start free seed times, so they run a
+    touch long versus actual relay splits (flying exchanges) — a conservative,
+    ready-early estimate, which is the safe direction for a posted timeline.
+    """
+    plan, _ = heat_plan(conn, scenario_id, lanes)
+    running = start_seconds
+    rows = []
+    for cat in plan:
+        duration = 0
+        for heat in cat["heats"]:
+            slowest = max((slot["relay"]["total"] for slot in heat["lanes"]), default=0.0)
+            # Round each heat up to the whole second — hundredths are false
+            # precision on an estimate, and integer blocks keep every displayed
+            # start/length/total mutually consistent.
+            duration += math.ceil(slowest) + gap
+        rows.append(
+            {
+                "event": cat["event"],
+                "label": cat["label"],
+                "leg": cat["leg"],
+                "heats": len(cat["heats"]),
+                "start": running,
+                "duration": duration,
+            }
+        )
+        running += duration
+    return {"rows": rows, "start": start_seconds, "end": running, "total": running - start_seconds}
 
 
 def team_reports(conn: sqlite3.Connection, scenario_id: int, lanes: int = 8) -> list[dict]:

@@ -2,6 +2,13 @@
 {% block title %}Swimmer Pool — GPSA Relay Builder{% endblock %}
 {% block content %}
 
+{% if added %}
+<div class="mb-6 p-4 rounded-lg text-sm bg-green-50 text-green-800 border border-green-200" role="status">Added <span class="font-semibold">{{ added }}</span> to the pool.</div>
+{% endif %}
+{% if err %}
+<div class="mb-6 p-4 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200" role="alert">{{ err }}</div>
+{% endif %}
+
 <!-- Import -->
 <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
     <h2 class="text-lg font-bold text-gray-800 mb-1">Import entry files</h2>
@@ -27,6 +34,53 @@
 
     <div id="result" class="hidden mt-6 p-4 rounded-lg text-sm" role="status" aria-live="polite"></div>
 </div>
+
+<!-- Manual add -->
+<details class="bg-white rounded-xl shadow-lg p-6 mb-8">
+    <summary class="cursor-pointer text-lg font-bold text-gray-800">Add a swimmer manually</summary>
+    <p class="text-gray-600 text-sm mt-1 mb-5">For a relay opt-in who isn't in any entry file. Leave a time blank if you don't have it — a swimmer with no free time lands in the alternates.</p>
+    <form action="/swimmers" method="post" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+            <label for="first_name" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">First name</label>
+            <input id="first_name" name="first_name" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label for="last_name" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Last name</label>
+            <input id="last_name" name="last_name" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+            <label for="gender" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Gender</label>
+            <select id="gender" name="gender" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="F">Girl</option>
+                <option value="M">Boy</option>
+            </select>
+        </div>
+        <div>
+            <label for="age_group" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Age group</label>
+            <select id="age_group" name="age_group" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                {% for ag in age_groups %}<option value="{{ ag }}">{{ ag }}</option>{% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="team" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Team</label>
+            <input id="team" name="team" type="text" list="team-codes" required autocomplete="off" placeholder="e.g. GG" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <datalist id="team-codes">{% for code in team_codes %}<option value="{{ code }}"></option>{% endfor %}</datalist>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="free25" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">25 Free</label>
+                <input id="free25" name="free25" type="text" inputmode="decimal" placeholder="31.45" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="free50" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">50 Free</label>
+                <input id="free50" name="free50" type="text" inputmode="decimal" placeholder="1:08.20" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+        <div class="sm:col-span-2">
+            <button type="submit" class="btn-primary font-bold py-2.5 px-5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all">Add swimmer</button>
+        </div>
+    </form>
+</details>
 
 {% if imports %}
 <details class="bg-white rounded-xl shadow-sm p-4 mb-6 text-sm">
@@ -78,7 +132,18 @@
                 <tbody>
                     {% for s in swimmers|sort(attribute='full_name') %}
                     <tr class="border-b border-gray-50">
-                        <td class="py-1.5 px-2 text-gray-800">{{ s.full_name }}</td>
+                        <td class="py-1.5 px-2 text-gray-800">
+                            {{ s.full_name }}
+                            {% if s.source == 'manual' %}
+                            <span class="ml-1 inline-flex items-center gap-1.5 align-middle">
+                                <span class="text-[0.6rem] font-semibold uppercase tracking-wide text-[#0033a0] bg-blue-50 rounded px-1 py-0.5">manual</span>
+                                <form action="/swimmers/delete" method="post" class="inline" data-confirm="Remove {{ s.full_name }} from the pool?">
+                                    <input type="hidden" name="swimmer_id" value="{{ s.id }}">
+                                    <button type="submit" title="Remove swimmer" class="text-red-500 hover:text-red-700 leading-none font-bold">&times;</button>
+                                </form>
+                            </span>
+                            {% endif %}
+                        </td>
                         <td class="py-1.5 px-2 text-gray-400" style="font-variant: small-caps;">{{ s.team }}</td>
                         <td class="py-1.5 px-2 text-right tabular-nums {{ 'text-red-500' if not s.free25 else 'text-gray-700' }}">{{ '%.2f'|format(s.free25) if s.free25 else '—' }}</td>
                         <td class="py-1.5 px-2 text-right tabular-nums {{ 'text-red-500' if not s.free50 else 'text-gray-700' }}">{{ '%.2f'|format(s.free50) if s.free50 else '—' }}</td>

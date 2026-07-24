@@ -49,8 +49,8 @@
 {% for t in teams %}
 <div class="tr-team bg-white rounded-xl shadow-lg p-6 mb-6 print:shadow-none print:p-0 print:mb-0 print:rounded-none">
   <div class="tr-banner">
-    <span class="team">{{ t.team }}</span>
-    <span class="meta">{{ sc.name }} &middot; {{ t.entries|length }} swimmer{{ 's' if t.entries|length != 1 }} &middot; printed {{ printed }}</span>
+    <span class="team">{% if TEAM_NAMES.get(t.team) %}{{ TEAM_NAMES[t.team] }} ({{ t.team }}){% else %}{{ t.team }}{% endif %}</span>
+    <span class="meta">{{ MEET_TITLE }} &middot; {{ t.entries|length }} swimmer{{ 's' if t.entries|length != 1 }} &middot; printed {{ printed }}</span>
   </div>
   <table class="tr-tbl">
     <thead>
