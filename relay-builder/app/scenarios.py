@@ -187,7 +187,8 @@ def detail(conn: sqlite3.Connection, scenario_id: int) -> list[dict]:
     ).fetchall()
     alts = conn.execute(
         """
-        SELECT a.category, a.leg_distance, a.seconds, a.reason, s.full_name, s.team
+        SELECT a.category, a.leg_distance, a.seconds, a.reason,
+               s.id AS swimmer_id, s.full_name, s.team, s.age_group
         FROM relay_alternates a JOIN swimmers s ON s.id = a.swimmer_id
         WHERE a.scenario_id = ? ORDER BY a.category, a.reason, s.full_name
         """,
