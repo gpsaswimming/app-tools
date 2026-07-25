@@ -133,7 +133,7 @@
     <div id="toast-container"></div>
 
     <script type="module">
-        import { summarizeByTeam, collectBillables, compareBillables, computeFees, MEETS, formatUsd } from './lib/entry-summary-core.js';
+        import { summarizeByTeam, collectBillables, compareBillables, computeFees, MEETS, formatUsd, VERSION } from './lib/entry-summary-core.js';
         import { wireDropzone } from './lib/dropzone.js';
 
         const $ = (id) => document.getElementById(id);
@@ -267,7 +267,7 @@
                         <div class="text-xs uppercase tracking-wide text-gray-500">Greater Peninsula Swimming Association</div>
                         <div class="text-xl font-bold accent-navy">${escapeHtml(rep.meetLabel)} &mdash; Entry Fees by Team</div>
                     </div>
-                    <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams</div>
+                    <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams &middot; v${VERSION}</div>
                 </div>
                 <div class="overflow-x-auto">
                 <table class="w-full text-sm border-collapse">
@@ -326,7 +326,7 @@
                         <div class="text-xl font-bold accent-navy">${escapeHtml(rep.meetLabel)} &mdash; Entry Fees by Team</div>
                         <div class="text-xs text-gray-500 mt-0.5">Seeding + deck-added swims &middot; scratches not refunded</div>
                     </div>
-                    <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams</div>
+                    <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams &middot; v${VERSION}</div>
                 </div>
                 <div class="overflow-x-auto">
                 <table class="w-full text-sm border-collapse">
@@ -417,7 +417,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `gpsa-${report.meetKey}-entry-fees.csv`;
+            a.download = `gpsa-${report.meetKey}-entry-fees-v${VERSION}.csv`;
             document.body.appendChild(a);
             a.click();
             a.remove();
