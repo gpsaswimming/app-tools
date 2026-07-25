@@ -417,7 +417,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `gpsa-${report.meetKey}-entry-fees-v${VERSION}.csv`;
+            a.download = `gpsa-${report.meetKey}-entry-fees.csv`;
             document.body.appendChild(a);
             a.click();
             a.remove();
