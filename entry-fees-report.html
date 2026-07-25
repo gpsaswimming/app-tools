@@ -71,8 +71,10 @@
                     For the treasurer: upload the <strong>merged meet entries file</strong> (Hy-Tek
                     <code>.hy3</code>, SDIF <code>.sd3</code>, or a <code>.zip</code> of either) to get a
                     per-team breakdown of entry fees, with a grand total and a CSV export for reconciliation.
-                    The file is parsed <strong>entirely in your browser</strong> &mdash; nothing is uploaded and no
-                    birthdates leave this page.
+                    Optionally add a <strong>post-meet file</strong> to bill deck-added swims: the count for
+                    each team never drops below its seeding (scratches are not refunded), and additional
+                    swims are charged. The files are parsed <strong>entirely in your browser</strong>
+                    &mdash; nothing is uploaded and no birthdates leave this page.
                 </p>
 
                 <label for="meet-select" class="block text-sm font-semibold text-gray-800 mb-1">Invitational</label>
@@ -82,19 +84,34 @@
                     <option value="city-meet">City Meet</option>
                 </select>
 
-                <div>
-                    <label id="file-dropzone" for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-44 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors">
-                        <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                            <svg id="file-icon-empty" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <svg id="file-icon-selected" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <p id="file-prompt" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose a file</span> or drag it here</p>
-                            <p id="file-name" class="text-xs text-gray-500">Accepted: .hy3, .sd3, or .zip</p>
-                        </div>
-                        <input id="file-upload" type="file" accept=".hy3,.sd3,.txt,.zip" class="hidden" />
-                    </label>
-                    <p class="text-xs text-gray-400 mt-2">Parsed locally in your browser &mdash; nothing is uploaded, and no birthdates leave this page.</p>
-                    <p id="parse-status" class="text-xs mt-2"></p>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-800 mb-1">Entries file (seeding) <span class="text-red-600">*</span></label>
+                        <label id="file-dropzone" for="file-upload" class="file-upload-label flex flex-col items-center justify-center w-full h-44 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                                <svg id="file-icon-empty" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <svg id="file-icon-selected" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p id="file-prompt" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose a file</span> or drag it here</p>
+                                <p id="file-name" class="text-xs text-gray-500">Accepted: .hy3, .sd3, or .zip</p>
+                            </div>
+                            <input id="file-upload" type="file" accept=".hy3,.sd3,.txt,.zip" class="hidden" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-800 mb-1">Post-meet file <span class="font-normal text-gray-400">(optional)</span></label>
+                        <label id="file-dropzone-2" for="file-upload-2" class="file-upload-label flex flex-col items-center justify-center w-full h-44 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                                <svg id="file-icon-empty-2" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <svg id="file-icon-selected-2" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p id="file-prompt-2" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose a file</span> or drag it here</p>
+                                <p id="file-name-2" class="text-xs text-gray-500">Adds deck entries to the bill</p>
+                            </div>
+                            <input id="file-upload-2" type="file" accept=".hy3,.sd3,.txt,.zip" class="hidden" />
+                        </label>
+                    </div>
                 </div>
+                <p class="text-xs text-gray-400 mt-2">Parsed locally in your browser &mdash; nothing is uploaded, and no birthdates leave this page.</p>
+                <p id="parse-status" class="text-xs mt-2"></p>
 
                 <div class="flex flex-wrap gap-3 mt-6">
                     <button id="export-btn" class="btn-red font-semibold py-2.5 px-5 rounded-lg hidden">Download CSV</button>
@@ -109,7 +126,7 @@
     <div id="toast-container"></div>
 
     <script type="module">
-        import { summarizeByTeam, computeFees, MEETS, formatUsd } from './lib/entry-summary-core.js';
+        import { summarizeByTeam, mergeTeamCounts, computeFees, MEETS, formatUsd } from './lib/entry-summary-core.js';
         import { wireDropzone } from './lib/dropzone.js';
 
         const $ = (id) => document.getElementById(id);
@@ -184,7 +201,42 @@
                 relay: a.relay + r.relay,
                 total: a.total + r.total,
             }), { swimmers: 0, individualEntries: 0, relayEntries: 0, surcharge: 0, individual: 0, relay: 0, total: 0 });
-            return { meetKey, meetLabel, rows, totals };
+            return { mode: 'single', meetKey, meetLabel, rows, totals };
+        }
+
+        // Two-file comparison: bill = max(seeding, post-meet) per metric, so
+        // scratches never reduce the bill and deck adds are charged.
+        function buildCompareReport(mergedRows, meetKey) {
+            const meetLabel = MEETS[meetKey].label;
+            const rows = mergedRows.map((m) => {
+                const billFees = computeFees(m.billable, meetKey);
+                const by = Object.fromEntries(billFees.lines.map((l) => [l.label, l.amount]));
+                return {
+                    teamName: m.teamName,
+                    teamCode: m.teamCode,
+                    billable: m.billable,
+                    added: m.added,
+                    surcharge: by['Swimmer surcharge'],
+                    individual: by['Individual events'],
+                    relay: by['Relay events'],
+                    total: billFees.total,
+                    addedTotal: computeFees(m.added, meetKey).total,
+                };
+            });
+            const totals = rows.reduce((a, r) => ({
+                swimmers: a.swimmers + r.billable.swimmers,
+                individualEntries: a.individualEntries + r.billable.individualEntries,
+                relayEntries: a.relayEntries + r.billable.relayEntries,
+                addedSwimmers: a.addedSwimmers + r.added.swimmers,
+                addedIndividualEntries: a.addedIndividualEntries + r.added.individualEntries,
+                addedRelayEntries: a.addedRelayEntries + r.added.relayEntries,
+                surcharge: a.surcharge + r.surcharge,
+                individual: a.individual + r.individual,
+                relay: a.relay + r.relay,
+                total: a.total + r.total,
+                addedTotal: a.addedTotal + r.addedTotal,
+            }), { swimmers: 0, individualEntries: 0, relayEntries: 0, addedSwimmers: 0, addedIndividualEntries: 0, addedRelayEntries: 0, surcharge: 0, individual: 0, relay: 0, total: 0, addedTotal: 0 });
+            return { mode: 'compare', meetKey, meetLabel, rows, totals };
         }
 
         function renderReport(rep) {
@@ -241,7 +293,74 @@
             $('report').classList.add('ready');
         }
 
+        function renderCompareReport(rep) {
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            // Show the billable count, annotating any deck-added amount in red.
+            const cell = (val, add) => `${val}${add ? ` <span class="text-red-600 font-normal text-xs">+${add}</span>` : ''}`;
+            const feeCell = (amt) => `<td class="num ${amt ? 'text-red-600 font-semibold' : 'text-gray-400'}">${formatUsd(amt)}</td>`;
+            const body = rep.rows.map((r) => `
+                <tr>
+                    <td class="font-medium text-gray-900">${escapeHtml(r.teamName)}</td>
+                    <td class="num">${cell(r.billable.swimmers, r.added.swimmers)}</td>
+                    <td class="num">${cell(r.billable.individualEntries, r.added.individualEntries)}</td>
+                    <td class="num">${cell(r.billable.relayEntries, r.added.relayEntries)}</td>
+                    <td class="num">${formatUsd(r.surcharge)}</td>
+                    <td class="num">${formatUsd(r.individual)}</td>
+                    <td class="num">${formatUsd(r.relay)}</td>
+                    <td class="num font-semibold">${formatUsd(r.total)}</td>
+                    ${feeCell(r.addedTotal)}
+                </tr>`).join('');
+            const t = rep.totals;
+            $('report').innerHTML = `
+                <div class="flex items-center gap-4 border-b-2 rule-navy pb-3 mb-4">
+                    <img src="https://assets.gpsaswimming.org/img/gpsa_logo.png" alt="GPSA" class="h-12 w-12 rounded-full" onerror="this.style.display='none'">
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-gray-500">Greater Peninsula Swimming Association</div>
+                        <div class="text-xl font-bold accent-navy">${escapeHtml(rep.meetLabel)} &mdash; Entry Fees by Team</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Seeding + deck-added swims &middot; scratches not refunded</div>
+                    </div>
+                    <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams</div>
+                </div>
+                <div class="overflow-x-auto">
+                <table class="w-full text-sm border-collapse">
+                    <thead>
+                        <tr class="text-left text-xs uppercase text-gray-500 border-b border-gray-200">
+                            <th>Team</th>
+                            <th class="num">Swimmers</th>
+                            <th class="num">Ind. Events</th>
+                            <th class="num">Relays</th>
+                            <th class="num">Surcharge</th>
+                            <th class="num">Ind. Fees</th>
+                            <th class="num">Relay Fees</th>
+                            <th class="num">Total</th>
+                            <th class="num">Added Fees</th>
+                        </tr>
+                    </thead>
+                    <tbody>${body}
+                        <tr class="total-row border-t-2 rule-navy font-bold accent-navy">
+                            <td>Total (${rep.rows.length} teams)</td>
+                            <td class="num">${cell(t.swimmers, t.addedSwimmers)}</td>
+                            <td class="num">${cell(t.individualEntries, t.addedIndividualEntries)}</td>
+                            <td class="num">${cell(t.relayEntries, t.addedRelayEntries)}</td>
+                            <td class="num">${formatUsd(t.surcharge)}</td>
+                            <td class="num">${formatUsd(t.individual)}</td>
+                            <td class="num">${formatUsd(t.relay)}</td>
+                            <td class="num text-lg">${formatUsd(t.total)}</td>
+                            <td class="num text-lg ${t.addedTotal ? 'text-red-600' : 'text-gray-400'}">${formatUsd(t.addedTotal)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                <p class="text-xs text-gray-500 mt-3">
+                    <strong>Total</strong> is the full billable amount (seeding, never reduced by scratches).
+                    <strong>Added Fees</strong> is the supplemental owed for swims added after seeding &mdash;
+                    a like-for-like swap (scratch offset by an add) is a wash.
+                </p>`;
+            $('report').classList.add('ready');
+        }
+
         function toCsv(rep) {
+            if (rep.mode === 'compare') return compareToCsv(rep);
             const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
             const header = ['Team', 'Team Code', 'Swimmers', 'Individual Events', 'Relay Events',
                 'Swimmer Surcharge', 'Individual Fees', 'Relay Fees', 'Total'];
@@ -259,6 +378,31 @@
             return lines.join('\r\n');
         }
 
+        function compareToCsv(rep) {
+            const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
+            const header = ['Team', 'Team Code',
+                'Swimmers (billable)', 'Ind. Events (billable)', 'Relays (billable)',
+                'Added Swimmers', 'Added Ind. Events', 'Added Relays',
+                'Swimmer Surcharge', 'Individual Fees', 'Relay Fees', 'Total', 'Added Fees'];
+            const lines = [header.map(q).join(',')];
+            for (const r of rep.rows) {
+                lines.push([
+                    q(r.teamName), q(r.teamCode),
+                    r.billable.swimmers, r.billable.individualEntries, r.billable.relayEntries,
+                    r.added.swimmers, r.added.individualEntries, r.added.relayEntries,
+                    r.surcharge.toFixed(2), r.individual.toFixed(2), r.relay.toFixed(2),
+                    r.total.toFixed(2), r.addedTotal.toFixed(2),
+                ].join(','));
+            }
+            const t = rep.totals;
+            lines.push([q('TOTAL'), q(''),
+                t.swimmers, t.individualEntries, t.relayEntries,
+                t.addedSwimmers, t.addedIndividualEntries, t.addedRelayEntries,
+                t.surcharge.toFixed(2), t.individual.toFixed(2), t.relay.toFixed(2),
+                t.total.toFixed(2), t.addedTotal.toFixed(2)].join(','));
+            return lines.join('\r\n');
+        }
+
         function downloadCsv() {
             if (!report) return;
             const blob = new Blob([toCsv(report)], { type: 'text/csv;charset=utf-8;' });
@@ -272,29 +416,54 @@
             URL.revokeObjectURL(url);
         }
 
-        async function handleFile(file) {
+        async function readMeetText(file) {
+            return file.name.toLowerCase().endsWith('.zip') ? await extractSdifFromZip(file) : await file.text();
+        }
+
+        // Reads whichever files are present: the seeding file alone → per-team
+        // fees; seeding + post-meet → a billable comparison.
+        async function runReport() {
             const meetKey = $('meet-select').value;
+            const seedFile = $('file-upload').files?.[0];
+            const finalFile = $('file-upload-2').files?.[0];
+            if (!seedFile) return;
             if (!meetKey) { showToast('Please select a meet first.', 'warning'); return; }
             $('parse-status').textContent = '';
             try {
-                const text = file.name.toLowerCase().endsWith('.zip')
-                    ? await extractSdifFromZip(file)
-                    : await file.text();
-                if (text == null) return;
-                const teams = summarizeByTeam(text, { filename: file.name });
-                if (teams.length === 0) {
-                    showToast('No team entries found in that file.', 'error', 6000);
+                const seedText = await readMeetText(seedFile);
+                if (seedText == null) return;
+                const seededTeams = summarizeByTeam(seedText, { filename: seedFile.name });
+                if (seededTeams.length === 0) {
+                    showToast('No team entries found in the entries (seeding) file.', 'error', 6000);
                     return;
                 }
-                report = buildReport(teams, meetKey);
-                renderReport(report);
+
+                if (finalFile) {
+                    const finalText = await readMeetText(finalFile);
+                    if (finalText == null) return;
+                    const finalTeams = summarizeByTeam(finalText, { filename: finalFile.name });
+                    if (finalTeams.length === 0) {
+                        showToast('No team entries found in the post-meet file.', 'error', 6000);
+                        return;
+                    }
+                    report = buildCompareReport(mergeTeamCounts(seededTeams, finalTeams), meetKey);
+                    renderCompareReport(report);
+                    $('parse-status').className = 'text-xs mt-2 text-green-700';
+                    $('parse-status').textContent =
+                        `Compared ${report.rows.length} teams. Billable total: ${formatUsd(report.totals.total)} `
+                        + `(incl. ${formatUsd(report.totals.addedTotal)} in deck-added swims).`;
+                    showToast(`Comparison ready — ${report.rows.length} teams.`, 'success');
+                } else {
+                    report = buildReport(seededTeams, meetKey);
+                    renderReport(report);
+                    $('parse-status').className = 'text-xs mt-2 text-green-700';
+                    $('parse-status').textContent =
+                        `Parsed ${seededTeams.length} teams. Grand total: ${formatUsd(report.totals.total)}.`;
+                    showToast(`Report ready — ${seededTeams.length} teams.`, 'success');
+                }
                 $('export-btn').classList.remove('hidden');
                 $('print-btn').classList.remove('hidden');
-                $('parse-status').className = 'text-xs mt-2 text-green-700';
-                $('parse-status').textContent =
-                    `Parsed ${teams.length} teams. Grand total: ${formatUsd(report.totals.total)}.`;
                 $('report').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                showToast(`Report ready — ${teams.length} teams.`, 'success');
             } catch (err) {
                 $('parse-status').className = 'text-xs mt-2 text-red-700';
                 $('parse-status').textContent = `Could not parse this file: ${err.message}`;
@@ -306,13 +475,16 @@
             dropzone: $('file-dropzone'), input: $('file-upload'), prompt: $('file-prompt'),
             nameLabel: $('file-name'), iconEmpty: $('file-icon-empty'), iconSelected: $('file-icon-selected'),
             accepted: 'Accepted: .hy3, .sd3, or .zip',
-            onFile: handleFile,
+            onFile: runReport,
         });
-        // If a file is already chosen and the meet changes, re-run the report.
-        $('meet-select').addEventListener('change', () => {
-            const file = $('file-upload').files?.[0];
-            if (file) handleFile(file);
+        wireDropzone({
+            dropzone: $('file-dropzone-2'), input: $('file-upload-2'), prompt: $('file-prompt-2'),
+            nameLabel: $('file-name-2'), iconEmpty: $('file-icon-empty-2'), iconSelected: $('file-icon-selected-2'),
+            accepted: 'Adds deck entries to the bill',
+            onFile: runReport,
         });
+        // If files are already chosen and the meet changes, re-run the report.
+        $('meet-select').addEventListener('change', runReport);
         $('export-btn').addEventListener('click', downloadCsv);
         $('print-btn').addEventListener('click', () => window.print());
     </script>
