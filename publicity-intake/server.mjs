@@ -88,8 +88,9 @@ app.use((req, res, next) => {
             "font-src https://fonts.gstatic.com",
             // JSZip (cdnjs) reads the .sd3 out of a Meet Maestro .zip for the
             // client-side preview; swimparse is served same-origin ('self').
-            "script-src 'self' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
-            "connect-src 'self'",
+            "script-src 'self' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://citadel.dadalorian.com",
+            // Umami loads its script from — and POSTs pageview beacons back to — citadel.
+            "connect-src 'self' https://citadel.dadalorian.com",
             "form-action 'self'",
             "base-uri 'none'",
             "frame-ancestors 'none'"
