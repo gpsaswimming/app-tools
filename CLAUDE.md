@@ -96,7 +96,7 @@ Brand colors:
 ## What NOT to Do
 
 - Do not add a local `css/` folder — use the absolute URL to `css.gpsaswimming.org`
-- Do not add HY3 support to the publicity tool (SDIF only — see monolith DOCUMENTATION.md for rationale). **Exception:** `entry-fees-report.html` (the treasurer's per-team fee report) accepts `.hy3` because the league's *merged* entries file is Hy-Tek-native; the single-team tools (`publicity.html`, `entry-summary.html`) stay SDIF-only.
+- Do not add HY3 support to the publicity tool (SDIF only — see monolith DOCUMENTATION.md for rationale). **Exception:** `entry-fees-report.html` (the treasurer's per-team fee report) is **`.hy3`-only, both files** — the league's *merged* invitational entries file is only exportable from Meet Manager as Hy-Tek. Do not re-add `.sd3` there: HY3 stores a middle name as a single initial while SDIF carries the full string, so the same swimmer parses to two different names across formats, and the two-file comparison then bills that swimmer twice (measured at 76% of deck-add dollars on the 2026 City Meet). The single-team tools (`publicity.html`, `entry-summary.html`) stay SDIF-only.
 - Do not add regularly-updated content (meet results) here — that belongs in the `results` repo
 - Do not commit `node_modules/` or raw SDIF files (`.sd3`, `.zip`)
 - Do not commit `publicity-intake/.env` (holds `N8N_WEBHOOK_URL`) — it's gitignored; use `.env.example` as the template

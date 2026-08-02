@@ -29,6 +29,45 @@
         #report tbody tr.total-row { background: #fff !important; }
         #report th, #report td { padding: 8px 10px; }
         #report .num { text-align: right; font-variant-numeric: tabular-nums; }
+        /* ---- Addendum: a statement of account, not a data dump. The money is the
+           hierarchy; names and events are the supporting evidence. ---- */
+        .addendum { margin-top: 2.5rem; }
+
+        .team-block { margin-bottom: 1.75rem; }
+        .team-head {
+            display: flex; align-items: baseline; justify-content: space-between;
+            gap: 1rem; border-bottom: 1px solid #d1d5db; padding-bottom: .3rem; margin-bottom: .5rem;
+        }
+        .team-head h3 { font-size: .95rem; font-weight: 700; color: #002366; }
+        .team-due { text-align: right; white-space: nowrap; }
+        .team-due-label { display: block; font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; }
+        .team-due-amount { font-size: 1.05rem; font-weight: 700; color: #d9242b; font-variant-numeric: tabular-nums; }
+        .team-due.is-zero .team-due-amount { color: #9ca3af; font-weight: 600; }
+
+        table.ledger { width: 100%; border-collapse: collapse; font-size: .8rem; }
+        table.ledger thead th {
+            text-align: left; font-size: .62rem; text-transform: uppercase; letter-spacing: .05em;
+            color: #6b7280; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding: .3rem .5rem; vertical-align: bottom;
+        }
+        table.ledger th.num, table.ledger td.num { text-align: right; font-variant-numeric: tabular-nums; }
+        table.ledger th .rate { display: block; font-weight: 400; text-transform: none; letter-spacing: 0; color: #9ca3af; }
+        table.ledger td { padding: .4rem .5rem; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        .swimmer-name { font-weight: 600; color: #111827; }
+        .swimmer-why { font-size: .68rem; color: #6b7280; margin-top: .1rem; }
+        .events { color: #374151; }
+        .charged-for { font-size: .68rem; color: #d9242b; font-weight: 500; margin-top: .1rem; }
+        .line-total { font-weight: 700; color: #d9242b; }
+        /* No-charge rows stay legible but recede — they exist to answer
+           "why wasn't I charged for this?", not to compete with the money. */
+        tr.no-charge .line-total { font-weight: 500; }
+        tr.no-charge .swimmer-name, tr.no-charge .events { color: #6b7280; font-weight: 500; }
+        table.ledger tfoot td {
+            border-top: 2px solid #002366; border-bottom: none; padding: .4rem .5rem;
+            font-weight: 700; color: #002366; font-size: .82rem;
+        }
+        table.ledger tfoot .foots { color: #d9242b; }
+        /* Identifies a team page once it has been separated from the PDF. Print only. */
+        .team-stamp { display: none; font-size: 7.5px; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; margin-bottom: 4px; }
 
         @media print {
             .no-print, #toast-container { display: none !important; }
@@ -55,7 +94,22 @@
             #report .num { white-space: nowrap; }
             #report tr { break-inside: avoid; }
             #report img { height: 34px !important; width: 34px !important; }
-            @page { margin: 0.4in; }
+            /* Landscape so the full summary table fits page 1 without shrinking. */
+            @page { size: landscape; margin: 0.4in; }
+            /* Page 1 is the invoice; the per-swimmer backup starts on page 2. */
+            .addendum { break-before: page; margin-top: 0 !important; }
+            /* One team per page, so a rep can be handed just their own sheet. The
+               first team starts page 2 via the .addendum break above; every team
+               after it breaks here. */
+            .team-block + .team-block { break-before: page; }
+            .team-block { margin-bottom: 0; }
+            /* Pages get separated and emailed individually, so each one has to
+               say which meet it belongs to. */
+            .team-stamp { display: block !important; }
+            table.ledger { font-size: 8.5px; }
+            table.ledger td, table.ledger thead th { padding: 2px 5px; }
+            .team-head h3, .team-due-amount { font-size: 10px; }
+            .swimmer-why, .charged-for { font-size: 7.5px; }
         }
     </style>
 <!-- Umami analytics (privacy-friendly, no cookies) -->
@@ -78,12 +132,18 @@
             <div class="bg-white rounded-xl shadow-lg p-6 no-print">
                 <p class="text-sm text-gray-600 mb-6">
                     For the treasurer: upload the <strong>merged meet entries file</strong> (Hy-Tek
-                    <code>.hy3</code>, SDIF <code>.sd3</code>, or a <code>.zip</code> of either) to get a
+                    <code>.hy3</code>, or a <code>.zip</code> containing one) to get a
                     per-team breakdown of entry fees, with a grand total and a CSV export for reconciliation.
                     Optionally add a <strong>post-meet file</strong> to bill deck-added swims: the count for
                     each team never drops below its seeding (scratches are not refunded), and additional
                     swims are charged. The files are parsed <strong>entirely in your browser</strong>
                     &mdash; nothing is uploaded and no birthdates leave this page.
+                </p>
+                <p class="text-xs text-gray-600 mb-6 border-l-4 border-gray-300 pl-3">
+                    <strong>Export both files as <code>.hy3</code> from Meet Manager.</strong> SDIF
+                    (<code>.sd3</code>) stores a swimmer's middle name differently, so the same child
+                    reads as two different people across formats &mdash; which bills their events twice.
+                    This tool only accepts <code>.hy3</code> so that can't happen.
                 </p>
 
                 <label for="meet-select" class="block text-sm font-semibold text-gray-800 mb-1">Invitational</label>
@@ -101,9 +161,9 @@
                                 <svg id="file-icon-empty" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 <svg id="file-icon-selected" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <p id="file-prompt" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose a file</span> or drag it here</p>
-                                <p id="file-name" class="text-xs text-gray-500">Accepted: .hy3, .sd3, or .zip</p>
+                                <p id="file-name" class="text-xs text-gray-500">Accepted: .hy3 or .zip</p>
                             </div>
-                            <input id="file-upload" type="file" accept=".hy3,.sd3,.txt,.zip" class="hidden" />
+                            <input id="file-upload" type="file" accept=".hy3,.zip" class="hidden" />
                         </label>
                     </div>
                     <div>
@@ -113,9 +173,9 @@
                                 <svg id="file-icon-empty-2" class="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 <svg id="file-icon-selected-2" class="hidden w-10 h-10 mb-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <p id="file-prompt-2" class="mb-1 text-sm text-gray-500"><span class="font-semibold">Click to choose a file</span> or drag it here</p>
-                                <p id="file-name-2" class="text-xs text-gray-500">Adds deck entries to the bill</p>
+                                <p id="file-name-2" class="text-xs text-gray-500">.hy3 &mdash; adds deck entries to the bill</p>
                             </div>
-                            <input id="file-upload-2" type="file" accept=".hy3,.sd3,.txt,.zip" class="hidden" />
+                            <input id="file-upload-2" type="file" accept=".hy3,.zip" class="hidden" />
                         </label>
                     </div>
                 </div>
@@ -161,7 +221,14 @@
         // state for the current report (used by CSV export)
         let report = null; // { meetKey, meetLabel, rows:[{team, counts, fees}], totals }
 
-        async function extractSdifFromZip(file) {
+        // Hy-Tek .hy3 only, both files. SDIF stores a middle name as a full string
+        // while .hy3 stores a single initial, so the same swimmer reads as two
+        // different people across formats — which double-bills their events.
+        // Accepting one format is what makes that impossible.
+        const WRONG_FORMAT = 'This tool reads Hy-Tek .hy3 files only. Export from Meet Manager as .hy3 — '
+            + 'SDIF (.sd3) spells swimmer names differently, which would double-bill deck entries.';
+
+        async function extractHy3FromZip(file) {
             const maxSize = 512 * 1024; // merged files are larger than a single team's
             if (file.size > maxSize) {
                 showToast(`Zip file is too large (${(file.size / 1024).toFixed(0)}KB). Maximum size is 512KB.`, 'error', 6000);
@@ -170,17 +237,18 @@
             try {
                 const zip = await JSZip.loadAsync(file);
                 const found = [];
+                let sawOtherMeetFile = false;
                 zip.forEach((path, entry) => {
+                    if (entry.dir) return;
                     const n = path.toLowerCase();
-                    if ((n.endsWith('.hy3') || n.endsWith('.sd3') || n.endsWith('.txt')) && !entry.dir) {
-                        found.push({ name: path, entry });
-                    }
+                    if (n.endsWith('.hy3')) found.push({ name: path, entry });
+                    else if (n.endsWith('.sd3') || n.endsWith('.txt')) sawOtherMeetFile = true;
                 });
                 if (found.length === 0) {
-                    showToast('No meet file (.hy3 / .sd3 / .txt) found in the zip archive.', 'error', 6000);
+                    showToast(sawOtherMeetFile ? WRONG_FORMAT : 'No .hy3 file found in the zip archive.', 'error', 8000);
                     return null;
                 }
-                if (found.length > 1) showToast(`Found ${found.length} files in the zip. Using: ${found[0].name}`, 'info', 6000);
+                if (found.length > 1) showToast(`Found ${found.length} .hy3 files in the zip. Using: ${found[0].name}`, 'info', 6000);
                 return await found[0].entry.async('text');
             } catch (err) {
                 showToast(`Failed to read zip file: ${err.message}`, 'error', 6000);
@@ -219,15 +287,31 @@
         // seededTotal + addedTotal = total.
         function buildCompareReport(mergedRows, meetKey) {
             const meetLabel = MEETS[meetKey].label;
+            const rate = MEETS[meetKey];
+            const newSet = (m) => new Set(m.detail.newSwimmers);
             const rows = mergedRows.map((m) => {
                 const billFees = computeFees(m.billable, meetKey);
                 const by = Object.fromEntries(billFees.lines.map((l) => [l.label, l.amount]));
+                // Price each addendum line: a surcharge only for genuinely new
+                // swimmers, plus the fee for their net-new events.
+                const isNew = newSet(m);
+                const ledger = m.detail.swimmers.map((d) => {
+                    const surcharge = isNew.has(d.name) ? rate.swimmerSurcharge : 0;
+                    const eventFees = d.addedCharged * rate.individualEntry;
+                    return { ...d, surcharge, eventFees, lineTotal: surcharge + eventFees };
+                });
+                const relayFees = m.detail.addedRelays.length * rate.relayEntry;
                 return {
+                    ledger,
+                    relayFees,
+                    ledgerSurcharge: ledger.reduce((n, d) => n + d.surcharge, 0),
+                    ledgerEventFees: ledger.reduce((n, d) => n + d.eventFees, 0),
                     teamName: m.teamName,
                     teamCode: m.teamCode,
                     seeded: m.seeded,
                     added: m.added,
                     billable: m.billable,
+                    detail: m.detail,
                     surcharge: by['Swimmer surcharge'],
                     individual: by['Individual events'],
                     relay: by['Relay events'],
@@ -307,6 +391,97 @@
             $('report').classList.add('ready');
         }
 
+        // Addendum (page 2+): the named swimmers and events behind each team's
+        // deck-add charge, so a rep can reconcile without calling the treasurer.
+        const NOTE = {
+            new: 'New swimmer at the meet',
+            added: 'Swam an event they were not seeded in',
+            scratched: 'Did not swim &mdash; seeding kept, not refunded',
+            reduced: 'Swam fewer events &mdash; seeding kept, not refunded',
+            swapped: 'Moved their own entry &mdash; no charge',
+        };
+
+        function renderAddendum(rep, meetKey) {
+            const rate = MEETS[meetKey];
+            const stamped = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const money = (amt) => (amt ? formatUsd(amt) : '<span class="text-gray-300">&mdash;</span>');
+            const changed = rep.rows.filter((r) => r.ledger.length || r.detail.addedRelays.length);
+            // Nothing changed anywhere — page 1 already shows an em-dash in Deck
+            // Adds for every team, so an addendum would just be a blank page.
+            if (!changed.length) return '';
+
+            const blocks = changed.map((r) => {
+                const rows = r.ledger.map((d) => {
+                    const swam = d.relayOnly ? 'Relay legs only'
+                        : d.finalEvents.length ? d.finalEvents.join(', ')
+                        : 'Did not swim';
+                    // Only the events that drove a charge are called out in red.
+                    const charge = d.gainedEvents.length && d.addedCharged
+                        ? `<div class="charged-for">Charged for: ${escapeHtml(d.gainedEvents.slice(0, d.addedCharged).join(', '))}</div>`
+                        : '';
+                    return `<tr class="${d.lineTotal ? '' : 'no-charge'}">
+                        <td class="swimmer">
+                            <div class="swimmer-name">${escapeHtml(d.name)}</div>
+                            <div class="swimmer-why">${NOTE[d.status]}</div>
+                        </td>
+                        <td class="events">
+                            <div>${escapeHtml(swam)}</div>
+                            ${charge}
+                        </td>
+                        <td class="num">${money(d.surcharge)}</td>
+                        <td class="num">${money(d.eventFees)}</td>
+                        <td class="num line-total">${d.lineTotal ? formatUsd(d.lineTotal) : '<span class="text-gray-400">no charge</span>'}</td>
+                    </tr>`;
+                }).join('');
+
+                const relayRow = r.detail.addedRelays.length ? `<tr>
+                        <td class="swimmer">
+                            <div class="swimmer-name">Deck-entered relays</div>
+                            <div class="swimmer-why">${r.detail.addedRelays.length} relay${r.detail.addedRelays.length === 1 ? '' : 's'} not in the seeding file</div>
+                        </td>
+                        <td class="events"><div>${escapeHtml(r.detail.addedRelays.join(', '))}</div></td>
+                        <td class="num">${money(0)}</td>
+                        <td class="num">${money(r.relayFees)}</td>
+                        <td class="num line-total">${r.relayFees ? formatUsd(r.relayFees) : '<span class="text-gray-400">no charge</span>'}</td>
+                    </tr>` : '';
+
+                return `<div class="team-block">
+                    <div class="team-stamp">${escapeHtml(rep.meetLabel)} &middot; Deck changes &middot; ${escapeHtml(stamped)}</div>
+                    <div class="team-head">
+                        <h3>${escapeHtml(r.teamName)}</h3>
+                        <div class="team-due ${r.addedTotal ? '' : 'is-zero'}">
+                            <span class="team-due-label">Added to this team's bill</span>
+                            <span class="team-due-amount">${r.addedTotal ? formatUsd(r.addedTotal) : 'Nothing'}</span>
+                        </div>
+                    </div>
+                    <table class="ledger">
+                        <thead>
+                            <tr>
+                                <th>Swimmer</th>
+                                <th>What they swam</th>
+                                <th class="num">Surcharge<span class="rate">${formatUsd(rate.swimmerSurcharge)} ea.</span></th>
+                                <th class="num">Event fees<span class="rate">${formatUsd(rate.individualEntry)} ea.</span></th>
+                                <th class="num">Line total</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}${relayRow}</tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2">Deck adds &mdash; ${escapeHtml(r.teamName)}</td>
+                                <td class="num">${money(r.ledgerSurcharge)}</td>
+                                <td class="num">${money(r.ledgerEventFees + r.relayFees)}</td>
+                                <td class="num foots">${formatUsd(r.addedTotal)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>`;
+            }).join('');
+
+            // No section heading or preamble: each team is a standalone sheet that
+            // gets separated from the PDF and sent to that team's rep.
+            return `<section class="addendum">${blocks}</section>`;
+        }
+
         function renderCompareReport(rep) {
             const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             // Counts read as "seeded +deck-added"; money reads left-to-right as
@@ -336,7 +511,7 @@
                     </div>
                     <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams &middot; v${VERSION}</div>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto summary">
                 <table class="w-full text-sm border-collapse">
                     <thead>
                         <tr class="text-left text-xs uppercase text-gray-500 border-b border-gray-200">
@@ -368,7 +543,9 @@
                     supplemental for swimmers and swims added after seeding, and <strong>Total Due</strong> is the sum of the two.
                     Scratches are not refunded, and a swimmer moving their own entry to a different event is a wash
                     &mdash; only genuinely new swimmers and net-new swims are charged.
-                </p>`;
+                    Per-swimmer backup for every change is in the addendum.
+                </p>
+                ${renderAddendum(rep, rep.meetKey)}`;
             $('report').classList.add('ready');
         }
 
@@ -435,8 +612,16 @@
             URL.revokeObjectURL(url);
         }
 
+        // The accept attribute is only a picker filter — a dragged file bypasses
+        // it, so the format is enforced here.
         async function readMeetText(file) {
-            return file.name.toLowerCase().endsWith('.zip') ? await extractSdifFromZip(file) : await file.text();
+            const n = file.name.toLowerCase();
+            if (n.endsWith('.zip')) return await extractHy3FromZip(file);
+            if (!n.endsWith('.hy3')) {
+                showToast(WRONG_FORMAT, 'error', 8000);
+                return null;
+            }
+            return await file.text();
         }
 
         // Reads whichever files are present: the seeding file alone → per-team
@@ -450,11 +635,11 @@
             $('parse-status').textContent = '';
             try {
                 const seedText = await readMeetText(seedFile);
-                if (seedText == null) return;
+                if (seedText == null) { $('file-upload').value = ''; seedZone.reset(); return; }
 
                 if (finalFile) {
                     const finalText = await readMeetText(finalFile);
-                    if (finalText == null) return;
+                    if (finalText == null) { $('file-upload-2').value = ''; finalZone.reset(); return; }
                     const seededBillables = collectBillables(seedText, { filename: seedFile.name });
                     const finalBillables = collectBillables(finalText, { filename: finalFile.name });
                     if (seededBillables.size === 0 || finalBillables.size === 0) {
@@ -491,16 +676,16 @@
             }
         }
 
-        wireDropzone({
+        const seedZone = wireDropzone({
             dropzone: $('file-dropzone'), input: $('file-upload'), prompt: $('file-prompt'),
             nameLabel: $('file-name'), iconEmpty: $('file-icon-empty'), iconSelected: $('file-icon-selected'),
-            accepted: 'Accepted: .hy3, .sd3, or .zip',
+            accepted: 'Accepted: .hy3 or .zip',
             onFile: runReport,
         });
-        wireDropzone({
+        const finalZone = wireDropzone({
             dropzone: $('file-dropzone-2'), input: $('file-upload-2'), prompt: $('file-prompt-2'),
             nameLabel: $('file-name-2'), iconEmpty: $('file-icon-empty-2'), iconSelected: $('file-icon-selected-2'),
-            accepted: 'Adds deck entries to the bill',
+            accepted: '.hy3 — adds deck entries to the bill',
             onFile: runReport,
         });
         // If files are already chosen and the meet changes, re-run the report.
