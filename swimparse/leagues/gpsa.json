@@ -32,7 +32,7 @@
     { "code": "WO" },
     { "code": "WPPIR", "aliases": ["WPPI"] },
     { "code": "WW" },
-    { "code": "WYCC" },
+    { "code": "WYCC", "name": "Warwick Yacht Sea Turtles" },
     { "code": "WYTH", "name": "Wythe Wahoos", "aliases": ["GWRA", "WYTHE"] }
   ]
 }

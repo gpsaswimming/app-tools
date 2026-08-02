@@ -99,7 +99,7 @@ export const GPSA = {
         { code: 'WO' },                             // Willow Oaks
         { code: 'WPPIR', aliases: ['WPPI'] },       // Windy Point
         { code: 'WW' },                             // Wendwood
-        { code: 'WYCC' },                           // Warwick Yacht
+        { code: 'WYCC', name: 'Warwick Yacht Sea Turtles' }, // Warwick Yacht (files carry "WYCC Sea Turtles")
         { code: 'WYTH', name: 'Wythe Wahoos', aliases: ['GWRA', 'WYTHE'] }, // Wythe (re-brand; was GWRA)
     ],
 };
