@@ -214,7 +214,9 @@
         }
 
         // Two-file comparison: bill = max(seeding, post-meet) per metric, so
-        // scratches never reduce the bill and deck adds are charged.
+        // scratches never reduce the bill and deck adds are charged. Because
+        // billable = seeded + added for every metric, the money reconciles as
+        // seededTotal + addedTotal = total.
         function buildCompareReport(mergedRows, meetKey) {
             const meetLabel = MEETS[meetKey].label;
             const rows = mergedRows.map((m) => {
@@ -223,28 +225,31 @@
                 return {
                     teamName: m.teamName,
                     teamCode: m.teamCode,
-                    billable: m.billable,
+                    seeded: m.seeded,
                     added: m.added,
+                    billable: m.billable,
                     surcharge: by['Swimmer surcharge'],
                     individual: by['Individual events'],
                     relay: by['Relay events'],
-                    total: billFees.total,
+                    seededTotal: computeFees(m.seeded, meetKey).total,
                     addedTotal: computeFees(m.added, meetKey).total,
+                    total: billFees.total,
                 };
             });
             const totals = rows.reduce((a, r) => ({
-                swimmers: a.swimmers + r.billable.swimmers,
-                individualEntries: a.individualEntries + r.billable.individualEntries,
-                relayEntries: a.relayEntries + r.billable.relayEntries,
+                swimmers: a.swimmers + r.seeded.swimmers,
+                individualEntries: a.individualEntries + r.seeded.individualEntries,
+                relayEntries: a.relayEntries + r.seeded.relayEntries,
                 addedSwimmers: a.addedSwimmers + r.added.swimmers,
                 addedIndividualEntries: a.addedIndividualEntries + r.added.individualEntries,
                 addedRelayEntries: a.addedRelayEntries + r.added.relayEntries,
                 surcharge: a.surcharge + r.surcharge,
                 individual: a.individual + r.individual,
                 relay: a.relay + r.relay,
-                total: a.total + r.total,
+                seededTotal: a.seededTotal + r.seededTotal,
                 addedTotal: a.addedTotal + r.addedTotal,
-            }), { swimmers: 0, individualEntries: 0, relayEntries: 0, addedSwimmers: 0, addedIndividualEntries: 0, addedRelayEntries: 0, surcharge: 0, individual: 0, relay: 0, total: 0, addedTotal: 0 });
+                total: a.total + r.total,
+            }), { swimmers: 0, individualEntries: 0, relayEntries: 0, addedSwimmers: 0, addedIndividualEntries: 0, addedRelayEntries: 0, surcharge: 0, individual: 0, relay: 0, seededTotal: 0, addedTotal: 0, total: 0 });
             return { mode: 'compare', meetKey, meetLabel, rows, totals };
         }
 
@@ -304,20 +309,21 @@
 
         function renderCompareReport(rep) {
             const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            // Show the billable count, annotating any deck-added amount in red.
-            const cell = (val, add) => `${val}${add ? ` <span class="text-red-600 font-normal text-xs">+${add}</span>` : ''}`;
-            const feeCell = (amt) => `<td class="num ${amt ? 'text-red-600 font-semibold' : 'text-gray-400'}">${formatUsd(amt)}</td>`;
+            // Counts read as "seeded +deck-added"; money reads left-to-right as
+            // original + adds = due.
+            const cell = (seed, add) => `${seed}${add ? ` <span class="text-red-600 font-normal text-xs">+${add}</span>` : ''}`;
+            const addFee = (amt) => amt
+                ? `<span class="text-red-600 font-semibold">+${formatUsd(amt)}</span>`
+                : '<span class="text-gray-300">&mdash;</span>';
             const body = rep.rows.map((r) => `
                 <tr>
                     <td class="font-medium text-gray-900">${escapeHtml(r.teamName)}</td>
-                    <td class="num">${cell(r.billable.swimmers, r.added.swimmers)}</td>
-                    <td class="num">${cell(r.billable.individualEntries, r.added.individualEntries)}</td>
-                    <td class="num">${cell(r.billable.relayEntries, r.added.relayEntries)}</td>
-                    <td class="num">${formatUsd(r.surcharge)}</td>
-                    <td class="num">${formatUsd(r.individual)}</td>
-                    <td class="num">${formatUsd(r.relay)}</td>
+                    <td class="num">${cell(r.seeded.swimmers, r.added.swimmers)}</td>
+                    <td class="num">${cell(r.seeded.individualEntries, r.added.individualEntries)}</td>
+                    <td class="num">${cell(r.seeded.relayEntries, r.added.relayEntries)}</td>
+                    <td class="num text-gray-600">${formatUsd(r.seededTotal)}</td>
+                    <td class="num">${addFee(r.addedTotal)}</td>
                     <td class="num font-semibold">${formatUsd(r.total)}</td>
-                    ${feeCell(r.addedTotal)}
                 </tr>`).join('');
             const t = rep.totals;
             $('report').innerHTML = `
@@ -326,7 +332,7 @@
                     <div>
                         <div class="text-xs uppercase tracking-wide text-gray-500">Greater Peninsula Swimming Association</div>
                         <div class="text-xl font-bold accent-navy">${escapeHtml(rep.meetLabel)} &mdash; Entry Fees by Team</div>
-                        <div class="text-xs text-gray-500 mt-0.5">Seeding + deck-added swims &middot; scratches not refunded</div>
+                        <div class="text-xs text-gray-500 mt-0.5">Seeded entries + deck adds &middot; scratches not refunded</div>
                     </div>
                     <div class="ml-auto text-xs text-gray-500">${escapeHtml(today)} &middot; ${rep.rows.length} teams &middot; v${VERSION}</div>
                 </div>
@@ -338,11 +344,9 @@
                             <th class="num">Swimmers</th>
                             <th class="num">Ind. Events</th>
                             <th class="num">Relays</th>
-                            <th class="num">Surcharge</th>
-                            <th class="num">Ind. Fees</th>
-                            <th class="num">Relay Fees</th>
-                            <th class="num">Total</th>
-                            <th class="num">Added Fees</th>
+                            <th class="num">Original</th>
+                            <th class="num">Deck Adds</th>
+                            <th class="num">Total Due</th>
                         </tr>
                     </thead>
                     <tbody>${body}
@@ -351,20 +355,19 @@
                             <td class="num">${cell(t.swimmers, t.addedSwimmers)}</td>
                             <td class="num">${cell(t.individualEntries, t.addedIndividualEntries)}</td>
                             <td class="num">${cell(t.relayEntries, t.addedRelayEntries)}</td>
-                            <td class="num">${formatUsd(t.surcharge)}</td>
-                            <td class="num">${formatUsd(t.individual)}</td>
-                            <td class="num">${formatUsd(t.relay)}</td>
+                            <td class="num text-gray-600">${formatUsd(t.seededTotal)}</td>
+                            <td class="num">${addFee(t.addedTotal)}</td>
                             <td class="num text-lg">${formatUsd(t.total)}</td>
-                            <td class="num text-lg ${t.addedTotal ? 'text-red-600' : 'text-gray-400'}">${formatUsd(t.addedTotal)}</td>
                         </tr>
                     </tbody>
                 </table>
                 </div>
                 <p class="text-xs text-gray-500 mt-3">
-                    <strong>Total</strong> is the full billable amount (seeding, never reduced by scratches).
-                    <strong>Added Fees</strong> is the supplemental owed for swimmers and swims added after
-                    seeding. A swimmer moving their own entry to a different event is a wash &mdash; only
-                    genuinely new swimmers and net-new swims are charged.
+                    Counts show the <strong>seeded</strong> number, with any <span class="text-red-600 font-semibold">+deck adds</span> beside it.
+                    <strong>Original</strong> is the fee owed from the seeding file, <strong>Deck Adds</strong> is the
+                    supplemental for swimmers and swims added after seeding, and <strong>Total Due</strong> is the sum of the two.
+                    Scratches are not refunded, and a swimmer moving their own entry to a different event is a wash
+                    &mdash; only genuinely new swimmers and net-new swims are charged.
                 </p>`;
             $('report').classList.add('ready');
         }
@@ -391,25 +394,31 @@
         function compareToCsv(rep) {
             const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
             const header = ['Team', 'Team Code',
-                'Swimmers (billable)', 'Ind. Events (billable)', 'Relays (billable)',
+                'Swimmers (seeded)', 'Ind. Events (seeded)', 'Relays (seeded)',
                 'Added Swimmers', 'Added Ind. Events', 'Added Relays',
-                'Swimmer Surcharge', 'Individual Fees', 'Relay Fees', 'Total', 'Added Fees'];
+                'Swimmers (billable)', 'Ind. Events (billable)', 'Relays (billable)',
+                'Swimmer Surcharge', 'Individual Fees', 'Relay Fees',
+                'Original Fees', 'Deck Add Fees', 'Total Due'];
             const lines = [header.map(q).join(',')];
             for (const r of rep.rows) {
                 lines.push([
                     q(r.teamName), q(r.teamCode),
-                    r.billable.swimmers, r.billable.individualEntries, r.billable.relayEntries,
+                    r.seeded.swimmers, r.seeded.individualEntries, r.seeded.relayEntries,
                     r.added.swimmers, r.added.individualEntries, r.added.relayEntries,
+                    r.billable.swimmers, r.billable.individualEntries, r.billable.relayEntries,
                     r.surcharge.toFixed(2), r.individual.toFixed(2), r.relay.toFixed(2),
-                    r.total.toFixed(2), r.addedTotal.toFixed(2),
+                    r.seededTotal.toFixed(2), r.addedTotal.toFixed(2), r.total.toFixed(2),
                 ].join(','));
             }
             const t = rep.totals;
             lines.push([q('TOTAL'), q(''),
                 t.swimmers, t.individualEntries, t.relayEntries,
                 t.addedSwimmers, t.addedIndividualEntries, t.addedRelayEntries,
+                t.swimmers + t.addedSwimmers,
+                t.individualEntries + t.addedIndividualEntries,
+                t.relayEntries + t.addedRelayEntries,
                 t.surcharge.toFixed(2), t.individual.toFixed(2), t.relay.toFixed(2),
-                t.total.toFixed(2), t.addedTotal.toFixed(2)].join(','));
+                t.seededTotal.toFixed(2), t.addedTotal.toFixed(2), t.total.toFixed(2)].join(','));
             return lines.join('\r\n');
         }
 
@@ -456,8 +465,8 @@
                     renderCompareReport(report);
                     $('parse-status').className = 'text-xs mt-2 text-green-700';
                     $('parse-status').textContent =
-                        `Compared ${report.rows.length} teams. Billable total: ${formatUsd(report.totals.total)} `
-                        + `(incl. ${formatUsd(report.totals.addedTotal)} in deck-added swims).`;
+                        `Compared ${report.rows.length} teams. Original ${formatUsd(report.totals.seededTotal)} `
+                        + `+ ${formatUsd(report.totals.addedTotal)} deck adds = ${formatUsd(report.totals.total)} due.`;
                     showToast(`Comparison ready — ${report.rows.length} teams.`, 'success');
                 } else {
                     const seededTeams = summarizeByTeam(seedText, { filename: seedFile.name });
